@@ -1,0 +1,21 @@
+# meta — stack-{{TECH_SLUG}}
+
+| Campo | Valor |
+|-------|--------|
+| tech_name | {{TECH_NAME}} |
+| tech_slug | {{TECH_SLUG}} |
+| stack_role | {{STACK_ROLE}} |
+| last_verified | {{ISO_DATETIME}} |
+| ttl_days | 30 |
+| status | fresh \| stale \| fetch-failed |
+| last_attempt | {{ISO_DATETIME}} |
+
+## URLs verificadas
+
+| url | claim_soportado | deprecations |
+|-----|-----------------|--------------|
+| | | |
+
+## Notas de refresh
+
+- 

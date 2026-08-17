@@ -1,0 +1,46 @@
+---
+name: stack-{{TECH_SLUG}}
+description: >-
+  Project stack expert for {{TECH_NAME}}. Use when implementing features with
+  {{TECH_NAME}}, configuring {{TECH_NAME}}, or when hu-implementer codes against
+  this project's stack.md entry for {{TECH_NAME}}.
+---
+
+# Stack expert — {{TECH_NAME}}
+
+Skill **de proyecto** (no global). Fuente: docs oficiales verificadas en `last_verified`.
+Verify with official docs via WebSearch/WebFetch before recommending; record sources.
+
+## Rol en este proyecto
+
+- Entrada en `02-arquitectura/stack.md`: {{STACK_ROLE}}
+- Canal/versión documentada el día de verificación: {{VERSION_CHANNEL}}
+- Relación con otros componentes: {{RELATED}}
+
+## Patrones vigentes (docs del día)
+
+1. 
+2. 
+
+## Do
+
+- 
+
+## Don't / deprecations
+
+- 
+
+## Testing / calidad (si aplica)
+
+- 
+
+## Gotchas del proyecto
+
+- Respetar overview/NFRs en `02-arquitectura/`
+- No añadir deps fuera de stack.md sin AskQuestion (`impl-decision-gate`)
+
+## Fuentes oficiales
+
+Ver `meta.md` y `02-arquitectura/sources-ledger.md`.
+
+Si `meta.md` está stale → invocar `stack-skills-updater` o re-fetch antes de confiar en APIs sensibles.

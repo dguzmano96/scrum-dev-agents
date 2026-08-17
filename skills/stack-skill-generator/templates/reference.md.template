@@ -1,0 +1,13 @@
+# Reference — {{TECH_NAME}}
+
+## Snippets / convenciones (solo patrones estables documentados)
+
+```text
+(pegar ejemplos cortos desde docs oficiales; citar URL)
+```
+
+## Checklist implementación
+
+- [ ] API usada no aparece como deprecated en docs fetchadas
+- [ ] Alineado a stack.md
+- [ ] Secrets vía env/config del proyecto

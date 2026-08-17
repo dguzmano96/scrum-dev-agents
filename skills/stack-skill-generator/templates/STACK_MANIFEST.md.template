@@ -1,0 +1,19 @@
+# STACK_MANIFEST — skills expertos del stack
+
+Proyecto: {{PROYECTO}}  
+TTL default (días): 30  
+Generado/actualizado: {{ISO_DATETIME}}
+
+| tech_slug | rol | path | last_verified | status | notes |
+|-----------|-----|------|---------------|--------|-------|
+| | | `.cursor/skills/stack-.../` | | fresh/stale/missing | |
+
+## Cómo refrescar
+
+- Manual: `actualizar skills del stack`
+- Async: `/loop 1d Ejecuta stack-skills-updater en proyecto {{PROYECTO}}`
+- Skill global: `stack-skills-updater`
+
+## Regla
+
+hu-implementer debe leer este manifest en I1 y cargar skills `stack-*` relevantes a la HU.

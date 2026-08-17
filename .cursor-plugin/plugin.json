@@ -1,0 +1,21 @@
+{
+  "name": "scrum-dev-agents",
+  "displayName": "Scrum Dev Agents",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": {
+    "name": "Diego Guzman"
+  },
+  "description": "Cursor agents and skills for Scrum product discovery, INVEST user stories, HU-by-HU implementation, architecture briefs, solution debate, and skeptical verification. Spanish-first.",
+  "keywords": [
+    "scrum",
+    "cursor",
+    "agents",
+    "user-stories",
+    "architecture",
+    "spanish"
+  ],
+  "agents": "./agents/",
+  "skills": "./skills/",
+  "repository": "https://github.com/dguzmano96/scrum-dev-agents"
+}
