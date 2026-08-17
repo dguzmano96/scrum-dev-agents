@@ -1,14 +1,14 @@
 # Agentes de primera línea
 
-Estos son los agentes con los que **hablas directamente en el chat** de Cursor. Cada uno orquesta skills y subagentes internos; no necesitas invocar los internos salvo casos especiales.
+Estos son los **agentes que tú llamas en el chat** de Cursor. Cada uno orquesta skills y otros agentes por detrás; en el día a día no necesitas invocar a los que trabajan en segundo plano.
 
-> **Documentación ampliada:** el [README](../README.md) incluye guía por agente (qué hace / qué no / prompts / entregables), flujos greenfield/brownfield y la sección **Plus del pack** (stack skills, freshness, quality gate, craft gate, OPP-*, etc.).
+> **Guía principal:** el [README](../README.md) explica instalación, recetas típicas (app nueva vs app existente), los 8 especialistas con prompts copiables, y por qué el pack no es “otro chatbot” (skills de tu stack, docs al día, verificación escéptica, tarjetas de mejora, etc.).
 
 ## Mapa de agentes
 
 ```mermaid
 flowchart TB
-    subgraph primera_linea["Primera línea (hablas con ellos)"]
+    subgraph primera_linea["Tú los llamas en el chat"]
         scrum["agent-scrum"]
         evolucion["agent-evolucion"]
         ideador["agent-investigador-ideador"]
@@ -19,7 +19,7 @@ flowchart TB
         refactor["agent-refactor-malas-practicas"]
     end
 
-    subgraph internos["Internos (orquestados)"]
+    subgraph internos["Otros agentes los llaman solos"]
         arq["agent-arquitecto-hu"]
         scout["agent-research-scout"]
         adv["agent-debate-advocate"]
@@ -53,7 +53,7 @@ flowchart TB
     style fit stroke-dasharray: 5 5
 ```
 
-**Línea sólida** = primera línea. **Línea punteada** = internos (el orquestador los lanza; tú no tienes que llamarlos).
+**Línea sólida** = los que tú invocas. **Línea punteada** = los que el orquestador lanza por ti.
 
 ---
 
@@ -61,26 +61,26 @@ flowchart TB
 
 | Agent | Cuándo usarlo | Qué hace |
 |-------|---------------|----------|
-| **agent-scrum** | Idea nueva, producto greenfield | Discovery guiado → épicas MoSCoW → HU INVEST (AC + BDD) → arquitectura → stack. No codea. |
-| **agent-evolucion** | Producto existente (brownfield) | Inventario as-is → brecha → backlog **delta** (épicas/HU nuevas). No codea. |
-| **agent-investigador-ideador** | "¿Cómo implementar X?", comparar enfoques | Escanea repo, investiga con web, debate opciones, entrega reporte (#1 + #2). Readonly. |
-| **agent-implementador** | Una sola HU | Pipeline I0–I9: craft gate, arch-brief, plan, código en slices, evidencia AC/BDD. |
-| **agent-implementador-epicas** | Toda una épica | Orquesta HU por HU vía subagentes implementador; build+test tras cada HU. |
-| **agent-verificador** | Tras implementación o antes de marcar done | Escéptico: tests, AC Must, craft gate. Veredicto PASS/FAIL con evidencia. Readonly. |
-| **agent-auditor-oportunidades** | Health check, pre-release, deuda | Audita NFR, tests, deps/CVE, craft → fichas OPP-* priorizadas. No codea. |
+| **agent-scrum** | Idea nueva, producto desde cero | Discovery guiado → épicas → HU bien escritas (criterios de aceptación + escenarios Given/When/Then por separado) → arquitectura → stack. No codea. |
+| **agent-evolucion** | Producto existente | Inventario de lo que hay → brecha del cambio → backlog **solo con lo nuevo** (épicas/HU nuevas o que reemplazan). No codea. |
+| **agent-investigador-ideador** | "¿Cómo implementar X?", comparar enfoques | Escanea repo, investiga con web, debate opciones, entrega reporte (#1 + #2). Solo lectura. |
+| **agent-implementador** | Una sola HU | Chequeo de diseño → briefing arquitectónico → plan → código en trozos → evidencia de criterios de aceptación. |
+| **agent-implementador-epicas** | Toda una épica | Coordina una HU tras otra vía subagentes; build+test tras cada una. |
+| **agent-verificador** | Tras implementación o antes de marcar done | Escéptico: tests, criterios obligatorios, chequeo de diseño. PASS/FAIL con evidencia. Solo lectura. |
+| **agent-auditor-oportunidades** | Health check, pre-release, deuda | Audita NFR, tests, dependencias, calidad → tarjetas de mejora priorizadas. No codea. |
 | **agent-refactor-malas-practicas** | Olores de diseño, plan de refactor | Reporte Markdown priorizado bajo `03-calidad/refactor/`. No implementa salvo petición explícita. |
 
 ---
 
-## Internos (referencia breve)
+## Los que trabajan detrás (referencia breve)
 
 | Agent | Rol |
 |-------|-----|
-| **agent-arquitecto-hu** | Fase I3: escribe `arch-brief-{HU}.md` vinculante (patrones, seams, anti-patrones). Excepción: puedes pedir solo briefing sin implementar. |
+| **agent-arquitecto-hu** | Escribe `arch-brief-{HU}.md` vinculante (patrones, límites, anti-patrones) antes de codear. Excepción: puedes pedir solo briefing sin implementar. |
 | **agent-research-scout** | Búsqueda de libs, patrones y docs oficiales (lanzado por investigador-ideador). |
 | **agent-debate-advocate** | Argumenta a favor de una opción candidata. |
 | **agent-debate-skeptic** | Riesgos, costos ocultos, "por qué no". |
-| **agent-debate-fit** | Encaje con stack y código as-is del repo. |
+| **agent-debate-fit** | Encaje con stack y código actual del repo. |
 
 ---
 
@@ -102,7 +102,7 @@ flowchart TB
 
 ## Prompts de ejemplo
 
-### Greenfield (idea → backlog → implementación)
+### App nueva (idea → backlog → implementación)
 
 ```
 Usa agent-scrum: convierte esta idea en backlog Scrum (modo guiado completo):
@@ -127,7 +127,7 @@ Para una épica entera:
 Usa agent-implementador-epicas: implementa la épica EP-001 (todas las HU Must).
 ```
 
-### Brownfield (producto existente)
+### App existente (producto con código)
 
 ```
 Usa agent-evolucion: evoluciona este producto — quiero agregar [feature].
@@ -170,7 +170,7 @@ No implementes código.
 
 ## Flujos típicos
 
-### Greenfield
+### App nueva
 
 1. **agent-scrum** — discovery, épicas, HU, arquitectura, stack
 2. (Opcional) **agent-investigador-ideador** — si hay dudas técnicas grandes antes de implementar
@@ -178,7 +178,7 @@ No implementes código.
 4. **agent-verificador** — tras cada HU o al cerrar épica
 5. (Opcional) **agent-auditor-oportunidades** — health check pre-release
 
-### Brownfield
+### App existente
 
 1. **agent-evolucion** — inventario, brecha, backlog delta
 2. (Opcional) **agent-investigador-ideador** — debate de enfoques para el cambio
@@ -192,4 +192,4 @@ No implementes código.
 
 - Idioma por defecto: **español** en artefactos y preguntas.
 - Los agentes de implementación **no commitean** salvo que lo pidas explícitamente.
-- Para skills de tu stack (Next.js, .NET, etc.), genera las tuyas con `stack-skill-generator` en el proyecto; este plugin no incluye skills de stack de terceros.
+- Para skills de tu stack (Next.js, .NET, etc.), el pack las genera en tu proyecto al elegir tecnologías; no trae guías de terceros embebidas.

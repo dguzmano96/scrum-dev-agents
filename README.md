@@ -1,32 +1,32 @@
 # Scrum Dev Agents
 
-Plugin de **agentes y skills para Cursor** que te guía de una idea (o de un producto existente) hasta historias INVEST implementadas y verificadas, en **español**, con artefactos Scrum documentados y gates de calidad antes de escribir código.
+**Lleva una idea (o un producto que ya existe) hasta software implementado y verificado**, con orden Scrum y sin que el chat principal se convierta en un “hazlo todo ya”.
 
-**Para quién:** equipos o desarrolladores que usan Scrum en Cursor y quieren separar *discovery/backlog* de *implementación*, con verificación escéptica y skills de stack generadas en el proyecto (Next.js, .NET, Cloudflare, PostgreSQL, etc.) según lo que elijas — no memorias genéricas del modelo.
+Plugin de agentes y skills para [Cursor](https://cursor.com). Hablas en **español**; cada agente tiene un rol claro: planificar, investigar, codear o verificar. El backlog queda documentado, el código pasa chequeos antes de darse por bueno, y las librerías que uses tienen guías escritas en tu propio proyecto — no memorias genéricas del modelo.
+
+**Para quién:** un dev que ya usa git y Cursor, conoce historias de usuario, y quiere separar *“¿qué construimos?”* de *“vamos a codearlo”* — sin aprender un framework interno de siglas.
 
 ---
 
 ## Instalar
 
-**Requisito:** [Cursor](https://cursor.com) con soporte de Plugins.
+**Requisito:** Cursor con soporte de Plugins.
 
-1. Abre **Cursor**
-2. Ve a **Customize → Plugins**
-3. Selecciona **Add from GitHub**
-4. Pega la URL: `https://github.com/dguzmano96/scrum-dev-agents`
+1. Abre **Cursor** → **Customize → Plugins** → **Add from GitHub**
+2. Pega: `https://github.com/dguzmano96/scrum-dev-agents`
+3. Abre el **workspace de tu proyecto** (no solo este repo del plugin) cuando vayas a generar skills de tu stack
 
-Los **13 agentes** aparecen en el selector; las **46 skills** del plugin se cargan desde `./skills/`. Para usar skills de stack en tu código, abre el **workspace del proyecto** (no solo este repo del plugin) y genera skills locales con el flujo descrito más abajo.
+Al instalar verás **8 agentes que tú invocas en el chat** y **5 que trabajan detrás** cuando hace falta. Las skills del plugin se cargan solas; las de tu stack (Next.js, .NET, Cloudflare, PostgreSQL, etc.) se crean en tu proyecto cuando eliges tecnologías.
 
 ---
 
-## Cómo funciona
+## El truco (en 30 segundos)
 
-Hay **dos capas**:
+1. **Tú pides en español** con `Usa agent-{nombre}:` y lo que necesitas.
+2. **Cursor elige al especialista** — Scrum arma el plano, el Implementador construye un cuarto, Épicas levanta toda la planta, el Verificador no se cree el “ya está”.
+3. **El chat principal no debería codear tu producto.** Los agentes de backlog planifican; los de implementación codean con reglas; el verificador mira con lupa.
 
-| Capa | Agentes | Rol |
-|------|---------|-----|
-| **Primera línea** | scrum, evolucion, investigador-ideador, implementador, implementador-epicas, verificador, auditor-oportunidades, refactor-malas-practicas | Tú hablas con ellos en el chat. Orquestan skills y subagentes. Los de backlog **no codean**. |
-| **Internos** | arquitecto-hu, research-scout, debate-advocate, debate-skeptic, debate-fit | Los lanza el orquestador. Solo los invocas tú en casos puntuales (p. ej. solo briefing arquitectónico). |
+No tienes que memorizar pipelines internos (W0–W8, I0–I9…). Esos pasos los ejecutan las skills por detrás.
 
 ```mermaid
 flowchart TB
@@ -34,7 +34,7 @@ flowchart TB
         U[Pedido en español]
     end
 
-    subgraph primera["Primera línea"]
+    subgraph llamas["Agentes que tú llamas"]
         scrum[agent-scrum]
         evo[agent-evolucion]
         ide[agent-investigador-ideador]
@@ -45,7 +45,7 @@ flowchart TB
         ref[agent-refactor-malas-practicas]
     end
 
-    subgraph internos["Internos"]
+    subgraph detras["Los que otros agentes llaman solos"]
         arq[agent-arquitecto-hu]
         scout[agent-research-scout]
         adv[agent-debate-advocate]
@@ -62,124 +62,131 @@ flowchart TB
     impl --> ver
 ```
 
-**Regla práctica:** empieza siempre con `Usa agent-…` y el agente de primera línea que corresponda. No necesitas conocer los pipelines internos (W0–W8b, E0–E12, I0–I9, etc.); los skills los aplican por ti.
-
 ---
 
-## Flujo de producto
+## Receta típica
 
-### Greenfield (idea nueva)
+### App nueva (empiezas desde cero)
 
-1. **agent-scrum** — discovery guiado, épicas MoSCoW, HU INVEST (AC checklist + BDD Gherkin separados), arquitectura, elección de stack con AskQuestion, generación de skills `stack-*` en tu proyecto.
-2. *(Opcional)* **agent-investigador-ideador** — si hay duda técnica grande antes de implementar.
-3. **agent-implementador** (una HU) o **agent-implementador-epicas** (toda una épica) — craft gate + briefing arquitectónico + código en slices.
-4. **agent-verificador** — tras cada HU o al cerrar épica; sin PASS no hay done.
-5. *(Opcional)* **agent-auditor-oportunidades** — health check pre-release.
+Piensa en Scrum como el arquitecto que dibuja planos y corta el trabajo en historias. Cuando el backlog está listo, el Implementador toma **una historia de usuario (HU)** a la vez; si quieres toda una épica de golpe, Épicas coordina varias HU sin saltarse pasos. Al final, el Verificador ejecuta tests y revisa que los **criterios de aceptación** (lo que debe cumplir la HU) estén cubiertos — no acepta un “listo” sin evidencia.
 
-### Brownfield (producto existente)
-
-1. **agent-evolucion** — inventario código + backlog, brecha del cambio, backlog **delta** (no reescribe todo).
-2. *(Opcional)* **agent-investigador-ideador** — debate de enfoques para el cambio.
-3. **agent-implementador** / **agent-implementador-epicas** — implementación del delta.
-4. **agent-verificador** — validación escéptica con tests y AC Must.
-5. *(Opcional)* **agent-refactor-malas-practicas** — si el cambio expuso deuda en el área tocada.
-
----
-
-## Agentes de primera línea
-
-En el chat, invoca con **`Usa agent-{nombre}:`** seguido de tu pedido. Ejemplos copiables en cada sección.
-
-### agent-scrum
-
-**Qué hace:** convierte una idea en backlog Scrum documentado: discovery → épicas → HU INVEST → diagramas Mermaid → arquitectura → stack confirmado → skills de stack en el proyecto.
-
-**Qué NO hace:** no escribe código de producto.
-
-**Cuándo usarlo:** producto nuevo, greenfield, “convierte esta idea en backlog”.
-
-**Prompt de ejemplo:**
+**Prompts para copiar:**
 
 ```
 Usa agent-scrum: convierte esta idea en backlog Scrum (modo guiado completo):
 [describe tu producto — usuarios, problema, restricciones]
 ```
 
-**Qué entrega:** árbol `00-discovery/`, `01-backlog/` (épicas + HU), `02-arquitectura/` (`stack.md`, `nfr.md`, diagramas), `03-calidad/`, `04-sesion/`, skills `stack-*` en `.cursor/skills/` del proyecto tras confirmar stack.
+```
+Usa agent-implementador: implementa HU-001 del proyecto [nombre].
+```
 
----
+```
+Usa agent-verificador: valida HU-001 — no aceptes claims sin evidencia.
+```
 
-### agent-evolucion
+Si la épica entera va junta:
 
-**Qué hace:** evoluciona un producto con código y/o backlog existente: inventario as-is → brecha → épicas/HU **nuevas o superseding** (delta).
+```
+Usa agent-implementador-epicas: implementa la épica EP-001 (todas las HU Must).
+```
 
-**Qué NO hace:** no reescribe el backlog entero; no codea.
+### App que ya existe (quieres agregar o cambiar algo)
 
-**Cuándo usarlo:** “agregar feature”, “modificar flujo”, “mejorar rendimiento” en brownfield.
-
-**Prompt de ejemplo:**
+Aquí entra **agent-evolucion**: mira qué hay (código y backlog), define la brecha del cambio y escribe solo lo **nuevo** — no reescribe todo el backlog desde cero. Luego el flujo es el mismo: implementar y verificar.
 
 ```
 Usa agent-evolucion: evoluciona este producto — quiero agregar exportación CSV.
 Hay código existente. Modo guiado.
 ```
 
-**Qué entrega:** mapas de código y backlog, `changelog-backlog`, épicas/HU delta, impacto clasificado, handoff a implementador.
-
----
-
-### agent-investigador-ideador
-
-**Qué hace:** escanea el repo, investiga con web (docs oficiales), orquesta debate entre subagentes y entrega reporte con **opción #1 recomendada + opción #2**.
-
-**Qué NO hace:** no modifica código (readonly estricto).
-
-**Cuándo usarlo:** “¿cómo implementar X?”, “compara enfoques”, “qué tecnología usar” antes de decidir backlog o código.
-
-**Prompt de ejemplo:**
+Si antes de decidir necesitas comparar enfoques técnicos:
 
 ```
 Usa agent-investigador-ideador: investiga la mejor forma de agregar autenticación OAuth
 a este repo. Entrega reporte con opción #1 y #2. No toques código.
 ```
 
-**Qué entrega:** reporte bajo `03-calidad/research/` con argumentación, tradeoffs, pasos de implementación sugeridos y fuentes en `sources-ledger.md`.
+---
+
+## Los 8 especialistas (los que tú llamas)
+
+Invócalos con **`Usa agent-{nombre}:`** + tu pedido.
+
+### agent-scrum
+
+**Para qué:** convierte una idea en backlog Scrum documentado — discovery, épicas, HU bien escritas, diagramas, arquitectura y elección de stack (te pregunta; no elige solo).
+
+**No lo uses si:** ya tienes backlog cerrado y solo quieres codear una HU concreta → ve al Implementador.
+
+**Prueba a decir:**
+
+```
+Usa agent-scrum: convierte esta idea en backlog Scrum (modo guiado completo):
+[describe tu producto]
+```
+
+**Te deja:** carpetas `00-discovery/`, `01-backlog/`, `02-arquitectura/`, `03-calidad/`, `04-sesion/` y skills de tu stack en `.cursor/skills/` del proyecto.
+
+---
+
+### agent-evolucion
+
+**Para qué:** producto con código y/o backlog existente. Inventario → brecha → épicas y HU **nuevas o que reemplazan** las anteriores (backlog delta).
+
+**No lo uses si:** es idea desde cero → usa Scrum.
+
+**Prueba a decir:**
+
+```
+Usa agent-evolucion: evoluciona este producto — quiero agregar [feature].
+Hay código existente. Modo guiado.
+```
+
+---
+
+### agent-investigador-ideador
+
+**Para qué:** “¿cómo hago X?”, “¿qué tecnología conviene?”. Escanea el repo, busca en documentación oficial y arma un reporte con **opción #1 recomendada y opción #2** — sin tocar código.
+
+**No lo uses si:** ya sabes qué hacer y solo falta implementar.
+
+**Prueba a decir:**
+
+```
+Usa agent-investigador-ideador: investiga la mejor forma de agregar [feature]
+a este repo. Entrega reporte con opción #1 y #2. No toques código.
+```
 
 ---
 
 ### agent-implementador
 
-**Qué hace:** implementa **una sola HU** (pipeline I0–I9): carga contexto, craft gate, briefing arquitectónico (I3), plan, código en slices, evidencia AC/BDD.
+**Para qué:** implementa **una sola HU**. Antes de codear pasa un **chequeo de diseño sucio** (motores por keywords, clases gigantes, acoplamiento raro…) y escribe un briefing arquitectónico. Luego codea en trozos pequeños con evidencia de criterios de aceptación.
 
-**Qué NO hace:** no implementa una épica entera en un prompt; no commitea salvo que lo pidas.
+**No lo uses si:** quieres toda una épica de una vez → usa Implementador-Épicas.
 
-**Cuándo usarlo:** “implementa HU-003”, una historia concreta lista en el backlog.
-
-**Prompt de ejemplo:**
+**Prueba a decir:**
 
 ```
 Usa agent-implementador: implementa HU-003 del proyecto [nombre]. Modo guiado.
 ```
 
-Modo rápido (solo si la HU es pequeña y sin riesgos):
+Modo rápido solo si la HU es pequeña y sin riesgos:
 
 ```
 Usa agent-implementador: implementa HU-003 en modo express
 ```
 
-**Qué entrega:** código, `04-sesion/arch-brief-HU-003.md`, evidencia de AC Must, estado en docs de sesión. Declara done solo con craft PASS + arch-brief + evidencia.
-
 ---
 
 ### agent-implementador-epicas
 
-**Qué hace:** orquesta **toda una épica** lanzando un subagente `agent-implementador` **por cada HU**, con build+test tras cada una y docs de progreso actualizadas.
+**Para qué:** coordina **toda una épica**, lanzando un Implementador por cada HU, con build y tests tras cada una. No avanza si algo queda rojo.
 
-**Qué NO hace:** no escribe código él mismo; no salta HU con build rojo.
+**No lo uses si:** es una sola HU → usa Implementador.
 
-**Cuándo usarlo:** “implementa EP-001”, “todas las HU Must de la épica X”.
-
-**Prompt de ejemplo:**
+**Prueba a decir:**
 
 ```
 Usa agent-implementador-epicas: implementa la épica EP-001 del proyecto [nombre]. Modo guiado.
@@ -191,167 +198,109 @@ Reanudar:
 Usa agent-implementador-epicas: reanudar épica EP-001 desde HU-003
 ```
 
-**Qué entrega:** épica cerrada solo cuando todas las HU Must pasan build+test + AC con evidencia; `04-sesion/epic-EP-001-progress.md`, INDEX y trazabilidad sincronizados.
-
 ---
 
 ### agent-verificador
 
-**Qué hace:** validador **escéptico e independiente**: ejecuta tests, comprueba AC Must, aplica craft gate; veredicto PASS o FAIL con gaps concretos.
+**Para qué:** el escéptico del equipo. Ejecuta tests, revisa cada criterio de aceptación obligatorio y vuelve a pasar el chequeo de diseño. Veredicto **PASS** o **FAIL** con huecos concretos — no edita código.
 
-**Qué NO hace:** no edita código; no acepta claims sin evidencia.
+**No lo uses si:** aún no hay implementación que revisar.
 
-**Cuándo usarlo:** siempre después de implementación o antes de marcar HU/épica como done.
-
-**Prompt de ejemplo:**
+**Prueba a decir:**
 
 ```
 Usa agent-verificador: valida HU-003 — no aceptes claims sin evidencia.
 ```
 
-Pre-release:
+Antes de release:
 
 ```
 Usa agent-verificador: pre-release check — valida que EP-002 está done con evidencia.
 ```
 
-**Qué entrega:** informe con tabla AC Must, tests ejecutados, craft gate y señal `verify-ok` | `verify-fail`.
-
 ---
 
 ### agent-auditor-oportunidades
 
-**Qué hace:** audita salud del proyecto y prioriza fichas **OPP-*** (NFR, tests, deps/CVE, craft, skills stale). Tú eliges qué adoptar.
+**Para qué:** health check del proyecto — seguridad, tests faltantes, dependencias, calidad de código. Entrega **tarjetas de mejora** priorizadas (OPP-001, OPP-002…); **tú eliges** cuáles adoptar.
 
-**Qué NO hace:** no implementa; no genera épicas/HU finales automáticamente.
+**No lo uses si:** solo quieres implementar una HU puntual.
 
-**Cuándo usarlo:** health check, deuda técnica, auditoría pre-release.
-
-**Prompt de ejemplo:**
+**Prueba a decir:**
 
 ```
 Usa agent-auditor-oportunidades: audita oportunidades de mejora en el proyecto [nombre].
 Modo completo. Foco seguridad y tests.
 ```
 
-**Qué entrega:** informe `OPP-*` priorizado + prompts sugeridos hacia evolución, implementador o scrum.
-
 ---
 
 ### agent-refactor-malas-practicas
 
-**Qué hace:** escanea código (repo o módulo) buscando olores de diseño (keyword engines NL, god-classes, acoplamiento, i18n hardcodeada, etc.) y genera **plan de refactor priorizado** en Markdown.
+**Para qué:** escanea código buscando olores (lógica frágil, clases que hacen de todo, textos hardcodeados…) y genera un **plan de refactor** priorizado en Markdown. No implementa salvo que se lo pidas.
 
-**Qué NO hace:** no implementa el refactor salvo petición explícita tuya.
-
-**Cuándo usarlo:** antes de un refactor grande, tras detectar deuda en un módulo, revisión de craft.
-
-**Prompt de ejemplo:**
+**Prueba a decir:**
 
 ```
 Usa agent-refactor-malas-practicas: escanea el módulo src/api y genera plan de refactor
 priorizado. Solo reporte, no implementes.
 ```
 
-**Qué entrega:** `03-calidad/refactor/YYYY-MM-DD-refactor-malas-practicas-{scope}.md` con findings P0→P3 y pasos propuestos.
-
 ---
 
-## Agentes internos
+## Los que trabajan detrás
 
-No necesitas invocarlos en el flujo normal; el orquestador los lanza.
+En el flujo normal **no tienes que llamarlos**. Otros agentes los invocan cuando hace falta — por ejemplo, el arquitecto escribe el briefing antes de codear, o el panel de debate cuando investigas opciones técnicas.
 
-| Agente | Rol | Cuándo invocarlo tú |
-|--------|-----|---------------------|
-| **agent-arquitecto-hu** | Escribe `04-sesion/arch-brief-{HU}.md` vinculante (patrones, seams, anti-patrones) antes de codear | Solo briefing sin implementar |
-| **agent-research-scout** | Búsqueda de libs, patrones y docs oficiales | Raramente; lo usa investigador-ideador |
-| **agent-debate-advocate** | Argumenta a favor de una opción candidata | Panel de debate del ideador |
-| **agent-debate-skeptic** | Riesgos, costos ocultos, “por qué no” | Panel de debate del ideador |
-| **agent-debate-fit** | Encaje con stack y código as-is del repo | Panel de debate del ideador |
+| Agente | Qué hace | ¿Cuándo llamarlo tú? |
+|--------|----------|----------------------|
+| **agent-arquitecto-hu** | Briefing vinculante por HU (patrones, límites, anti-patrones) | Solo si quieres arquitectura sin implementar |
+| **agent-research-scout** | Busca libs y docs oficiales | Casi nunca; lo usa el investigador |
+| **agent-debate-advocate** | Argumenta a favor de una opción | Panel del investigador-ideador |
+| **agent-debate-skeptic** | Riesgos y “por qué no” | Panel del investigador-ideador |
+| **agent-debate-fit** | ¿Encaja con tu stack y código actual? | Panel del investigador-ideador |
 
-**Solo arquitectura (sin código):**
+Solo arquitectura (sin código):
 
 ```
 Usa agent-arquitecto-hu: genera arch-brief para HU-005 — patrones, seams y anti-patrones.
 No implementes código.
 ```
 
+Más prompts y diagramas: [docs/primera-linea.md](docs/primera-linea.md).
+
 ---
 
-## Plus del pack
+## Por qué no es “otro chatbot con nombres bonitos”
 
-Más allá de “chatbots con nombres”, el plugin encadena **skills** con reglas explícitas. Esto es lo que aporta valor en la práctica.
+**Skills de tu stack, en tu repo.** Cuando eliges tecnologías, el pack **escribe skills de esas techs en tu proyecto** para que quien codea no alucine APIs. No trae guías genéricas embebidas: las genera consultando documentación oficial del día. Si se quedan viejas, puedes pedir refrescarlas.
 
-### Skills de stack del proyecto
+**No inventa versiones.** Antes de nombrar una versión, API o librería, consulta fuentes oficiales y deja rastro en `sources-ledger.md` — no confía en blogs SEO ni en “creo que es la v3”.
 
-El plugin **no trae** skills de Next.js, .NET o Cloudflare embebidas (dependen de tu stack). En su lugar:
+**Backlog que se puede implementar.** Las historias siguen INVEST (independientes, acotadas, con valor). Los **criterios de aceptación** (checklist de lo que debe cumplir) van separados de los **escenarios BDD** (Given/When/Then) — no mezclados en el mismo bloque. Si algo suena vago (“rápido”, “seguro”), te pregunta umbrales concretos en lugar de inventar requisitos.
 
-1. **`stack-advisor`** (fase W8 en greenfield, o al añadir tech en brownfield) propone 2–3 stacks con scores y tradeoffs. **Debes elegir con AskQuestion** — el agente no auto-elige.
-2. Tras confirmar, **`stack-skill-generator`** crea skills expertas en **`{tu-proyecto}/.cursor/skills/stack-*`** (p. ej. `stack-nextjs`, `stack-dotnet`, `stack-postgresql`) consultando docs oficiales del día.
-3. **`stack-skills-updater`** refresca skills stale (TTL ~30 días) o cuando pides `refresh-tech` / `/loop` periódico.
+**Te pregunta en lotes, no adivina.** Usa AskQuestion: bloques de 5–12 preguntas. Sin respuestas claras no cierra épicas ni marca Must.
 
-Así los implementadores **obedecen APIs y patrones verificados**, no inventan sintaxis de memoria. Abre el workspace del **proyecto** para que Cursor descubra esas skills.
+**Chequeo de diseño antes de codear.** El *craft gate* es un filtro binario: ¿el diseño propuesto huele mal? Sin PASS no hay plan ni “done”. Motores por keywords, clases gigantes y acoplamientos raros suelen caer aquí.
 
-### Freshness (anti-deprecación)
+**Verificación que no se cree el “listo”.** El Verificador corre tests, revisa cada criterio obligatorio y mira el diff con ojos de quien no implementó. Sin PASS no hay done.
 
-**`freshness-guard`** obliga WebSearch/WebFetch a docs oficiales antes de nombrar versiones, APIs o stacks. Registra claims en `02-arquitectura/sources-ledger.md`. Banlist de listicles SEO y foros como única fuente.
+**Brownfield sin reescribir el mundo.** En productos existentes solo documenta el delta — épicas y HU nuevas o que reemplazan las viejas, no un backlog entero desde cero.
 
-### Calidad de backlog
+**Investigación con dos opciones.** Cuando hay duda técnica, el reporte trae opción #1 y #2 con argumentos — no una recomendación a ciegas.
 
-- HU **INVEST** con **`story-splitter`** si están grandes o mal acotadas.
-- **AC checklist ≠ BDD Gherkin** — nunca mezclados en el mismo bloque.
-- **`quality-gate`**: rúbrica 8 dimensiones; bloquea “ready” si la nota es baja.
-- **`nfr-extractor`**: convierte “rápido/seguro/escalable” en umbrales medibles vía AskQuestion; no inventa Must.
+**Tarjetas de mejora, tú decides.** La auditoría prioriza oportunidades (OPP-*) pero no convierte todo en obligatorio automáticamente.
 
-### Craft + arquitectura antes de codear
-
-- **`impl-craft-gate`**: gate binario PASS/FAIL — prohíbe motores keyword/NL, dual-track, god-class stuffing, etc. Sin PASS no hay plan ni done.
-- **`agent-arquitecto-hu`** + **`impl-architecture-guide`**: briefing I3 vinculante; el implementador debe obedecerlo o pedir AskQuestion.
-
-### Verificación escéptica
-
-**`agent-verificador`** + **`impl-verifier`**: sin PASS no hay done. Comprueba tests, cada AC Must y craft sobre el diff.
-
-### Brownfield sin reescritura
-
-Inventario código + backlog (`codebase-inventory`, `backlog-as-is-mapper`), análisis de brecha y **`delta-backlog-writer`**: solo épicas/HU nuevas o superseding, no backlog desde cero.
-
-### Investigación argumentada
-
-**`solution-research-ideator`** + scout + panel debate (advocate / skeptic / fit) → **`solution-report-writer`**: siempre **dos opciones** con evidencia, no una sola recomendación a ciegas.
-
-### Auditoría OPP-*
-
-**`project-opportunity-auditor`**: NFR, gaps de tests, deps/CVE, craft, skills stale → fichas **OPP-*** priorizadas. **Tú** eliges qué adoptar en AskQuestion; no convierte todo en Must automáticamente.
-
-### Wizard en español
-
-Preguntas con **AskQuestion** en lotes de 5–12. **No inventa requisitos Must.** Sin completeness gate verde no hay épicas finales.
-
-### Output scaffold
-
-**`output-scaffold`** crea la estructura estándar del proyecto Scrum:
-
-```text
-{nombre-proyecto}/
-├── .cursor/skills/          # stack-* generadas tras W8
-├── 00-discovery/
-├── 01-backlog/              # INDEX, traceability, EP-*/HU/
-├── 02-arquitectura/         # stack, nfr, diagramas, sources-ledger
-├── 03-calidad/
-└── 04-sesion/               # wizard-progress, arch-brief-*, epic-*-progress
-```
+**Estructura de proyecto predecible.** Al planificar, crea carpetas estándar para discovery, backlog, arquitectura, calidad y sesión — para que no pierdas artefactos entre chats.
 
 ---
 
 ## Qué no incluye
 
-Este plugin **no** es:
-
-- Un **runtime** ni un servidor — solo agentes y skills para Cursor.
-- **`agent-sonarqube`** — análisis estático estilo SonarQube no está publicado en este repo.
-- Skills oficiales de terceros embebidas (Cloudflare Workers, Wrangler, sandbox-*, etc.) — genera las tuyas con `stack-skill-generator` en el proyecto.
-- Configuración global de tu máquina (`AGENTS.md` global, políticas, extensiones).
+- **No es un runtime ni un servidor** — solo agentes y skills dentro de Cursor.
+- **No trae SonarQube** — análisis estático estilo Sonar no está publicado en este repo.
+- **No configura tu máquina** — no toca `AGENTS.md` global, políticas ni extensiones.
+- **No commitea por ti** salvo que lo pidas explícitamente.
 
 ---
 
@@ -368,8 +317,6 @@ Este plugin **no** es:
 | Health check / deuda | `agent-auditor-oportunidades` |
 | Plan de refactor | `agent-refactor-malas-practicas` |
 | Solo briefing arquitectónico | `agent-arquitecto-hu` |
-
-Mapa ampliado, diagramas y más prompts: [docs/primera-linea.md](docs/primera-linea.md).
 
 ---
 
