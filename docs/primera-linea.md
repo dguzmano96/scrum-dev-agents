@@ -2,6 +2,8 @@
 
 Estos son los agentes con los que **hablas directamente en el chat** de Cursor. Cada uno orquesta skills y subagentes internos; no necesitas invocar los internos salvo casos especiales.
 
+> **Documentación ampliada:** el [README](../README.md) incluye guía por agente (qué hace / qué no / prompts / entregables), flujos greenfield/brownfield y la sección **Plus del pack** (stack skills, freshness, quality gate, craft gate, OPP-*, etc.).
+
 ## Mapa de agentes
 
 ```mermaid
