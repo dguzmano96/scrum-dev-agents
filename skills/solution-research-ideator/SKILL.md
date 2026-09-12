@@ -23,7 +23,7 @@ Verify claims with official docs via WebSearch/WebFetch (`freshness-guard`); rec
 | `solution-research-ideator` (this) | Investigates and ideates; does not write product code or final epics/HUs |
 | `scrum-idea-to-backlog` | Greenfield: chosen approach → initial backlog |
 | `scrum-evolution` | Brownfield: chosen approach → delta backlog |
-| `hu-implementer` | Implements an HU that is already ready |
+| `story-implementer` | Implements an HU that is already ready |
 | `project-opportunity-auditor` | Discovers improvement opportunities (not "how to implement X") |
 
 **Typical flow:** Researcher → user chooses #1 or #2 → Evolution/Scrum → Implementer.
@@ -119,7 +119,7 @@ Evoluciona este producto: [opción #1 resumida]. Modo guiado.
 # → scrum-idea-to-backlog
 Convierte esta idea en backlog Scrum: [opción #1]. Modo guiado.
 
-# → hu-implementer (solo si ya existe HU ready)
+# → story-implementer (solo si ya existe HU ready)
 Implementa la HU-00Y. Modo guiado.
 ```
 

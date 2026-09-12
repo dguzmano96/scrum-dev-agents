@@ -102,7 +102,7 @@ Optional: commit those two files so teammates get the same matrix.
 
 ## The trick (in 30 seconds)
 
-1. You request in your language using `Usa agent-{name}:` (examples below). Session language = first chat message.
+1. You request in your language using `Use agent-{name}:` (examples below). Session language = first chat message. Legacy Spanish ids (`agent-implementador`, …) still route.
 2. The chat asks the model mode (**low / mid / high / cursor**) once per Multitask session.
 3. Scrum picks the specialist and the pipeline. The **model policy** maps `modo activo` × work type to a slug on **every** `Task` (including nested). Never omit `model`.
 4. The main chat should not implement your product. Backlog agents plan; implementer agents write code under rules; the verifier inspects thoroughly.
@@ -115,17 +115,17 @@ flowchart TB
 
     subgraph llamas["Agents you call"]
         scrum[agent-scrum]
-        evo[agent-evolucion]
-        ide[agent-investigador-ideador]
-        impl[agent-implementador]
-        epi[agent-implementador-epicas]
-        ver[agent-verificador]
-        aud[agent-auditor-oportunidades]
-        ref[agent-refactor-malas-practicas]
+        evo[agent-evolution]
+        ide[agent-investigator-ideator]
+        impl[agent-implementer]
+        epi[agent-epic-implementer]
+        ver[agent-verifier]
+        aud[agent-opportunity-auditor]
+        ref[agent-refactor-bad-practices]
     end
 
     subgraph detras["Those agents call behind the scenes"]
-        arq[agent-arquitecto-hu]
+        arq[agent-story-architect]
         scout[agent-research-scout]
         adv[agent-debate-advocate]
         ske[agent-debate-skeptic]
@@ -157,11 +157,11 @@ Every `Task` (child and grandchild) must include `model`, `modo activo: low|mid|
 
 | You call | Matrix type | Example slug in **low** |
 |---|---|---|
-| `agent-scrum` / `agent-evolucion` / `agent-implementador-epicas` | `plan` | `composer-2.5` |
-| `agent-implementador` | `implement` | `gemini-3.7-flash-high` |
-| `agent-arquitecto-hu` (nested) | `decide` | `gemini-3.8-flash-high` |
-| `agent-verificador` | `verify` | `claude-4.5-haiku-thinking` |
-| `agent-investigador-ideador` | `research` | `gpt-5.4-mini-medium` |
+| `agent-scrum` / `agent-evolution` / `agent-epic-implementer` | `plan` | `composer-2.5` |
+| `agent-implementer` | `implement` | `gemini-3.7-flash-high` |
+| `agent-story-architect` (nested) | `decide` | `gemini-3.8-flash-high` |
+| `agent-verifier` | `verify` | `claude-4.5-haiku-thinking` |
+| `agent-investigator-ideator` | `research` | `gpt-5.4-mini-medium` |
 
 If you do not pick a mode, the orchestrator stays on **low** and says so. Naming a model or "use Fast" wins **on that** `Task` only.
 
@@ -169,34 +169,34 @@ If you do not pick a mode, the orchestrator stays on **low** and says so. Naming
 
 ## Sample chat
 
-**You** (first message — this sets Spanish for the session):
+**You** (English first message — this sets English for the session):
 
 ```
-Usa agent-scrum: convierte esta idea en backlog Scrum (modo guiado completo):
-una app para apuntar bloqueos del daily. Interno, 20 personas, sin login el primer mes.
+Use agent-scrum: convert this idea into a Scrum backlog (full guided mode):
+an app to log daily blockers. Internal, 20 people, no login the first month.
 ```
 
 **Scrum Dev:** asks mode once (policy). Until you answer it operates in **low**.
 
 **You:** `mid`
 
-**Scrum Dev:** launches `agent-scrum` with `model` = `matrix[mid][plan]`, `modo activo: mid`, `session language: es`. Discovery questions in Spanish. No product code.
+**Scrum Dev:** launches `agent-scrum` with `model` = `matrix[mid][plan]`, `modo activo: mid`, `session language: en`. Discovery questions in English. No product code.
 
 Later, same chat (mode and language are **not** re-asked):
 
 ```
-Usa agent-implementador: implementa HU-001. Modo guiado.
+Use agent-implementer: implement HU-001. Guided mode.
 ```
 
-Lookup: `implement` × `mid`. Before code it launches `agent-arquitecto-hu` with a **new** lookup (`decide` × `mid`) and waits for `arch-ok`. You approve the plan; then slices; then:
+Lookup: `implement` × `mid`. Before code it launches `agent-story-architect` with a **new** lookup (`decide` × `mid`) and waits for `arch-ok`. You approve the plan; then slices; then:
 
 ```
-Usa agent-verificador: valida HU-001 — no aceptes claims sin evidencia.
+Use agent-verifier: validate HU-001 — do not accept claims without evidence.
 ```
 
-Lookup: `verify` × `mid`. Narrative in Spanish; tokens stay `PASS` / `FAIL` / `verify-ok`.
+Lookup: `verify` × `mid`. Narrative in English; tokens stay `PASS` / `FAIL` / `verify-ok`.
 
-Same pipeline if the first message is English — only the user-facing text changes. IDs (`HU-001`), folders (`01-backlog/`), and Gherkin (`Given` / `When` / `Then`) are never localized.
+If the first message is Spanish (`Usa agent-scrum: convierte esta idea…`), the same pipeline runs and AskQuestion / new HUs are in Spanish. IDs (`HU-001`), folders (`01-backlog/`), and Gherkin (`Given` / `When` / `Then`) are never localized.
 
 ---
 
@@ -206,60 +206,78 @@ Same pipeline if the first message is English — only the user-facing text chan
 
 Think of Scrum as the architect who draws blueprints and slices work into stories. When the backlog is ready, the Implementer takes **one user story (HU)** at a time; if you want an entire epic at once, Epics coordinates multiple HUs without skipping steps. At the end, the Verifier runs tests and checks that the **acceptance criteria** are met — it will not mark done without evidence.
 
-**Copy-paste prompts (Spanish and English both route; session language follows your first message):**
+**Copy-paste prompts (English names are canonical; Spanish ids still route. Session language follows your first message):**
 
 ```
-Usa agent-scrum: convierte esta idea en backlog Scrum (modo guiado completo):
-[describe tu producto — usuarios, problema, restricciones]
-
 Use agent-scrum: convert this idea into a Scrum backlog (full guided mode):
 [describe your product — users, problem, constraints]
+
+Usa agent-scrum: convierte esta idea en backlog Scrum (modo guiado completo):
+[describe tu producto — usuarios, problema, restricciones]
 ```
 
 ```
-Usa agent-implementador: implementa HU-001 del proyecto [nombre].
-Use agent-implementador: implement HU-001 for project [name].
+Use agent-implementer: implement HU-001 for project [name].
+Usa agent-implementer: implementa HU-001 del proyecto [nombre].
 ```
 
 ```
-Usa agent-verificador: valida HU-001 — no aceptes claims sin evidencia.
-Use agent-verificador: validate HU-001 — do not accept claims without evidence.
+Use agent-verifier: validate HU-001 — do not accept claims without evidence.
+Usa agent-verifier: valida HU-001 — no aceptes claims sin evidencia.
 ```
 
 If the epic must go as a single job:
 
 ```
-Usa agent-implementador-epicas: implementa la épica EP-001 (todas las HU Must).
-Use agent-implementador-epicas: implement epic EP-001 (all Must HUs).
+Use agent-epic-implementer: implement epic EP-001 (all Must HUs).
+Usa agent-epic-implementer: implementa la épica EP-001 (todas las HU Must).
 ```
 
 ### Existing app (you want to add or change something)
 
-Use **agent-evolucion**: it inventories what exists, defines the change gap, and writes only the **new** backlog items — it does not rewrite the whole backlog. Then the flow is the same: implement and verify.
+Use **agent-evolution**: it inventories what exists, defines the change gap, and writes only the **new** backlog items — it does not rewrite the whole backlog. Then the flow is the same: implement and verify.
 
 ```
-Usa agent-evolucion: evoluciona este producto — quiero agregar exportación CSV.
-Hay código existente. Modo guiado.
-
-Use agent-evolucion: evolve this product — I want to add CSV export.
+Use agent-evolution: evolve this product — I want to add CSV export.
 Code exists. Guided mode.
+
+Usa agent-evolution: evoluciona este producto — quiero agregar exportación CSV.
+Hay código existente. Modo guiado.
 ```
 
 If you need to compare technical approaches before deciding:
 
 ```
-Usa agent-investigador-ideador: investiga la mejor forma de agregar autenticación OAuth
-a este repo. Entrega reporte con opción #1 y #2. No toques código.
-
-Use agent-investigador-ideador: research the best way to add OAuth authentication
+Use agent-investigator-ideator: research the best way to add OAuth authentication
 to this repo. Deliver a report with option #1 and #2. Do not modify code.
+
+Usa agent-investigator-ideator: investiga la mejor forma de agregar autenticación OAuth
+a este repo. Entrega reporte con opción #1 y #2. No toques código.
 ```
 
 ---
 
 ## The 8 specialists (those you call)
 
-Invoke them with **`Usa agent-{name}:`** + your request.
+Invoke them with **`Use agent-{name}:`** (or `Usa agent-{name}:`) + your request.
+
+Canonical names are English. Legacy Spanish ids still route (kept in each agent `description`).
+
+| Canonical | Legacy |
+|---|---|
+| `agent-evolution` | `agent-evolucion` |
+| `agent-investigator-ideator` | `agent-investigador-ideador` |
+| `agent-implementer` | `agent-implementador` |
+| `agent-epic-implementer` | `agent-implementador-epicas` |
+| `agent-verifier` | `agent-verificador` |
+| `agent-opportunity-auditor` | `agent-auditor-oportunidades` |
+| `agent-refactor-bad-practices` | `agent-refactor-malas-practicas` |
+| `agent-story-architect` | `agent-arquitecto-hu` |
+| `story-implementer` (skill) | `hu-implementer` |
+| `story-context-loader` (skill) | `hu-context-loader` |
+| `best-practices` (skill) | `skill-BestPractices` |
+
+`agent-scrum` and the debate/scout agents were already English.
 
 ### agent-scrum
 
@@ -269,126 +287,126 @@ Invoke them with **`Usa agent-{name}:`** + your request.
 
 ---
 
-### agent-evolucion
+### agent-evolution
 
 **Purpose:** product with existing code/backlog. Inventory → gap → epics and HUs **new or replacing** old ones (backlog delta).
 
 **Try saying:**
 
 ```
-Usa agent-evolucion: evoluciona este producto — quiero agregar [feature].
-Hay código existente. Modo guiado.
-
-Use agent-evolucion: evolve this product — I want to add [feature].
+Use agent-evolution: evolve this product — I want to add [feature].
 Code exists. Guided mode.
+
+Usa agent-evolution: evoluciona este producto — quiero agregar [feature].
+Hay código existente. Modo guiado.
 ```
 
 ---
 
-### agent-investigador-ideador
+### agent-investigator-ideator
 
 **Purpose:** "how do I do X?", "which tech fits best?". Scans the repo, searches official docs, and delivers a report with **option #1 recommended and option #2** — does not touch code.
 
 **Try saying:**
 
 ```
-Usa agent-investigador-ideador: investiga la mejor forma de agregar [feature]
-a este repo. Entrega reporte con opción #1 y #2. No toques código.
-
-Use agent-investigador-ideador: research the best way to add [feature]
+Use agent-investigator-ideator: research the best way to add [feature]
 to this repo. Deliver a report with option #1 and #2. Do not modify code.
+
+Usa agent-investigator-ideator: investiga la mejor forma de agregar [feature]
+a este repo. Entrega reporte con opción #1 y #2. No toques código.
 ```
 
 ---
 
-### agent-implementador
+### agent-implementer
 
 **Purpose:** implements **a single user story (HU)**. Before coding it runs a dirty-design check (keyword engines, giant classes, odd coupling...) and writes an architectural briefing. Then it codes in small slices with evidence for acceptance criteria.
 
 **Try saying:**
 
 ```
-Usa agent-implementador: implementa HU-003 del proyecto [nombre]. Modo guiado.
-Use agent-implementador: implement HU-003 for project [name]. Guided mode.
+Use agent-implementer: implement HU-003 for project [name]. Guided mode.
+Usa agent-implementer: implementa HU-003 del proyecto [nombre]. Modo guiado.
 ```
 
 Quick mode only for small, low-risk HUs:
 
 ```
-Usa agent-implementador: implementa HU-003 en modo express
-Use agent-implementador: implement HU-003 in express mode
+Use agent-implementer: implement HU-003 in express mode
+Usa agent-implementer: implementa HU-003 en modo express
 ```
 
 ---
 
-### agent-implementador-epicas
+### agent-epic-implementer
 
 **Purpose:** coordinate an entire epic, launching an Implementer per HU, with build and tests after each one. It stops on failures.
 
 **Try saying:**
 
 ```
-Usa agent-implementador-epicas: implementa la épica EP-001 del proyecto [nombre]. Modo guiado.
-Use agent-implementador-epicas: implement epic EP-001 for project [name]. Guided mode.
+Use agent-epic-implementer: implement epic EP-001 for project [name]. Guided mode.
+Usa agent-epic-implementer: implementa la épica EP-001 del proyecto [nombre]. Modo guiado.
 ```
 
 Resume:
 
 ```
-Usa agent-implementador-epicas: reanudar épica EP-001 desde HU-003
-Use agent-implementador-epicas: resume epic EP-001 from HU-003
+Use agent-epic-implementer: resume epic EP-001 from HU-003
+Usa agent-epic-implementer: reanudar épica EP-001 desde HU-003
 ```
 
 ---
 
-### agent-verificador
+### agent-verifier
 
 **Purpose:** the team's skeptic. Runs tests, checks each mandatory acceptance criterion, and re-runs the design check. Verdict **PASS** or **FAIL** with concrete gaps — does not edit code.
 
 **Try saying:**
 
 ```
-Usa agent-verificador: valida HU-003 — no aceptes claims sin evidencia.
-Use agent-verificador: validate HU-003 — do not accept claims without evidence.
+Use agent-verifier: validate HU-003 — do not accept claims without evidence.
+Usa agent-verifier: valida HU-003 — no aceptes claims sin evidencia.
 ```
 
 Before release:
 
 ```
-Usa agent-verificador: pre-release check — valida que EP-002 está done con evidencia.
-Use agent-verificador: pre-release check — validate that EP-002 is done with evidence.
+Use agent-verifier: pre-release check — validate that EP-002 is done with evidence.
+Usa agent-verifier: pre-release check — valida que EP-002 está done con evidencia.
 ```
 
 ---
 
-### agent-auditor-oportunidades
+### agent-opportunity-auditor
 
 **Purpose:** project health check — security, missing tests, dependencies, code quality. Delivers prioritized improvement cards (OPP-001, OPP-002...); you choose which to adopt.
 
 **Try saying:**
 
 ```
-Usa agent-auditor-oportunidades: audita oportunidades de mejora en el proyecto [nombre].
-Modo completo. Foco seguridad y tests.
-
-Use agent-auditor-oportunidades: audit improvement opportunities in project [name].
+Use agent-opportunity-auditor: audit improvement opportunities in project [name].
 Full mode. Focus security and tests.
+
+Usa agent-opportunity-auditor: audita oportunidades de mejora en el proyecto [nombre].
+Modo completo. Foco seguridad y tests.
 ```
 
 ---
 
-### agent-refactor-malas-practicas
+### agent-refactor-bad-practices
 
 **Purpose:** scans code for smells (fragile logic, classes doing everything, hardcoded texts...) and produces a prioritized refactor plan in Markdown. It does not implement unless explicitly requested.
 
 **Try saying:**
 
 ```
-Usa agent-refactor-malas-practicas: escanea el módulo src/api y genera plan de refactor
-priorizado. Solo reporte, no implementes.
-
-Use agent-refactor-malas-practicas: scan module src/api and generate a prioritized
+Use agent-refactor-bad-practices: scan module src/api and generate a prioritized
 refactor plan. Report only, do not implement.
+
+Usa agent-refactor-bad-practices: escanea el módulo src/api y genera plan de refactor
+priorizado. Solo reporte, no implementes.
 ```
 
 ---
@@ -399,7 +417,7 @@ In normal flow you don't call them. Other agents invoke them when needed — for
 
 | Agent | What it does | When to call directly |
 |--------|----------|----------------------|
-| **agent-arquitecto-hu** | Briefing tied to a HU (patterns, seams, anti-patterns) | Only if you want an architecture brief without implementation |
+| **agent-story-architect** | Briefing tied to a HU (patterns, seams, anti-patterns) | Only if you want an architecture brief without implementation |
 | **agent-research-scout** | Finds libs and official docs | Mostly used by the investigator |
 | **agent-debate-advocate** | Argues in favor of a candidate option | Investigator's panel |
 | **agent-debate-skeptic** | Risks and "why not" | Investigator's panel |
@@ -411,7 +429,7 @@ More prompts and diagrams: [docs/primera-linea.md](docs/primera-linea.md).
 
 ## Why this is not "another chatbot with pretty names"
 
-**Stack skills inside your repo.** When you choose technologies, the pack writes skills for those techs in your project so implementers don't have to guess APIs. It does not embed generic vendor guides; it generates them using official docs. If they get stale you can ask to refresh them.
+**Stack skills inside your repo.** After you confirm the stack, `stack-skill-generator` writes expert skills under `{project}/.cursor/skills/stack-*`. `stack-skills-updater` refreshes them on a 30-day TTL (`refresh-tech` or `/loop`). It does not embed generic vendor guides; it generates them from official docs.
 
 **It does not invent versions.** Before naming a version, API, or library, it consults official sources and records them in `sources-ledger.md` — it does not rely on blog memory.
 
@@ -447,14 +465,16 @@ More prompts and diagrams: [docs/primera-linea.md](docs/primera-linea.md).
 | If you want... | Use... |
 |-------------|------|
 | Idea → complete backlog | `agent-scrum` |
-| Feature in existing product | `agent-evolucion` |
-| Research approaches without coding | `agent-investigador-ideador` |
-| Implement one HU | `agent-implementador` |
-| Implement an entire epic | `agent-implementador-epicas` |
-| Confirm something is truly done | `agent-verificador` |
-| Health check / technical debt | `agent-auditor-oportunidades` |
-| Refactor plan | `agent-refactor-malas-practicas` |
-| Only an architecture brief | `agent-arquitecto-hu` |
+| Feature in existing product | `agent-evolution` |
+| Research approaches without coding | `agent-investigator-ideator` |
+| Implement one HU | `agent-implementer` |
+| Implement an entire epic | `agent-epic-implementer` |
+| Confirm something is truly done | `agent-verifier` |
+| Health check / technical debt | `agent-opportunity-auditor` |
+| Refactor plan | `agent-refactor-bad-practices` |
+| Only an architecture brief | `agent-story-architect` |
+| Create stack skills after W8 | `stack-skill-generator` |
+| Refresh stale stack skills | `stack-skills-updater` / `refresh-tech` |
 | How models are chosen | [`AGENTS.md`](AGENTS.md) · [docs/orquestacion.md](docs/orquestacion.md) |
 
 ---

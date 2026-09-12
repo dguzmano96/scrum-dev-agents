@@ -1,8 +1,8 @@
 # Epic Implementer (Cursor global)
 
-Agente + skill para **implementar una épica completa** orquestando al `hu-implementer` **HU por HU mediante subagentes `agent-implementador` aislados**, con build+test tras cada HU, STOP+AskQuestion enriquecido (técnica + no técnica + soluciones) y docs siempre actualizadas.
+Agente + skill para **implementar una épica completa** orquestando al `story-implementer` **HU por HU mediante subagentes `agent-implementer` aislados**, con build+test tras cada HU, STOP+AskQuestion enriquecido (técnica + no técnica + soluciones) y docs siempre actualizadas.
 
-El orquestador **no codea**: lanza un subagente `agent-implementador` nuevo por cada HU (vía `Task`), recoge su estado/evidencia y aplica build+test + sync + gates.
+El orquestador **no codea**: lanza un subagente `agent-implementer` nuevo por cada HU (vía `Task`), recoge su estado/evidencia y aplica build+test + sync + gates.
 
 Diseñado para modelos medianos (Gemini Flash, Composer, GPT mini, etc.): fases cortas, checklists, STOP+AskQuestion.
 
@@ -11,7 +11,7 @@ Diseñado para modelos medianos (Gemini Flash, Composer, GPT mini, etc.): fases 
 | Qué | Ruta |
 |-----|------|
 | Orquestador | `~/.cursor/skills/epic-implementer/` |
-| Agente | `~/.cursor/agents/agent-implementador-epicas.md` |
+| Agente | `~/.cursor/agents/agent-epic-implementer.md` |
 | Regla | `~/.cursor/rules/epic-implementer-agent.mdc` |
 | Freshness (reuso) | `~/.cursor/skills/freshness-guard/` |
 
@@ -44,7 +44,7 @@ Estoy bloqueado: reabrir decisión sobre dependencia de la épica
 ```text
 Epi0 BIND → Epi1 PREFLIGHT → Epi2 QUEUE →
   [ por cada HU:
-    Epi3 LOOP (Task → subagente agent-implementador → hu-implementer I0–I9) →
+    Epi3 LOOP (Task → subagente agent-implementer → story-implementer I0–I9) →
     Epi4 BUILD+TEST →
     Epi5 SYNC →
     Epi6 GATE
@@ -57,12 +57,12 @@ Epi8 HANDOFF
 | Skill | Rol |
 |-------|-----|
 | `epic-implementer` | Orquestador Epi0–Epi8 (no codea) |
-| `agent-implementador` (subagente) | Motor por HU — lanzado vía `Task` en Epi3; ejecuta `hu-implementer` (I0–I9) aislado |
-| `hu-implementer` | Pipeline I0–I9 (dentro del subagente) |
-| `hu-context-loader` | Context pack + stack skills proyecto (Epi1) |
+| `agent-implementer` (subagente) | Motor por HU — lanzado vía `Task` en Epi3; ejecuta `story-implementer` (I0–I9) aislado |
+| `story-implementer` | Pipeline I0–I9 (dentro del subagente) |
+| `story-context-loader` | Context pack + stack skills proyecto (Epi1) |
 | `backlog-consistency-auditor` | Preflight de contradicciones/deps (Epi1, opcional) |
 | `impl-decision-gate` | Matriz STOP + AskQuestion (dentro de cada HU) |
-| `impl-planner` / `impl-coder` / `impl-verifier` / `impl-impact-scanner` | Vía `hu-implementer` |
+| `impl-planner` / `impl-coder` / `impl-verifier` / `impl-impact-scanner` | Vía `story-implementer` |
 | `impl-doc-sync` | Auto-sync de estado/INDEX/progress (Epi5, alcance limitado) |
 | `freshness-guard` | Docs oficiales (existente) |
 | `stack-skills-updater` | Si meta de stack skill está stale |
@@ -97,7 +97,7 @@ Si el código fuerza un cambio de requisito → STOP + handoff a Scrum/Evolució
 ## Relación con otros agentes
 
 - **Scrum / Evolución**: generan épicas y HU. Este agente **consume** esos artefactos.
-- **`agent-implementador` (HU)**: motor por HU. Este agente **lo lanza como subagente** en Epi3 (uno nuevo por HU, contexto aislado); no lo duplica ni codea.
+- **`agent-implementer` (HU)**: motor por HU. Este agente **lo lanza como subagente** en Epi3 (uno nuevo por HU, contexto aislado); no lo duplica ni codea.
 - **Auditor de Oportunidades**: tras cerrar la épica, handoff natural para health check.
 
 ## Smoke test
@@ -110,7 +110,7 @@ Si el código fuerza un cambio de requisito → STOP + handoff a Scrum/Evolució
 
 ## Optimización costo
 
-- Epi3 con modelo mediano (delegado a `hu-implementer`).
+- Epi3 con modelo mediano (delegado a `story-implementer`).
 - Epi4/Epi6: AskQuestion > inventar o saltar.
 - Fases cortas > monólogo largo.
-- Reutilizar `hu-implementer` sin reinventar el pipeline I0–I9.
+- Reutilizar `story-implementer` sin reinventar el pipeline I0–I9.

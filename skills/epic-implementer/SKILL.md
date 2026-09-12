@@ -9,9 +9,9 @@ description: >-
 
 # Epic Implementer (Orchestrator)
 
-Implements **one full epic** by launching **a new `agent-implementador` subagent per HU** (isolated context), keeping status/progress docs current, and **stopping** on any doubt, contradiction, or impact to ask with a technical explanation + **full plain-language non-technical explanation** + solutions.
+Implements **one full epic** by launching **a new `agent-implementer` subagent per HU** (isolated context), keeping status/progress docs current, and **stopping** on any doubt, contradiction, or impact to ask with a technical explanation + **full plain-language non-technical explanation** + solutions.
 
-**The orchestrator does NOT code or edit product code.** It only coordinates subagents, runs global build+test (Epi4), syncs status docs (Epi5), and applies gates (Epi6). All product code is written by `agent-implementador` subagents via `hu-implementer` (I0–I9).
+**The orchestrator does NOT code or edit product code.** It only coordinates subagents, runs global build+test (Epi4), syncs status docs (Epi5), and applies gates (Epi6). All product code is written by `agent-implementer` subagents via `story-implementer` (I0–I9).
 
 **User-facing language:** skill `session-language` (first chat message).
 **Code:** follow the repo convention; if none, the dominant language of neighboring files.
@@ -22,19 +22,19 @@ Verify with official docs via WebSearch/WebFetch before recommending or implemen
 
 ## Principios no negociables
 
-1. **No choca con `agent-implementador`**: ese implementa **una** HU por invocación. Este agente **orquesta** la épica y **lanza un subagente `agent-implementador` nuevo por cada HU** (contexto aislado).
+1. **No choca con `agent-implementer`**: ese implementa **una** HU por invocación. Este agente **orquesta** la épica y **lanza un subagente `agent-implementer` nuevo por cada HU** (contexto aislado).
 2. Contexto primero, código después.
 3. Scope = la épica pedida (MoSCoW acordado en Epi2).
 4. **STOP + AskQuestion** ante duda, contradicción, conflicto código↔docs, drift de arquitectura/stack, contrato compartido, dependencia nueva, seguridad, tradeoff irreversible o fallo de build/test.
 5. Preguntar hasta aclarar (lotes AskQuestion 3–8).
-6. **Una HU a la vez, un subagente por HU**: lanzar un subagente `agent-implementador` nuevo (vía `Task`) por cada HU de la cola; el subagente ejecuta `hu-implementer` completo (I0–I9) en su propio contexto.
+6. **Una HU a la vez, un subagente por HU**: lanzar un subagente `agent-implementer` nuevo (vía `Task`) por cada HU de la cola; el subagente ejecuta `story-implementer` completo (I0–I9) en su propio contexto.
 7. **Build + test tras cada HU** (Epi4): comando detectado del repo; si ambiguo → AskQuestion.
 8. **Docs siempre actualizadas** (Epi5): auto-sync de estado HU, `INDEX.md`, `traceability.md`, `dependencias.md`, `04-sesion/epic-*-progress.md` y `decisions-log.md` (decisiones ya respondidas). **Nunca** tocar AC, BDD, `EPIC.md`, `overview.md`, `stack.md`, `nfr.md` o diagramas sin AskQuestion explícita (`needs-scrum-update`).
 9. HECHOS vs INFERENCIAS; inferencia material → AskQuestion.
 10. Diff mínimo + patrones del repo > best practice abstracta.
 11. Repo o épica inexistentes → AskQuestion (scaffold o abortar).
 12. Una fase a la vez; cola de HU visible siempre.
-13. No commitear salvo que el usuario lo pida (igual que `agent-implementador`).
+13. No commitear salvo que el usuario lo pida (igual que `agent-implementer`).
 14. **Craft gate épico** (`impl-craft-gate`): en Epi1 revisar OUT/NFR de la épica contra olores prohibidos; en Epi3 cada subagente **debe** correr I3 ARCH + craft gate; en Epi6 exigir craft PASS reportado.
 15. No aceptar `done-local` de una HU sin path a `04-sesion/arch-brief-{HU}.md` (salvo docs-only declarado).
 
@@ -43,9 +43,9 @@ Verify with official docs via WebSearch/WebFetch before recommending or implemen
 | Fase | Skill | Acción |
 |------|-------|--------|
 | **Epi0 BIND** | orquestador | Localizar proyecto + `EP-{NN}` |
-| **Epi1 PREFLIGHT** | `hu-context-loader` + `backlog-consistency-auditor` (opcional) + **`impl-craft-gate`** | Leer EPIC + HU hijas + dependencias; detectar contradicciones/deps circulares; craft preflight épica |
+| **Epi1 PREFLIGHT** | `story-context-loader` + `backlog-consistency-auditor` (opcional) + **`impl-craft-gate`** | Leer EPIC + HU hijas + dependencias; detectar contradicciones/deps circulares; craft preflight épica |
 | **Epi2 QUEUE** | orquestador + `session-language` | Order HUs by dependencies + MoSCoW; AskQuestion: scope (Must / Must+Should / all) + mode (guided / express) + build/test command if ambiguous |
-| **Epi3 LOOP** | `Task` → subagente `agent-implementador` (ejecuta `hu-implementer` I0–I9 **con I3 ARCH**) | Por cada HU: **lanzar un subagente nuevo**; el subagente corre aislado y devuelve estado/STOP/evidencia **+ arch-brief + craft PASS**; el orquestador nunca codea |
+| **Epi3 LOOP** | `Task` → subagente `agent-implementer` (ejecuta `story-implementer` I0–I9 **con I3 ARCH**) | Por cada HU: **lanzar un subagente nuevo**; el subagente corre aislado y devuelve estado/STOP/evidencia **+ arch-brief + craft PASS**; el orquestador nunca codea |
 | **Epi4 BUILD+TEST** | orquestador + `session-language` | After each HU done: run repo build + test; if it fails → STOP + enriched AskQuestion |
 | **Epi5 SYNC** | `impl-doc-sync` (auto, alcance limitado) | Actualizar estado HU + INDEX + traceability + dependencias + epic-progress + decisions-log |
 | **Epi6 GATE** | orquestador + **`impl-craft-gate`** | Si HU no cierra AC Must, build/test rojo, **o craft FAIL / sin arch-brief** → **STOP épica** + AskQuestion enriquecido (no saltar a la siguiente HU) |
@@ -57,7 +57,7 @@ Verify with official docs via WebSearch/WebFetch before recommending or implemen
 - Sin Epi1 completo → no armar cola.
 - Contradicción o dep circular detectada en Epi1 → no avanzar hasta resolver (AskQuestion o handoff a Scrum/Evolución).
 - Sin Epi2 confirmado (alcance + modo + comando build/test) → no iniciar Epi3.
-- Señal STOP dentro del subagente `agent-implementador` (I2/I8) → el subagente devuelve control al orquestador; este pausa la épica y lanza AskQuestion enriquecido; no pasar a la siguiente HU.
+- Señal STOP dentro del subagente `agent-implementer` (I2/I8) → el subagente devuelve control al orquestador; este pausa la épica y lanza AskQuestion enriquecido; no pasar a la siguiente HU.
 - Build o test rojo en Epi4 → STOP épica (no saltar HU).
 - AC Must sin evidencia en alguna HU → STOP épica.
 - **Craft FAIL o sin arch-brief** (salvo docs-only) en reporte de HU → STOP épica (Epi6).
@@ -65,15 +65,15 @@ Verify with official docs via WebSearch/WebFetch before recommending or implemen
 
 ## Epi3 LOOP — Subagente por HU (obligatorio)
 
-Cada HU corre en un **subagente `agent-implementador` nuevo y aislado**, lanzado vía la herramienta `Task` con `subagent_type: "agent-implementador"`. **Con qué:** skill `cursor-agent-policy` — `model` = lookup(`modo activo`, `implement`). **Nunca omitas `model`.** Explore/lectura → tipo `explore`. Reenvía `modo activo` en el prompt del hijo. El orquestador **nunca** escribe ni edita código de producto.
+Cada HU corre en un **subagente `agent-implementer` nuevo y aislado**, lanzado vía la herramienta `Task` con `subagent_type: "agent-implementer"`. **Con qué:** skill `cursor-agent-policy` — `model` = lookup(`modo activo`, `implement`). **Nunca omitas `model`.** Explore/lectura → tipo `explore`. Reenvía `modo activo` en el prompt del hijo. El orquestador **nunca** escribe ni edita código de producto.
 
 ### Flujo por HU
 
-1. **Lanzar subagente** (`Task`, `subagent_type: "agent-implementador"`, `model` = lookup `implement`) con un prompt que incluya:
+1. **Lanzar subagente** (`Task`, `subagent_type: "agent-implementer"`, `model` = lookup `implement`) con un prompt que incluya:
    - `modo activo: {low|mid|high|cursor}` (el de la sesión; no confundir con guiado/express).
    - Proyecto (raíz) + EP-ID + HU-ID (o path al `HU-*.md`).
    - Modo Scrum (guiado / express) acordado en Epi2.
-   - Instrucción: ejecutar `hu-implementer` completa (I0–I9) **con I3 ARCH** (`agent-arquitecto-hu` / `impl-architecture-guide`) y **`impl-craft-gate`** en I2/I6/I7.
+   - Instrucción: ejecutar `story-implementer` completa (I0–I9) **con I3 ARCH** (`agent-story-architect` / `impl-architecture-guide`) y **`impl-craft-gate`** en I2/I6/I7.
    - Prohibiciones craft: no keyword engines NL; no confirmación por frases; no engordar god-classes fuera del arch-brief; no dual-track nuevo; no sync-over-async nuevo.
    - Restricciones heredadas: STOP ante `needs-user`/`needs-scrum-update`, no tocar AC/EPIC/arq/stack, no commitear.
    - Devolución estructurada: estado (`done-local` / `blocked`), archivos, evidencia AC Must, **path arch-brief**, **craft PASS/FAIL**, decisiones, señal STOP.
@@ -114,7 +114,7 @@ Señal STOP: none | needs-user | needs-scrum-update
 
 ## Modos
 
-- **Guiado** (default): el plan de cada HU se muestra en I4 (lo gestiona `hu-implementer`); además, Epi2 pide confirmación de la cola completa antes de arrancar.
+- **Guiado** (default): el plan de cada HU se muestra en I4 (lo gestiona `story-implementer`); además, Epi2 pide confirmación de la cola completa antes de arrancar.
 - **Express**: cada HU sigue las reglas express del Implementador (I4 auto-ok si ≤3 archivos y cero riesgos); Epi2 solo confirma cola + comando build/test.
 
 ## STOP + AskQuestion enriquecido (formato obligatorio)
@@ -173,7 +173,7 @@ Si falta proyecto o EP-ID → AskQuestion inmediato.
 ## Anti-patrones
 
 - Implementar varias HU en paralelo (un subagente por HU, secuencial).
-- Codear en el orquestador (todo el código va en el subagente `agent-implementador`).
+- Codear en el orquestador (todo el código va en el subagente `agent-implementer`).
 - Lanzar un subagente sin pasarle proyecto/EP-ID/HU-ID/modo.
 - Saltar build o test tras una HU "porque ya pasó I7".
 - Tocar AC/BDD/EPIC/arquitectura/stack sin AskQuestion explícita.
@@ -190,6 +190,6 @@ Si falta proyecto o EP-ID → AskQuestion inmediato.
 
 1. Leer esta skill + `impl-craft-gate`.
 2. Ejecutar Epi0 → Epi1 (con craft preflight) → Epi2.
-3. Por cada HU de la cola: lanzar subagente `agent-implementador` (Epi3, con ARCH+craft) → build+test (Epi4) → sync (Epi5) → gate (Epi6, craft).
+3. Por cada HU de la cola: lanzar subagente `agent-implementer` (Epi3, con ARCH+craft) → build+test (Epi4) → sync (Epi5) → gate (Epi6, craft).
 4. Al final o ante STOP: Epi8 handoff.
 5. NO implementar épicas de ejemplo en la tarea de creación de skills.

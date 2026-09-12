@@ -8,8 +8,8 @@ Diseñado para modelos medianos (Gemini Flash, Composer, GPT mini, etc.): fases 
 
 | Qué | Ruta |
 |-----|------|
-| Orquestador | `~/.cursor/skills/hu-implementer/` |
-| Regla | `~/.cursor/rules/hu-implementer-agent.mdc` |
+| Orquestador | `~/.cursor/skills/story-implementer/` |
+| Regla | `~/.cursor/rules/story-implementer-agent.mdc` |
 | Freshness (reuso) | `~/.cursor/skills/freshness-guard/` |
 
 Windows: `C:\Users\<user>\.cursor\skills\...`
@@ -43,9 +43,9 @@ I5 FRESH → I6 CODE → I7 VERIFY → I8 IMPACT → I9 HANDOFF
 
 | Skill | Rol |
 |-------|-----|
-| `hu-implementer` | Orquestador I0–I9 |
+| `story-implementer` | Orquestador I0–I9 |
 | `cursor-agent-policy` | Lookup `model` (modo × tipo). Scrum no elige slugs |
-| `hu-context-loader` | Context pack + progress + stack skills proyecto |
+| `story-context-loader` | Context pack + progress + stack skills proyecto |
 | `impl-decision-gate` | Matriz STOP + AskQuestion |
 | `impl-planner` | Plan ≤8 pasos |
 | `impl-coder` | Slices; usa `stack-*` del proyecto |

@@ -3,7 +3,7 @@ name: impl-craft-gate
 description: >-
   Binary craft/architecture gate for HU and epic implementation: forbids NL
   keyword engines, god-class growth, dual-track hacks, and other design smells
-  before and after coding. Use in hu-implementer (I2/I6/I7) and epic-implementer
+  before and after coding. Use in story-implementer (I2/I6/I7) and epic-implementer
   (Epi1/Epi3/Epi6). Blocks done-local if violations remain.
 ---
 
@@ -17,15 +17,15 @@ Gate **binario** (PASS/FAIL). No “casi”. Si falla → **STOP**: no I6 code /
 
 | Momento | Quién | Acción si FAIL |
 |---------|-------|----------------|
-| Tras I2 (antes de plan/arch) | `hu-implementer` | STOP; si la HU **exige** olor → `needs-scrum-update` |
-| Tras I3b ARCH + I3 PLAN | `hu-implementer` | Re-plan o STOP |
+| Tras I2 (antes de plan/arch) | `story-implementer` | STOP; si la HU **exige** olor → `needs-scrum-update` |
+| Tras I3b ARCH + I3 PLAN | `story-implementer` | Re-plan o STOP |
 | Tras cada slice I6 | `impl-coder` | Revertir/arreglar slice antes de seguir |
 | I7 VERIFY | `impl-verifier` | No `done-local` |
 | Epi1 / Epi3 prompt / Epi6 | `epic-implementer` | No lanzar o no cerrar HU |
 
 ## Skills a leer (obligatorio)
 
-1. `skill-BestPractices`
+1. `best-practices`
 2. `code-craft-fundamentals`
 3. `{proyecto}/.cursor/skills/stack-*` aplicables
 4. Si existe: `03-calidad/research/hardcoding-i18n-design-error-review.md`
@@ -62,7 +62,7 @@ Gate **binario** (PASS/FAIL). No “casi”. Si falla → **STOP**: no I6 code /
 
 ## Checklist OBLIGATORIO (PASS solo si todos los aplicables están ✔)
 
-- [ ] Briefing de `impl-architecture-guide` / `agent-arquitecto-hu` leído y citado en progress (salvo HU docs-only)
+- [ ] Briefing de `impl-architecture-guide` / `agent-story-architect` leído y citado en progress (salvo HU docs-only)
 - [ ] Diff sigue “Cómo implementarlo” del briefing (desvíos → AskQuestion)
 - [ ] Confirmaciones/escrituras: solo señales estructuradas + proposal-only si aplica
 - [ ] Activación/claim: estructural o LLM; **no** nuevos diccionarios es/en

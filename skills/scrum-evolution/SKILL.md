@@ -13,7 +13,7 @@ Lands high-impact / modification / improvement ideas for an already implemented 
 
 session-language: follow the `session-language` skill; artifacts and AskQuestion prompts must use the session language.  
 Diagrams: Mermaid.  
-Does not implement code — handoff to `hu-implementer`.
+Does not implement code — handoff to `story-implementer`.
 
 Verify with official docs via WebSearch/WebFetch before recommending; record sources (`freshness-guard`).
 
@@ -23,7 +23,7 @@ Verify with official docs via WebSearch/WebFetch before recommending; record sou
 |--------|------|
 | `scrum-idea-to-backlog` | Greenfield: idea → initial backlog |
 | `scrum-evolution` (this) | Brownfield: change → delta backlog |
-| `hu-implementer` | Implements a single HU |
+| `story-implementer` | Implements a single HU |
 
 ## Principios no negociables
 
@@ -113,4 +113,4 @@ Ignorar código · regenerar backlog entero · HU de rewrite total · silenciar 
 1. E0 AskQuestion.
 2. E1 inventory before eliciting details.
 3. Follow blockers.
-4. On close: handoff with ordered HUs for `hu-implementer`.
+4. On close: handoff with ordered HUs for `story-implementer`.

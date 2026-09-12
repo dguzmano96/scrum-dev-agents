@@ -28,7 +28,7 @@ description: >-
 7. Invocar `backlog-consistency-auditor`.
 8. Invocar `quality-gate`; si falla tamaño → `story-splitter`.
 9. Invocar `flow-diagram-generator` para épicas tocadas.
-10. Anotar orden sugerido de implementación para `hu-implementer`.
+10. Anotar orden sugerido de implementación para `story-implementer`.
 
 ## Prohibido
 

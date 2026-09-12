@@ -1,10 +1,10 @@
 ---
-name: hu-implementer
+name: story-implementer
 description: >-
   Orchestrates implementing a single user story (HU) with craft gate,
-  architecture briefing (agent-arquitecto-hu), plan, code slices, and AC/BDD
-  evidence. Use when user says implementa HU, implementar historia, HU-00X, or
-  implement user story from backlog.
+  architecture briefing (agent-story-architect), plan, code slices, and AC/BDD
+  evidence. Use when user says implementa HU, implementar historia, HU-00X,
+  implement user story, or invokes hu-implementer (legacy name).
 ---
 
 # HU Implementer (Orchestrator)
@@ -27,7 +27,7 @@ Verify with official docs via WebSearch/WebFetch before recommending or implemen
 5. Use `freshness-guard` + project skills `{project}/.cursor/skills/stack-*` (see `STACK_MANIFEST.md`).
 6. Apply stable theory `code-craft-fundamentals` (SOLID/DRY/KISS/YAGNI/patterns) **without over-engineering**; do not refresh that skill.
 7. **Mandatory craft gate** (`impl-craft-gate`): zero NL/keyword engines, zero unjustified god-class stuffing, zero new dual-track. FAIL → no code / no done.
-8. **Mandatory architecture guide** (`impl-architecture-guide` / `agent-arquitecto-hu`) before the code plan (except docs-only HUs). The briefing is **binding** for I3/I6.
+8. **Mandatory architecture guide** (`impl-architecture-guide` / `agent-story-architect`) before the code plan (except docs-only HUs). The briefing is **binding** for I3/I6.
 9. AC + BDD = DoD. No done without Must evidence **and** craft gate PASS at I7.
 10. FACTS vs INFERENCES; material inference → AskQuestion.
 11. Minimal diff + repo patterns > abstract best practice; the arch-brief wins over “invent layers”.
@@ -38,10 +38,10 @@ Verify with official docs via WebSearch/WebFetch before recommending or implemen
 
 | Fase | Skill | Acción |
 |------|--------|--------|
-| I0 BIND | `hu-context-loader` | Localizar HU + raíz proyecto |
-| I1 LOAD | `hu-context-loader` | Context pack + progress + **stack skills del proyecto** |
+| I0 BIND | `story-context-loader` | Localizar HU + raíz proyecto |
+| I1 LOAD | `story-context-loader` | Context pack + progress + **stack skills del proyecto** |
 | I2 CLARIFY | `impl-decision-gate` + **`impl-craft-gate` (preflight)** | Gaps → AskQuestion; craft FAIL si HU exige olor → `needs-scrum-update` |
-| **I3 ARCH** | **`agent-arquitecto-hu`** / `impl-architecture-guide` | Briefing vinculante `04-sesion/arch-brief-{HU}.md`; señal `arch-ok` |
+| **I3 ARCH** | **`agent-story-architect`** / `impl-architecture-guide` | Briefing vinculante `04-sesion/arch-brief-{HU}.md`; señal `arch-ok` |
 | I3b PLAN | `impl-planner` + arch-brief + `code-craft-fundamentals` | Plan formato fijo **obedeciendo** el briefing; craft gate post-plan |
 | I4 CONFIRM | orquestador + `session-language` | AskQuestion: Approve plan+brief / Adjust / Abort |
 | I5 FRESH | `freshness-guard` + skills `stack-*` | Docs + skills proyecto; si meta stale → `stack-skills-updater` o fetch puntual |
@@ -52,8 +52,8 @@ Verify with official docs via WebSearch/WebFetch before recommending or implemen
 
 ### I3 ARCH — How to launch the guide
 
-1. Preferred: `Task` `subagent_type: "agent-arquitecto-hu"` with prompt = root + HU-ID + HU path + “briefing only, no code”.
-2. Model: use the **`cursor-agent-policy`** skill — `model` = lookup(`modo activo`, `decide`) for `agent-arquitecto-hu`. **Never omit `model`.** Auxiliary reading/`explore` → use `explore` type. Forward `modo activo` and `session language` in the child's prompt.
+1. Preferred: `Task` `subagent_type: "agent-story-architect"` with prompt = root + HU-ID + HU path + “briefing only, no code”.
+2. Model: use the **`cursor-agent-policy`** skill — `model` = lookup(`modo activo`, `decide`) for `agent-story-architect`. **Never omit `model`.** Auxiliary reading/`explore` → use `explore` type. Forward `modo activo` and `session language` in the child's prompt.
 3. If the `subagent_type` does not exist in the session → run skill `impl-architecture-guide` **yourself**.
 4. No `arch-ok` (and the HU is not docs-only) → **no** I3b/I6.
 5. Docs-only (backlog/ADR markdown only, no `src/` edits) → I3 ARCH may be N/A documented in progress.
@@ -100,6 +100,6 @@ Si falta proyecto o ID → AskQuestion inmediato.
 ## Arranque
 
 1. Leer esta skill + `impl-craft-gate` + `impl-architecture-guide`.
-2. Invocar `hu-context-loader` (I0–I1).
+2. Invocar `story-context-loader` (I0–I1).
 3. Seguir pipeline sin saltar bloqueos (I2 craft → I3 ARCH → I3b PLAN → …).
 4. NO implementar HU de ejemplo en la tarea de creación de skills.

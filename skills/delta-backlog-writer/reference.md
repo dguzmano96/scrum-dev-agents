@@ -6,4 +6,4 @@
 - [ ] Auditoría consistencia OK
 - [ ] Quality gate Must >= umbral o split hecho
 - [ ] flujo.mmd de épicas tocadas
-- [ ] Orden HU para hu-implementer escrito en evolution-progress
+- [ ] Orden HU para story-implementer escrito en evolution-progress

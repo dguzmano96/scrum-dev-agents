@@ -37,7 +37,7 @@ Plugin instructions are **English**. User-facing chat, AskQuestion, and **new** 
 | Phase codes | `W0`–`W8`, `I0`–`I9`, `Epi0`–`Epi8`, `R0`–`R8`, `O0`–`O10` |
 | Framework words | MoSCoW, INVEST, AC, BDD, Must/Should/Could/Won't |
 | Gherkin keywords | `Given` / `When` / `Then` / `And` / `But` |
-| Agent and skill names | `agent-scrum`, `hu-implementer` |
+| Agent and skill names | Canonical English ids (`agent-implementer`, `story-implementer`). Legacy Spanish ids still route via description aliases. |
 | Source code | Follow the repo’s language; comments match neighboring files |
 
 ## Read existing artifacts

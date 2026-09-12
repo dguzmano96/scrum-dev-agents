@@ -3,7 +3,7 @@ name: code-craft-fundamentals
 description: >-
   Static software craft theory for HU implementation: SOLID, DRY, KISS, YAGNI,
   Clean Code basics, GoF/enterprise pattern catalog, coupling/cohesion. Use with
-  hu-implementer, impl-coder, code review, or when user asks SOLID DRY buenas
+  story-implementer, impl-coder, code review, or when user asks SOLID DRY buenas
   practicas patrones. Does NOT auto-refresh (stable theory).
 ---
 
@@ -128,7 +128,7 @@ Si 6 = “patrón” pero el repo no lo usa → Preferir patrón local; AskQuest
 | `code-craft-fundamentals` (este) | Teoría estable |
 | `stack-*` (proyecto) | Cómo aplicar teoría **en** ese stack hoy |
 | `freshness-guard` | APIs/versiones (cambiante) |
-| `skill-BestPractices` | Alternativa más amplia; este skill es el **default del implementer** |
+| `best-practices` | Alternativa más amplia; este skill es el **default del implementer** |
 
 ## Cuándo NO aplicar al pie de la letra
 

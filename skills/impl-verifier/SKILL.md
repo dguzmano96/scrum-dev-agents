@@ -2,7 +2,7 @@
 name: impl-verifier
 description: >-
   Maps HU acceptance criteria and BDD scenarios to evidence (tests or manual
-  checklist); blocks done if Must items fail. Use in I7 of hu-implementer.
+  checklist); blocks done if Must items fail. Use in I7 of story-implementer.
 ---
 
 # Impl Verifier (I7)
@@ -10,7 +10,7 @@ description: >-
 ## Método
 
 1. Leer AC y BDD de la HU.
-2. Llenar template `hu-implementer/templates/ac-evidence.md` (o sección en progress).
+2. Llenar template `story-implementer/templates/ac-evidence.md` (o sección en progress).
 3. Preferir tests automatizados alineados a BDD si el repo tiene harness.
 4. Si **no** hay harness → AskQuestion:
    - Crear tests mínimos

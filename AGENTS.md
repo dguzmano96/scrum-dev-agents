@@ -106,14 +106,14 @@ When launching the custom agent, `model` = this type’s row × active mode. The
 | Agent / `subagent_type` | Type | Scrum ceiling notes |
 |---|---|---|
 | `agent-scrum` | `plan` | One discovery / backlog. Does not code. |
-| `agent-evolucion` | `plan` | One backlog delta. Does not code. |
-| `agent-investigador-ideador` | `research` | One research request. |
-| `agent-implementador-epicas` | `plan` | One epic; one HU per `Task` to `agent-implementador`. |
-| `agent-implementador` | `implement` | **One** HU. Inner slices = more bounded `implement`s. |
-| `agent-arquitecto-hu` | `decide` | One HU; `arch-brief` only. |
-| `agent-verificador` | `verify` | One HU / one criterion. |
-| `agent-auditor-oportunidades` | `review` | One audit. |
-| `agent-refactor-malas-practicas` | `review` | One scan scope. |
+| `agent-evolution` | `plan` | One backlog delta. Does not code. |
+| `agent-investigator-ideator` | `research` | One research request. |
+| `agent-epic-implementer` | `plan` | One epic; one HU per `Task` to `agent-implementer`. |
+| `agent-implementer` | `implement` | **One** HU. Inner slices = more bounded `implement`s. |
+| `agent-story-architect` | `decide` | One HU; `arch-brief` only. |
+| `agent-verifier` | `verify` | One HU / one criterion. |
+| `agent-opportunity-auditor` | `review` | One audit. |
+| `agent-refactor-bad-practices` | `review` | One scan scope. |
 | `agent-research-scout` | `research` | One question + URLs. |
 | `agent-debate-advocate` | `decide` | One trade-off (for). |
 | `agent-debate-skeptic` | `decide` | One trade-off (against). |

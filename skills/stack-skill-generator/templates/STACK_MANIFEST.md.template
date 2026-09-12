@@ -16,4 +16,4 @@ Generado/actualizado: {{ISO_DATETIME}}
 
 ## Regla
 
-hu-implementer debe leer este manifest en I1 y cargar skills `stack-*` relevantes a la HU.
+story-implementer debe leer este manifest en I1 y cargar skills `stack-*` relevantes a la HU.

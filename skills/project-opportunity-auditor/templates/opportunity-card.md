@@ -8,7 +8,7 @@
 | Confianza | Alta / Media / Baja |
 | Esfuerzo estimado | XS / S / M / L / XL |
 | Score | {0–100} |
-| Agente siguiente | scrum-evolution / hu-implementer / scrum-idea-to-backlog |
+| Agente siguiente | scrum-evolution / story-implementer / scrum-idea-to-backlog |
 | Estado O9 | adoptada / aplazada / descartada / pendiente |
 
 ## Problema

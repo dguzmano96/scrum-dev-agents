@@ -2,7 +2,7 @@
 name: stack-{{TECH_SLUG}}
 description: >-
   Project stack expert for {{TECH_NAME}}. Use when implementing features with
-  {{TECH_NAME}}, configuring {{TECH_NAME}}, or when hu-implementer codes against
+  {{TECH_NAME}}, configuring {{TECH_NAME}}, or when story-implementer codes against
   this project's stack.md entry for {{TECH_NAME}}.
 ---
 

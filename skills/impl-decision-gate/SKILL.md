@@ -33,7 +33,7 @@ Parar **inmediatamente** si:
 
 ## Formato AskQuestion
 
-Usar `hu-implementer/templates/decision-ask.md`:
+Usar `story-implementer/templates/decision-ask.md`:
 
 - 2–4 bullets (hecho vs opciones)
 - Impacto HU / épica / arquitectura

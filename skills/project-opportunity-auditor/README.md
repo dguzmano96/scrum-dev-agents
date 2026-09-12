@@ -58,7 +58,7 @@ O5 QUALITY → O6 DEPS → O7 STACK → O8 CONSOLIDATE → O9 SELECT → O10 OUT
 
 1. `scrum-idea-to-backlog` — greenfield  
 2. `scrum-evolution` — cambio concreto → delta  
-3. `hu-implementer` — implementa HU  
+3. `story-implementer` — implementa HU  
 4. `project-opportunity-auditor` — **descubre** qué mejorar
 
 ## Flujo típico

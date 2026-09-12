@@ -61,7 +61,7 @@ Mantenimiento: `stack-skills-updater` o `/loop 1d`.
 
 1. `scrum-idea-to-backlog` — greenfield  
 2. `scrum-evolution` — cada cambio sustancial  
-3. `hu-implementer` — `Implementa la HU-0XX`
+3. `story-implementer` — `Implementa la HU-0XX`
 
 ## Smoke test
 

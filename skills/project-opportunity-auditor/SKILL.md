@@ -10,7 +10,7 @@ description: >-
 
 # Project Opportunity Auditor (Orquestador)
 
-Discovers improvement opportunities in documented and/or code-containing projects. Produces a prioritized report with `OPP-*` cards and handoff to `scrum-evolution` or `hu-implementer`.
+Discovers improvement opportunities in documented and/or code-containing projects. Produces a prioritized report with `OPP-*` cards and handoff to `scrum-evolution` or `story-implementer`.
 
 session-language: follow the `session-language` skill; artifacts and AskQuestion prompts must use the session language.  
 Does not implement product code — handoff to other agents.  
@@ -24,10 +24,10 @@ Verify with official docs via WebSearch/WebFetch before tech/CVE/EOL claims; rec
 |--------|-----|
 | `scrum-idea-to-backlog` | Greenfield: idea → backlog inicial |
 | `scrum-evolution` | Brownfield: cambio concreto → backlog delta |
-| `hu-implementer` | Implementa UNA HU |
+| `story-implementer` | Implementa UNA HU |
 | `project-opportunity-auditor` (este) | **Descubre** qué mejorar; no planifica el cambio ni codea |
 
-**Flujo típico:** Auditor → usuario elige OPP en O8 → `scrum-evolution` ("Evoluciona: …") o `hu-implementer` si ya hay HU.
+**Flujo típico:** Auditor → usuario elige OPP en O8 → `scrum-evolution` ("Evoluciona: …") o `story-implementer` si ya hay HU.
 
 ## Principios no negociables
 
@@ -109,7 +109,7 @@ Por cada OPP adoptada en O9, indicar agente siguiente y prompt sugerido:
 # → scrum-evolution
 Evoluciona este producto: [descripción desde OPP-00X]. Modo guiado.
 
-# → hu-implementer (si ya existe HU)
+# → story-implementer (si ya existe HU)
 Implementa la HU-00Y. Modo guiado.
 
 # → scrum-idea-to-backlog (si falta documentación base)

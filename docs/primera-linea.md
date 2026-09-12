@@ -12,17 +12,17 @@ These are the agents you call directly from the Cursor chat. Each orchestrates s
 flowchart TB
     subgraph primera_linea["Agents you call from chat"]
         scrum["agent-scrum"]
-        evolucion["agent-evolucion"]
-        ideador["agent-investigador-ideador"]
-        impl["agent-implementador"]
-        impl_epi["agent-implementador-epicas"]
-        verif["agent-verificador"]
-        auditor["agent-auditor-oportunidades"]
-        refactor["agent-refactor-malas-practicas"]
+        evolution["agent-evolution"]
+        investigator["agent-investigator-ideator"]
+        impl["agent-implementer"]
+        impl_epi["agent-epic-implementer"]
+        verif["agent-verifier"]
+        auditor["agent-opportunity-auditor"]
+        refactor["agent-refactor-bad-practices"]
     end
 
     subgraph internos["Agents invoked by other agents"]
-        arq["agent-arquitecto-hu"]
+        arq["agent-story-architect"]
         scout["agent-research-scout"]
         adv["agent-debate-advocate"]
         skep["agent-debate-skeptic"]
@@ -30,18 +30,18 @@ flowchart TB
     end
 
     scrum --> impl
-    evolucion --> impl
-    ideador --> scout
-    ideador --> adv
-    ideador --> skep
-    ideador --> fit
+    evolution --> impl
+    investigator --> scout
+    investigator --> adv
+    investigator --> skep
+    investigator --> fit
     impl_epi --> impl
     impl --> arq
     impl --> verif
 
     style scrum stroke-width:3px
-    style evolucion stroke-width:3px
-    style ideador stroke-width:3px
+    style evolution stroke-width:3px
+    style investigator stroke-width:3px
     style impl stroke-width:3px
     style impl_epi stroke-width:3px
     style verif stroke-width:3px
@@ -64,13 +64,13 @@ Solid lines = agents you call. Dashed lines = agents the orchestrator calls for 
 | Agent | When to use it | What it does |
 |-------|---------------|--------------|
 | **agent-scrum** | New idea / greenfield product | Guided discovery → epics → well-formed HUs (acceptance criteria + separate Given/When/Then) → architecture → stack selection. Does not implement. |
-| **agent-evolucion** | Existing product | Inventory → gap analysis → backlog delta (only new or replacing epics/HUs). Does not implement. |
-| **agent-investigador-ideador** | "How to implement X?", compare approaches | Scans the repo, researches web, runs debate panels, delivers a report (recommended option #1 + option #2). Read-only. |
-| **agent-implementador** | A single HU | Design check → architectural brief → plan → code in small slices → evidence of acceptance criteria. |
-| **agent-implementador-epicas** | A whole epic | Coordinates one HU after another via subagents; build + test after each HU. |
-| **agent-verificador** | After implementation or before marking done | Skeptical reviewer: runs tests, checks mandatory criteria, re-runs design check. PASS/FAIL with evidence. Read-only. |
-| **agent-auditor-oportunidades** | Health check, pre-release, debt | Audits NFRs, missing tests, dependencies, quality → prioritized improvement cards. Does not implement. |
-| **agent-refactor-malas-practicas** | Design smells, refactor plan | Generates a prioritized refactor plan under `03-calidad/refactor/`. Does not implement unless requested. |
+| **agent-evolution** | Existing product | Inventory → gap analysis → backlog delta (only new or replacing epics/HUs). Does not implement. |
+| **agent-investigator-ideator** | "How to implement X?", compare approaches | Scans the repo, researches web, runs debate panels, delivers a report (recommended option #1 + option #2). Read-only. |
+| **agent-implementer** | A single HU | Design check → architectural brief → plan → code in small slices → evidence of acceptance criteria. |
+| **agent-epic-implementer** | A whole epic | Coordinates one HU after another via subagents; build + test after each HU. |
+| **agent-verifier** | After implementation or before marking done | Skeptical reviewer: runs tests, checks mandatory criteria, re-runs design check. PASS/FAIL with evidence. Read-only. |
+| **agent-opportunity-auditor** | Health check, pre-release, debt | Audits NFRs, missing tests, dependencies, quality → prioritized improvement cards. Does not implement. |
+| **agent-refactor-bad-practices** | Design smells, refactor plan | Generates a prioritized refactor plan under `03-calidad/refactor/`. Does not implement unless requested. |
 
 ---
 
@@ -78,7 +78,7 @@ Solid lines = agents you call. Dashed lines = agents the orchestrator calls for 
 
 | Agent | Role |
 |-------|------|
-| **agent-arquitecto-hu** | Writes `arch-brief-{HU}.md` (patterns, seams, anti-patterns) before code. You may request a briefing only. |
+| **agent-story-architect** | Writes `arch-brief-{HU}.md` (patterns, seams, anti-patterns) before code. You may request a briefing only. |
 | **agent-research-scout** | Finds libraries, patterns, and official docs (launched by the investigator). |
 | **agent-debate-advocate** | Argues in favor of a candidate option. |
 | **agent-debate-skeptic** | Lists risks, hidden costs, and why an option may fail. |
@@ -91,14 +91,14 @@ Solid lines = agents you call. Dashed lines = agents the orchestrator calls for 
 | Goal | Agent |
 |------|-------|
 | Convert an idea into a full Scrum backlog | `agent-scrum` |
-| Add or change features in an existing product | `agent-evolucion` |
-| Research technical approaches without coding | `agent-investigador-ideador` |
-| Implement a single user story | `agent-implementador` |
-| Implement all HUs of an epic | `agent-implementador-epicas` |
-| Confirm that something is actually done | `agent-verificador` |
-| Audit project health before release | `agent-auditor-oportunidades` |
-| Generate a refactor / anti-pattern plan | `agent-refactor-malas-practicas` |
-| Request an architecture brief only | `agent-arquitecto-hu` |
+| Add or change features in an existing product | `agent-evolution` |
+| Research technical approaches without coding | `agent-investigator-ideator` |
+| Implement a single user story | `agent-implementer` |
+| Implement all HUs of an epic | `agent-epic-implementer` |
+| Confirm that something is actually done | `agent-verifier` |
+| Audit project health before release | `agent-opportunity-auditor` |
+| Generate a refactor / anti-pattern plan | `agent-refactor-bad-practices` |
+| Request an architecture brief only | `agent-story-architect` |
 
 ---
 

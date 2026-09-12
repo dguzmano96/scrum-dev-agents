@@ -1,9 +1,9 @@
 ---
-name: hu-context-loader
+name: story-context-loader
 description: >-
   Resolves HU ID/path, loads Scrum context pack (epic, architecture, stack,
-  discovery), and writes impl progress file. Use in I0/I1 of hu-implementer or
-  when binding a user story before coding.
+  discovery), and writes impl progress file. Use in I0/I1 of story-implementer,
+  when binding a user story before coding, or hu-context-loader (legacy name).
 ---
 
 # HU Context Loader (I0–I1)
@@ -20,7 +20,7 @@ Falla cerrado si no existe la HU.
 ## I1 LOAD — context pack (orden fijo)
 
 Marcar checklist en `{proyecto}/04-sesion/impl-{HU-ID}-progress.md`  
-(usar template `hu-implementer/templates/impl-progress.md`).
+(usar template `story-implementer/templates/impl-progress.md`).
 
 1. HU completa (AC, BDD, deps, OoS, NFRs)
 2. `EPIC.md` padre

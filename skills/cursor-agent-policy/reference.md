@@ -28,14 +28,14 @@ If today > `vence`: warn and offer a refresh. If the user continues, use this ta
 | `subagent_type` | Type |
 |---|---|
 | `agent-scrum` | `plan` |
-| `agent-evolucion` | `plan` |
-| `agent-investigador-ideador` | `research` |
-| `agent-implementador-epicas` | `plan` |
-| `agent-implementador` | `implement` |
-| `agent-arquitecto-hu` | `decide` |
-| `agent-verificador` | `verify` |
-| `agent-auditor-oportunidades` | `review` |
-| `agent-refactor-malas-practicas` | `review` |
+| `agent-evolution` | `plan` |
+| `agent-investigator-ideator` | `research` |
+| `agent-epic-implementer` | `plan` |
+| `agent-implementer` | `implement` |
+| `agent-story-architect` | `decide` |
+| `agent-verifier` | `verify` |
+| `agent-opportunity-auditor` | `review` |
+| `agent-refactor-bad-practices` | `review` |
 | `agent-research-scout` | `research` |
 | `agent-debate-advocate` | `decide` |
 | `agent-debate-skeptic` | `decide` |

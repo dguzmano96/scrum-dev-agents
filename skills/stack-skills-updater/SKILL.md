@@ -17,7 +17,7 @@ Verify with official docs via WebSearch/WebFetch before recommending; record sou
 
 - Usuario: `actualizar skills del stack` / `refresh-tech` / `refresh stack skills`
 - `/loop 1d actualizar skills del stack del proyecto {nombre}` (u otro intervalo)
-- Al inicio de sesión de `hu-implementer` si algún `meta.md` está **stale** (aviso + oferta de update; update completo puede diferirse)
+- Al inicio de sesión de `story-implementer` si algún `meta.md` está **stale** (aviso + oferta de update; update completo puede diferirse)
 
 ## TTL default
 
@@ -62,7 +62,7 @@ Reglas loop:
 | `stack-skill-generator` | Crear / regenerar desde stack.md |
 | `stack-skills-updater` | Refrescar por TTL / loop |
 | `freshness-guard` | Protocolo allowlist |
-| `hu-implementer` | Consume skills; si stale en I5 → preferir updater o fetch puntual |
+| `story-implementer` | Consume skills; si stale en I5 → preferir updater o fetch puntual |
 
 ## Fuera de alcance de este updater
 

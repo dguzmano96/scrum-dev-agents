@@ -18,9 +18,9 @@ Ejemplo: `mi-app/04-sesion/epic-EP-001-progress.md`
 | Fase | Skill |
 |------|--------|
 | Epi0 | epic-implementer (orquestador) |
-| Epi1 | hu-context-loader + backlog-consistency-auditor (opcional) |
+| Epi1 | story-context-loader + backlog-consistency-auditor (opcional) |
 | Epi2 | epic-implementer (AskQuestion cola + modo + build) |
-| Epi3 | `Task` → subagente `agent-implementador` → `hu-implementer` (I0–I9) |
+| Epi3 | `Task` → subagente `agent-implementer` → `story-implementer` (I0–I9) |
 | Epi4 | epic-implementer (build + test) |
 | Epi5 | impl-doc-sync (auto, alcance limitado) |
 | Epi6 | epic-implementer (gate de bloqueo) |

@@ -2,8 +2,8 @@
 name: impl-architecture-guide
 description: >-
   Produces a binding architecture/design-pattern briefing for one HU by reading
-  the codebase and HU/epic context. Guides hu-implementer on exactly how to
-  implement. Use as I3 ARCH in hu-implementer, or via agent-arquitecto-hu.
+  the codebase and HU/epic context. Guides story-implementer on exactly how to
+  implement. Use as I3 ARCH in story-implementer, or via agent-story-architect.
   Does not write product code.
 ---
 
@@ -16,7 +16,7 @@ description: >-
 ```
 # Cualquier nivel (principal o anidado) — SIEMPRE model vía cursor-agent-policy
 Task({
-  subagent_type: "agent-arquitecto-hu",
+  subagent_type: "agent-story-architect",
   model: "<lookup modo activo × decide>",
   prompt: "modo activo: {low|mid|high|cursor}\nHU-ID, path HU, raíz proyecto. Solo briefing MD. No implementar."
 })
@@ -31,7 +31,7 @@ Task({
 
 No hardcodees slugs. No omitas `model`. Lee skill `cursor-agent-policy` antes del Task.
 
-Si `agent-arquitecto-hu` no está en la sesión → **ejecutar esta skill tú mismo** (mismo workflow).
+Si `agent-story-architect` no está en la sesión → **ejecutar esta skill tú mismo** (mismo workflow).
 
 ## Precondiciones
 

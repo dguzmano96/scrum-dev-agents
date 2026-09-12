@@ -1,10 +1,11 @@
 ---
-name: skill-BestPractices
+name: best-practices
 description: >-
   Software development best practices—SOLID, DRY, Clean Code, OOP, naming,
   refactoring, and maintainability. Uses WebSearch for authoritative guidance.
   Use when writing or reviewing code, refactoring, designing classes or modules,
-  pull requests, architecture decisions, or when the user invokes /skill-BestPractices.
+  pull requests, architecture decisions, /best-practices, or skill-BestPractices
+  (legacy name).
 ---
 
 # Software Best Practices

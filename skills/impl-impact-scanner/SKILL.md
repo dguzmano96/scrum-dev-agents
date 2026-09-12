@@ -2,7 +2,7 @@
 name: impl-impact-scanner
 description: >-
   Scans completed HU work for architecture/stack/contract/scope drift and forces
-  STOP+AskQuestion on unauthorized impact. Use in I8 of hu-implementer before handoff.
+  STOP+AskQuestion on unauthorized impact. Use in I8 of story-implementer before handoff.
 ---
 
 # Impl Impact Scanner (I8)

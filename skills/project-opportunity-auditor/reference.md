@@ -34,9 +34,9 @@
 | Tipo OPP | Agente | Condición |
 |----------|--------|-----------|
 | Nueva funcionalidad / cambio amplio | `scrum-evolution` | Siempre |
-| HU ya existe en backlog | `hu-implementer` | HU identificada y ready |
+| HU ya existe en backlog | `story-implementer` | HU identificada y ready |
 | Backlog/documentación incompleta | `scrum-idea-to-backlog` | Retomar wizard |
-| Solo actualizar deps / fix puntual | `hu-implementer` o spike | Si usuario prefiere HU mínima |
+| Solo actualizar deps / fix puntual | `story-implementer` o spike | Si usuario prefiere HU mínima |
 
 ## Templates
 

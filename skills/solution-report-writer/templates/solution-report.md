@@ -91,5 +91,5 @@ Recomendación del agente: **adoptar #1** / **adoptar #2** / **spike antes de de
 ## Handoff
 
 ```text
-{prompt listo para scrum-evolution | scrum-idea-to-backlog | hu-implementer}
+{prompt listo para scrum-evolution | scrum-idea-to-backlog | story-implementer}
 ```

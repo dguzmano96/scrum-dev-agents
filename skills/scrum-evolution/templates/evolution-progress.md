@@ -40,6 +40,6 @@ Decisión usuario:
 |----|------|-------|
 | | | |
 
-## Handoff HU order (para hu-implementer)
+## Handoff HU order (para story-implementer)
 
 1. HU-

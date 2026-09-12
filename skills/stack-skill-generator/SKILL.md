@@ -9,7 +9,7 @@ description: >-
 
 # Stack Skill Generator
 
-Crea **skills expertos del stack del proyecto** para que `hu-implementer` las use.
+Crea **skills expertos del stack del proyecto** para que `story-implementer` las use.
 Ubicación: **dentro del proyecto** (no en `~/.cursor/skills/` global).
 
 Verify with official docs via WebSearch/WebFetch before recommending; record sources.

@@ -2,7 +2,7 @@
 name: impl-coder
 description: >-
   Implements one approved plan slice at a time with minimal diff, repo patterns,
-  project stack-* skills, and no scope creep. Use in I6 of hu-implementer after
+  project stack-* skills, and no scope creep. Use in I6 of story-implementer after
   plan confirm and freshness.
 ---
 

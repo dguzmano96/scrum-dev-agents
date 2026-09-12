@@ -2,7 +2,7 @@
 name: impl-planner
 description: >-
   Builds a fixed-format implementation plan for one HU (max 8 steps, file lists,
-  AC-to-evidence map). Use in I3 of hu-implementer after clarify gate is green.
+  AC-to-evidence map). Use in I3 of story-implementer after clarify gate is green.
 ---
 
 # Impl Planner (I3)

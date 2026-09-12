@@ -12,4 +12,4 @@ Ejemplo: `/loop 1d Ejecuta stack-skills-updater en proyecto mi-app`
 
 ## Consumir
 
-`hu-implementer` / `hu-context-loader` leen manifest + skills `stack-*` en I1/I5/I6.
+`story-implementer` / `story-context-loader` leen manifest + skills `stack-*` en I1/I5/I6.

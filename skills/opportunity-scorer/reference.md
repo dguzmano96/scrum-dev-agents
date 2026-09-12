@@ -12,9 +12,9 @@
 | Señal en OPP | Agente |
 |--------------|--------|
 | Cambio de alcance, módulo nuevo, breaking | `scrum-evolution` |
-| HU existente con gap de implementación/tests | `hu-implementer` |
+| HU existente con gap de implementación/tests | `story-implementer` |
 | Falta discovery/NFR/backlog base | `scrum-idea-to-backlog` |
-| Solo bump de dependencia acotada | `hu-implementer` o spike HU |
+| Solo bump de dependencia acotada | `story-implementer` o spike HU |
 
 ## Ejemplo score
 
