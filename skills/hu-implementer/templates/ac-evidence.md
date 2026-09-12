@@ -1,23 +1,23 @@
-# Evidencia AC/BDD — {HU-ID}
+# AC/BDD evidence — {HU-ID}
 
-## Criterios de Aceptación
+## Acceptance Criteria
 
-| AC# | Descripción corta | Cumple? | Evidencia (test path o pasos manuales) |
-|-----|-------------------|---------|----------------------------------------|
-| 1 | | sí/no | |
-| 2 | | sí/no | |
+| AC# | Short description | Met? | Evidence (test path or manual steps) |
+|-----|-------------------|------|--------------------------------------|
+| 1 | | yes/no | |
+| 2 | | yes/no | |
 
-## Escenarios BDD
+## BDD Scenarios
 
-| Escenario | Tipo | Cumple? | Evidencia |
-|-----------|------|---------|-----------|
+| Scenario | Type | Met? | Evidence |
+|----------|------|------|----------|
 | | Happy | | |
-| | Validación | | |
+| | Validation | | |
 | | Edge | | |
-| | Fallo | | |
+| | Failure | | |
 
-## Resultado
+## Result
 
-- [ ] Todos los AC Must en verde
-- [ ] BDD Must cubiertos o exentos con autorización usuario
-- [ ] Bloqueado — Must en rojo
+- [ ] All Must ACs green
+- [ ] Must BDD covered or exempted with user authorization
+- [ ] Blocked — Must in red

@@ -7,32 +7,32 @@ description: >-
   implement user story from backlog.
 ---
 
-# HU Implementer (Orquestador)
+# HU Implementer (Orchestrator)
 
-Implementa **una** Historia de Usuario usando contexto Scrum del proyecto + codebase.
+Implements a single User Story using the project's Scrum context and the codebase.
 
-**Idioma con usuario:** Español.  
-**Código:** convención del repo; si no hay, idioma dominante de archivos vecinos.  
-**Modelos medianos:** fases cortas, checklists binarios, sin juicio implícito.  
-**Freshness:** reutilizar skill `freshness-guard` (no duplicar allowlist).
+session-language: follow the `session-language` skill; interact with the user in the session language.  
+**Code:** follow the repo convention; if none, the dominant language of neighboring files.  
+**Medium models:** short phases, binary checklists, no implicit judgment.  
+**Freshness:** reuse skill `freshness-guard` (do not duplicate the allowlist).
 
 Verify with official docs via WebSearch/WebFetch before recommending or implementing APIs/patterns; record sources.
 
-## Principios no negociables
+## Non-negotiable principles
 
-1. Contexto primero, código después.
-2. Scope = solo la HU pedida.
-3. STOP + AskQuestion ante decisión de impacto (ver `impl-decision-gate`).
-4. Preguntar hasta aclarar (lotes AskQuestion 3–8).
-5. Usar `freshness-guard` + skills de proyecto `{proyecto}/.cursor/skills/stack-*` (ver `STACK_MANIFEST.md`).
-6. Aplicar teoría estable `code-craft-fundamentals` (SOLID/DRY/KISS/YAGNI/patrones) **sin over-engineering**; no refrescar esa skill.
-7. **Craft gate obligatorio** (`impl-craft-gate`): cero motores NL/keywords, cero engorde injustificado de god-classes, cero dual-track nuevo. FAIL → no code / no done.
-8. **Guía arquitectónica obligatoria** (`impl-architecture-guide` / `agent-arquitecto-hu`) antes del plan de código (salvo HU docs-only). El briefing es **vinculante** para I3/I6.
-9. AC + BDD = DoD. No done sin evidencia Must **y** craft gate PASS en I7.
-10. HECHOS vs INFERENCIAS; inferencia material → AskQuestion.
-11. Diff mínimo + patrones del repo > best practice abstracta; el arch-brief gana sobre “inventar capas”.
-12. Repo inexistente → AskQuestion (scaffold según `02-arquitectura/` o abortar).
-13. Una fase a la vez; plan ≤ 8 pasos.
+1. Context first, code second.
+2. Scope = only the requested HU.
+3. STOP + AskQuestion on impact decisions (see `impl-decision-gate`).
+4. Keep asking until clear (AskQuestion batches of 3–8).
+5. Use `freshness-guard` + project skills `{project}/.cursor/skills/stack-*` (see `STACK_MANIFEST.md`).
+6. Apply stable theory `code-craft-fundamentals` (SOLID/DRY/KISS/YAGNI/patterns) **without over-engineering**; do not refresh that skill.
+7. **Mandatory craft gate** (`impl-craft-gate`): zero NL/keyword engines, zero unjustified god-class stuffing, zero new dual-track. FAIL → no code / no done.
+8. **Mandatory architecture guide** (`impl-architecture-guide` / `agent-arquitecto-hu`) before the code plan (except docs-only HUs). The briefing is **binding** for I3/I6.
+9. AC + BDD = DoD. No done without Must evidence **and** craft gate PASS at I7.
+10. FACTS vs INFERENCES; material inference → AskQuestion.
+11. Minimal diff + repo patterns > abstract best practice; the arch-brief wins over “invent layers”.
+12. Missing repo → AskQuestion (scaffold from `02-arquitectura/` or abort).
+13. One phase at a time; plan ≤ 8 steps.
 
 ## Pipeline I0–I9 (mostrar siempre fase + HU ID)
 
@@ -43,20 +43,20 @@ Verify with official docs via WebSearch/WebFetch before recommending or implemen
 | I2 CLARIFY | `impl-decision-gate` + **`impl-craft-gate` (preflight)** | Gaps → AskQuestion; craft FAIL si HU exige olor → `needs-scrum-update` |
 | **I3 ARCH** | **`agent-arquitecto-hu`** / `impl-architecture-guide` | Briefing vinculante `04-sesion/arch-brief-{HU}.md`; señal `arch-ok` |
 | I3b PLAN | `impl-planner` + arch-brief + `code-craft-fundamentals` | Plan formato fijo **obedeciendo** el briefing; craft gate post-plan |
-| I4 CONFIRM | orquestador | AskQuestion: Aprobar plan+brief / Ajustar / Abortar |
+| I4 CONFIRM | orquestador + `session-language` | AskQuestion: Approve plan+brief / Adjust / Abort |
 | I5 FRESH | `freshness-guard` + skills `stack-*` | Docs + skills proyecto; si meta stale → `stack-skills-updater` o fetch puntual |
 | I6 CODE | `impl-coder` + arch-brief + `impl-craft-gate` + `code-craft-fundamentals` | Slices; **seguir briefing**; craft gate tras cada slice |
 | I7 VERIFY | `impl-verifier` + **`impl-craft-gate`** | AC/BDD → evidencia; craft FAIL → no done |
 | I8 IMPACT | `impl-impact-scanner` | Drift → STOP si sí |
-| I9 HANDOFF | orquestador (+ `impl-doc-sync` si autorizan) | Resumen + path arch-brief |
+| I9 HANDOFF | orquestador + `session-language` (+ `impl-doc-sync` if authorized) | Summary + path to arch-brief |
 
-### I3 ARCH — Cómo lanzar el guía
+### I3 ARCH — How to launch the guide
 
-1. Preferido: `Task` `subagent_type: "agent-arquitecto-hu"` con prompt = raíz + HU-ID + path HU + “solo briefing, no code”.
-2. Modelo: **`~/.cursor/AGENTS.md`** (global; un `.cursor/AGENTS.md` de repo con matrices lo overridea). Anidado juicio → omitir `model`; anidado ligero → `composer-2.5[fast=false]`.
-3. Si el `subagent_type` no existe en la sesión → ejecutar skill `impl-architecture-guide` **tú mismo**.
-4. Sin `arch-ok` (y HU no es docs-only) → **no** I3b/I6.
-5. Docs-only (solo markdown backlog/ADR sin tocar `src/`) → I3 ARCH puede ser N/A documentado en progress.
+1. Preferred: `Task` `subagent_type: "agent-arquitecto-hu"` with prompt = root + HU-ID + HU path + “briefing only, no code”.
+2. Model: use the **`cursor-agent-policy`** skill — `model` = lookup(`modo activo`, `decide`) for `agent-arquitecto-hu`. **Never omit `model`.** Auxiliary reading/`explore` → use `explore` type. Forward `modo activo` and `session language` in the child's prompt.
+3. If the `subagent_type` does not exist in the session → run skill `impl-architecture-guide` **yourself**.
+4. No `arch-ok` (and the HU is not docs-only) → **no** I3b/I6.
+5. Docs-only (backlog/ADR markdown only, no `src/` edits) → I3 ARCH may be N/A documented in progress.
 
 ### Bloqueos duros
 
@@ -70,10 +70,10 @@ Verify with official docs via WebSearch/WebFetch before recommending or implemen
 - Diff que contradice arch-brief sin AskQuestion → STOP.
 - AC Must sin evidencia → no marcar done.
 
-### Modos
+### Modes
 
-- **Guiado** (default): I4 obligatorio.
-- **Express**: solo Must paths; I4 auto-ok si ≤3 archivos y cero riesgos tras mostrar plan.
+- **Guided** (default): I4 mandatory.
+- **Express**: Must paths only; I4 auto-ok if ≤3 files and zero risks after showing the plan.
 
 ### Input
 

@@ -44,6 +44,7 @@ I5 FRESH → I6 CODE → I7 VERIFY → I8 IMPACT → I9 HANDOFF
 | Skill | Rol |
 |-------|-----|
 | `hu-implementer` | Orquestador I0–I9 |
+| `cursor-agent-policy` | Lookup `model` (modo × tipo). Scrum no elige slugs |
 | `hu-context-loader` | Context pack + progress + stack skills proyecto |
 | `impl-decision-gate` | Matriz STOP + AskQuestion |
 | `impl-planner` | Plan ≤8 pasos |
@@ -78,6 +79,6 @@ Teoría de código: skill global `code-craft-fundamentals` — **no** se actuali
 
 ## Optimización costo
 
-- I6 con modelo mediano.
+- **Con qué:** skill `cursor-agent-policy` (matriz del modo de la sesión), no “modelo mediano” a ojo.
 - I2/I8: AskQuestion > inventar.
 - Fases cortas > monólogo largo.

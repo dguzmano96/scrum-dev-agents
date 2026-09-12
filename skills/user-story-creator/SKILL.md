@@ -1,14 +1,12 @@
 ---
 name: user-story-creator
 description: >-
-  Writes INVEST user stories in Spanish with declarative AC and separate BDD
-  Gherkin scenarios, MoSCoW, and epic traceability. Use when generating historias
-  de usuario, HU, user stories, acceptance criteria, or Gherkin for an epic.
+  Writes INVEST user stories using the session language (see `session-language` skill). Produces declarative AC and separate BDD Gherkin scenarios, MoSCoW, and epic traceability. Prefer the canonical English user-story shape `As a [role], I want [goal], so that [benefit]` and include the session-language equivalent (e.g. `Como/quiero/para`) in the generated artifact. Use when generating historias de usuario, HU, user stories, acceptance criteria, or Gherkin for an epic.
 ---
 
 # User Story Creator
 
-Genera `HU/HU-{NN}-{slug}.md` con template `scrum-idea-to-backlog/templates/HU.md`.
+Writes `HU/HU-{NN}-{slug}.md` using template `scrum-idea-to-backlog/templates/HU.md`.
 
 ## Precondiciones
 
@@ -16,9 +14,10 @@ Genera `HU/HU-{NN}-{slug}.md` con template `scrum-idea-to-backlog/templates/HU.m
 - Sin supuestos BLOQUEANTES abiertos que afecten la HU
 - Preferible stack ya elegido si la HU menciona integraciones tech (si no, lenguaje de capacidad)
 
-## Formato historia
+## Story format
 
-Como **[rol]**, quiero **[objetivo]**, para **[beneficio]**.
+Canonical (English): As a [role], I want [goal], so that [benefit].
+Include the session-language equivalent (e.g. "Como [rol], quiero [objetivo], para [beneficio]") when the session language is not English.
 
 ## AC vs BDD
 

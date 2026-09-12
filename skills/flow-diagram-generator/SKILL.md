@@ -8,23 +8,23 @@ description: >-
 
 # Flow Diagram Generator
 
-## Salida
+## Output
 
 `01-backlog/EP-{NN}-{slug}/flujo.mmd`
 
-## Método
+## Method
 
-1. Leer EPIC.md + HU Must (y Should si clarifican el flujo).
-2. Elegir `flowchart` para journeys; `sequenceDiagram` si hay muchos actores/sistemas.
-3. Nodos = pasos de usuario/sistema; decisiones = reglas de negocio.
-4. No inventar pasos fuera del backlog; si falta → AskQuestion o gap en auditoría.
+1. Read EPIC.md + Must HUs (and Shoulds if they clarify the flow).
+2. Choose `flowchart` for journeys; `sequenceDiagram` when many actors/systems exist.
+3. Nodes = user/system steps; decisions = business rules.
+4. Do not invent steps outside the backlog; if missing → AskQuestion or record an audit gap.
 5. Opcional: embeber link/resumen en EPIC.md.
 
 ## Reglas Mermaid
 
-- IDs de nodo simples (sin espacios raros)
-- Etiquetas en Español
-- Incluir camino de error principal si hay HU/BDD de fallo
+ - Use simple node IDs (no unusual spaces)
+ - Use labels in the session language (follow the `session-language` skill)
+ - Include the main error path if there are HU/BDD failure scenarios
 
 ## Tech names
 

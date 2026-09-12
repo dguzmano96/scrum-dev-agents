@@ -20,7 +20,7 @@ Escribe el **reporte final** del Investigador/Ideador. Solo documentación.
 ## Método
 
 1. Leer template `templates/solution-report.md`.
-2. Redactar en **español**, tono claro y argumentado (no telegráfico vacío).
+2. Write in the **session language** (skill `session-language`), clear and argued (not empty telegraphic).
 3. Incluir:
    - Resumen ejecutivo (qué pedirías si solo lees 30s)
    - Opción **#1**: por qué gana, cómo implementar (pasos), mitigaciones al skeptic

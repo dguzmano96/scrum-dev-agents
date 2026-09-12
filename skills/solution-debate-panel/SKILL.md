@@ -22,7 +22,7 @@ Panel estructurado: **argumentar, rebatir, evaluar encaje**, luego ranking.
 
 1. Congelar candidatas C1…Cn (de R3) — no añadir tech nueva a mitad de debate sin volver a R2.
 2. Para cada candidata top (máx 3 en completo, 2 en express):
-   - Lanzar **advocate** (puede ser paralelo por opción).
+   - Lanzar **advocate** (puede ser paralelo por opción) con `model` = lookup `decide` (`cursor-agent-policy`) y `modo activo` en el prompt.
 3. Lanzar **skeptic** con las tesis del advocate a la vista.
 4. Lanzar **fit** con inventory + todas las candidatas.
 5. Sintetizar en `debate-transcript.md`:

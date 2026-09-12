@@ -7,33 +7,29 @@ description: >-
   Does not write product code.
 ---
 
-# Impl Architecture Guide (guía arquitectónica por HU)
+# Impl Architecture Guide (HU architecture guide)
 
-**Rol:** diseñador arquitectónico. **No codea** producto. Produce un briefing **vinculante** para `impl-planner` / `impl-coder`.
+**Role:** architecture designer. **Does not write product code.** Produces a binding briefing for `impl-planner` / `impl-coder`.
 
 ## Preferido: agente
 
 ```
-# Desde el chat (subagente)
+# Cualquier nivel (principal o anidado) — SIEMPRE model vía cursor-agent-policy
 Task({
   subagent_type: "agent-arquitecto-hu",
-  model: "claude-sonnet-5-thinking-medium",
-  prompt: "HU-ID, path HU, raíz proyecto. Solo briefing MD. No implementar."
+  model: "<lookup modo activo × decide>",
+  prompt: "modo activo: {low|mid|high|cursor}\nHU-ID, path HU, raíz proyecto. Solo briefing MD. No implementar."
 })
 
-# Desde un subagente (sub-subagente con juicio) — omitir model; ver AGENTS.md
-Task({
-  subagent_type: "agent-arquitecto-hu",
-  prompt: "HU-ID, path HU, raíz proyecto. Solo briefing MD. No implementar."
-})
-
-# Sub-subagente ligero (lectura/explore)
+# Subagente ligero (lectura/explore)
 Task({
   subagent_type: "explore",
-  model: "composer-2.5[fast=false]",
-  prompt: "Solo leer área afectada; devolver paths + snippets."
+  model: "<lookup modo activo × explore>",
+  prompt: "modo activo: {low|mid|high|cursor}\nSolo leer área afectada; devolver paths + snippets."
 })
 ```
+
+No hardcodees slugs. No omitas `model`. Lee skill `cursor-agent-policy` antes del Task.
 
 Si `agent-arquitecto-hu` no está en la sesión → **ejecutar esta skill tú mismo** (mismo workflow).
 
@@ -47,9 +43,9 @@ Si `agent-arquitecto-hu` no está en la sesión → **ejecutar esta skill tú mi
 
 1. Leer HU (AC/BDD/OoS) + EPIC (IN/OUT/NFR).
 2. Explorar codebase en el área afectada (Grep/Glob/Read; explore agent OK).
-3. Identificar: seams existentes, god-classes a **no engordar**, patrones del repo a reutilizar, contratos (SSE, tools, proposal-only).
+3. Identify: existing seams, god-classes not to bloat, repo patterns to reuse, contracts (SSE, tools, proposal-only).
 4. Elegir **pocos** patrones (máx. 3) justificados por el AC — YAGNI.
-5. Escribir briefing con plantilla abajo.
+5. Write the briefing using the template below.
 6. Si el AC de la HU **obliga** un olor del craft-gate → señal `needs-scrum-update` (no inventar bypass).
 
 ## Patrones típicos a considerar (catálogo corto; no forzar)
@@ -111,16 +107,16 @@ Si `agent-arquitecto-hu` no está en la sesión → **ejecutar esta skill tú mi
 - `arch-ok` | `needs-scrum-update` | `needs-user`
 ```
 
-## Reglas
+## Rules
 
-1. Briefing **vincula** a I3 plan e I6 code; desvío → AskQuestion.
-2. Preferir patrones **ya en el repo** sobre Clean Architecture de libro.
-3. No pedir rewrite de god-class completa salvo que el AC lo sea (EP-CRAFT F3).
-4. No implementar código.
-5. Idioma: **Español**.
+1. The briefing **binds** to the I3 plan and I6 code; deviations → AskQuestion.
+2. Prefer patterns already present in the repo over textbook Clean Architecture.
+3. Do not request a complete rewrite of a god-class unless the AC explicitly requires it (EP-CRAFT F3).
+4. Do not implement code.
+5. session-language: follow the `session-language` skill; output and diagrams must use the session language. Gherkin keywords remain English.
 
-## Salida al orquestador
+## Output to the orchestrator
 
-- Path del `arch-brief-*.md`
-- Señal `arch-ok` / STOP
-- 3–5 bullets “cómo hacerlo” para el prompt del coder
+- Path of `arch-brief-*.md`
+- Signal `arch-ok` / STOP
+- 3–5 “how to do it” bullets for the coder prompt

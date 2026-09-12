@@ -1,7 +1,7 @@
 ---
 name: epic-creator
 description: >-
-  Creates outcome-driven Scrum epics (EPIC.md) in Spanish with MoSCoW, IN/OUT
+  Creates outcome-driven Scrum epics (EPIC.md) in the session language with MoSCoW, IN/OUT
   scope, metrics, and child story links. Use after discovery approval when
   generating épicas, epics, or splitting themes into epics.
 ---

@@ -1,29 +1,31 @@
-# HU-{NN} — {Título}
+# HU-{NN} — {Title}
 
-| Campo | Valor |
+| Field | Value |
 |-------|--------|
 | ID | HU-XXX |
-| Épica padre | EP-XXX |
-| Título | |
+| Parent epic | EP-XXX |
+| Title | |
 | MoSCoW | Must / Should / Could / Won't |
-| Valor de negocio (1–5) | |
-| Esfuerzo relativo (opcional) | |
+| Business value (1–5) | |
+| Relative effort (optional) | |
 
-## Historia
+## Story
 
-Como **[rol]**, quiero **[objetivo]**, para **[beneficio]**.
+As a **[role]**, I want **[goal]**, so that **[benefit]**.
 
-## Contexto / precondiciones
+(Write this sentence in the session language; keep the same three-part shape.)
 
-## Criterios de Aceptación
+## Context / preconditions
 
-Checklist declarativo y medible (NO Given/When/Then aquí):
+## Acceptance Criteria
+
+Declarative, measurable checklist (NO Given/When/Then here):
 
 1. 
 2. 
 3. 
 
-## Escenarios BDD
+## BDD Scenarios
 
 ### Happy path
 
@@ -33,7 +35,7 @@ When ...
 Then ...
 ```
 
-### Validación
+### Validation
 
 ```gherkin
 Given ...
@@ -49,7 +51,7 @@ When ...
 Then ...
 ```
 
-### Fallo / error
+### Failure / error
 
 ```gherkin
 Given ...
@@ -57,29 +59,29 @@ When ...
 Then ...
 ```
 
-## Reglas de negocio
+## Business rules
 
-## Datos de entrada / salida
+## Input / output data
 
-## Dependencias
+## Dependencies
 
 - HU:
-- Épicas:
-- Sistemas externos:
+- Epics:
+- External systems:
 
-## Out of scope (esta HU)
+## Out of scope (this HU)
 
-## NFRs aplicables
+## Applicable NFRs
 
-(Umbrales numéricos si existen.)
+(Numeric thresholds when they exist.)
 
-## Notas abiertas (solo no bloqueantes)
+## Open notes (non-blocking only)
 
-## Checklist INVEST
+## INVEST checklist
 
-- [ ] I — Independiente
-- [ ] N — Negociable
-- [ ] V — Valiosa
+- [ ] I — Independent
+- [ ] N — Negotiable
+- [ ] V — Valuable
 - [ ] E — Estimable
-- [ ] S — Small (cabe en un sprint)
-- [ ] T — Testeable
+- [ ] S — Small (fits in a sprint)
+- [ ] T — Testable

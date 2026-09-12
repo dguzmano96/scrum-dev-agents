@@ -42,11 +42,13 @@ Seguir `freshness-guard`. Priorizar:
 ## Prompt para subagente `agent-research-scout`
 
 ```text
-Eres agent-research-scout. Pedido del usuario: {pedido}
+Eres agent-research-scout. modo activo: {low|mid|high|cursor}
+Pedido del usuario: {pedido}
 Stack/as-is relevante: {resumen inventory}
 Frente de búsqueda: {frente}
 Investiga con WebSearch/WebFetch (allowlist freshness-guard).
 Devuelve el formato Scout obligatorio. No modifiques código.
+Con qué: skill cursor-agent-policy si lanzas Task (nunca omitas model).
 ```
 
 ## Salida mínima

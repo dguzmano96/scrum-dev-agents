@@ -7,16 +7,16 @@ description: >-
   implementar todas las HU de EP-00X.
 ---
 
-# Epic Implementer (Orquestador)
+# Epic Implementer (Orchestrator)
 
-Implementa **una épica completa** lanzando **un subagente `agent-implementador` nuevo por cada HU** (contexto aislado), manteniendo docs de estado y progreso, y **parando** ante cualquier duda, contradicción o impacto para preguntarte con explicación técnica + **explicación no técnica completa (en llano)** + soluciones.
+Implements **one full epic** by launching **a new `agent-implementador` subagent per HU** (isolated context), keeping status/progress docs current, and **stopping** on any doubt, contradiction, or impact to ask with a technical explanation + **full plain-language non-technical explanation** + solutions.
 
-**El orquestador NO codea ni edita código de producto.** Solo coordina subagentes, ejecuta build+test global (Epi4), sincroniza docs de estado (Epi5) y aplica gates (Epi6). Todo el código lo escriben los subagentes `agent-implementador` vía `hu-implementer` (I0–I9).
+**The orchestrator does NOT code or edit product code.** It only coordinates subagents, runs global build+test (Epi4), syncs status docs (Epi5), and applies gates (Epi6). All product code is written by `agent-implementador` subagents via `hu-implementer` (I0–I9).
 
-**Idioma con usuario:** Español.
-**Código:** convención del repo; si no hay, idioma dominante de archivos vecinos.
-**Modelos medianos:** fases cortas, checklists binarios, sin juicio implícito.
-**Freshness:** reutilizar skill `freshness-guard` (no duplicar allowlist).
+**User-facing language:** skill `session-language` (first chat message).
+**Code:** follow the repo convention; if none, the dominant language of neighboring files.
+**Medium models:** short phases, binary checklists, no implicit judgment.
+**Freshness:** reuse skill `freshness-guard` (do not duplicate the allowlist).
 
 Verify with official docs via WebSearch/WebFetch before recommending or implementing APIs/patterns; record sources.
 
@@ -44,13 +44,13 @@ Verify with official docs via WebSearch/WebFetch before recommending or implemen
 |------|-------|--------|
 | **Epi0 BIND** | orquestador | Localizar proyecto + `EP-{NN}` |
 | **Epi1 PREFLIGHT** | `hu-context-loader` + `backlog-consistency-auditor` (opcional) + **`impl-craft-gate`** | Leer EPIC + HU hijas + dependencias; detectar contradicciones/deps circulares; craft preflight épica |
-| **Epi2 QUEUE** | orquestador | Ordenar HU por dependencias + MoSCoW; AskQuestion: alcance (Must / Must+Should / toda) + modo (guiado / express) + comando build/test si ambiguo |
+| **Epi2 QUEUE** | orquestador + `session-language` | Order HUs by dependencies + MoSCoW; AskQuestion: scope (Must / Must+Should / all) + mode (guided / express) + build/test command if ambiguous |
 | **Epi3 LOOP** | `Task` → subagente `agent-implementador` (ejecuta `hu-implementer` I0–I9 **con I3 ARCH**) | Por cada HU: **lanzar un subagente nuevo**; el subagente corre aislado y devuelve estado/STOP/evidencia **+ arch-brief + craft PASS**; el orquestador nunca codea |
-| **Epi4 BUILD+TEST** | orquestador | Tras cada HU done: ejecutar build + test del repo; si falla → STOP + AskQuestion enriquecido |
+| **Epi4 BUILD+TEST** | orquestador + `session-language` | After each HU done: run repo build + test; if it fails → STOP + enriched AskQuestion |
 | **Epi5 SYNC** | `impl-doc-sync` (auto, alcance limitado) | Actualizar estado HU + INDEX + traceability + dependencias + epic-progress + decisions-log |
 | **Epi6 GATE** | orquestador + **`impl-craft-gate`** | Si HU no cierra AC Must, build/test rojo, **o craft FAIL / sin arch-brief** → **STOP épica** + AskQuestion enriquecido (no saltar a la siguiente HU) |
-| **Epi7 RESUME** | orquestador | `pausar` / `continuar` / `reabrir desde HU-00X` / `saltar HU-00X` (con confirmación) |
-| **Epi8 HANDOFF** | orquestador | Resumen épica: HU done / blocked / skipped + siguiente agente (Auditor / Evolución / Scrum) |
+| **Epi7 RESUME** | orquestador + `session-language` | `pause` / `continue` / `reopen from HU-00X` / `skip HU-00X` (with confirmation) |
+| **Epi8 HANDOFF** | orquestador + `session-language` | Epic summary: HUs done / blocked / skipped + next agent (Auditor / Evolution / Scrum) |
 
 ### Bloqueos duros
 
@@ -65,13 +65,14 @@ Verify with official docs via WebSearch/WebFetch before recommending or implemen
 
 ## Epi3 LOOP — Subagente por HU (obligatorio)
 
-Cada HU corre en un **subagente `agent-implementador` nuevo y aislado**, lanzado vía la herramienta `Task` con `subagent_type: "agent-implementador"`. Modelo: **`~/.cursor/AGENTS.md`** (global; un `.cursor/AGENTS.md` de repo con matrices lo overridea). El Principal pasa `model` de la matriz; este orquestador anidado omite `model` en juicio y usa `composer-2.5[fast=false]` en explore/lectura. El orquestador **nunca** escribe ni edita código de producto.
+Cada HU corre en un **subagente `agent-implementador` nuevo y aislado**, lanzado vía la herramienta `Task` con `subagent_type: "agent-implementador"`. **Con qué:** skill `cursor-agent-policy` — `model` = lookup(`modo activo`, `implement`). **Nunca omitas `model`.** Explore/lectura → tipo `explore`. Reenvía `modo activo` en el prompt del hijo. El orquestador **nunca** escribe ni edita código de producto.
 
 ### Flujo por HU
 
-1. **Lanzar subagente** (`Task`, `subagent_type: "agent-implementador"`) con un prompt que incluya:
+1. **Lanzar subagente** (`Task`, `subagent_type: "agent-implementador"`, `model` = lookup `implement`) con un prompt que incluya:
+   - `modo activo: {low|mid|high|cursor}` (el de la sesión; no confundir con guiado/express).
    - Proyecto (raíz) + EP-ID + HU-ID (o path al `HU-*.md`).
-   - Modo (guiado / express) acordado en Epi2.
+   - Modo Scrum (guiado / express) acordado en Epi2.
    - Instrucción: ejecutar `hu-implementer` completa (I0–I9) **con I3 ARCH** (`agent-arquitecto-hu` / `impl-architecture-guide`) y **`impl-craft-gate`** en I2/I6/I7.
    - Prohibiciones craft: no keyword engines NL; no confirmación por frases; no engordar god-classes fuera del arch-brief; no dual-track nuevo; no sync-over-async nuevo.
    - Restricciones heredadas: STOP ante `needs-user`/`needs-scrum-update`, no tocar AC/EPIC/arq/stack, no commitear.

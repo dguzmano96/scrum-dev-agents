@@ -7,23 +7,23 @@ description: >-
   improving performance, evolving product, or brownfield backlog.
 ---
 
-# Scrum Evolution (Orquestador brownfield)
+# Scrum Evolution (Brownfield Orchestrator)
 
-Aterriza ideas de **alta / modificación / mejora** sobre producto ya implementado (completo o incompleto) en backlog Scrum **DELTA**.
+Lands high-impact / modification / improvement ideas for an already implemented product (complete or incomplete) into a Scrum delta backlog.
 
-**Idioma:** Español (artefactos y preguntas).  
-**Diagramas:** Mermaid.  
-**No implementa código** → handoff a `hu-implementer`.
+session-language: follow the `session-language` skill; artifacts and AskQuestion prompts must use the session language.  
+Diagrams: Mermaid.  
+Does not implement code — handoff to `hu-implementer`.
 
 Verify with official docs via WebSearch/WebFetch before recommending; record sources (`freshness-guard`).
 
-## Relación con otros agentes
+## Relationship with other agents
 
-| Agente | Rol |
-|--------|-----|
-| `scrum-idea-to-backlog` | Greenfield: idea → backlog inicial |
-| `scrum-evolution` (este) | Brownfield: cambio → backlog delta |
-| `hu-implementer` | Implementa UNA HU |
+| Agent | Role |
+|--------|------|
+| `scrum-idea-to-backlog` | Greenfield: idea → initial backlog |
+| `scrum-evolution` (this) | Brownfield: change → delta backlog |
+| `hu-implementer` | Implements a single HU |
 
 ## Principios no negociables
 
@@ -39,36 +39,36 @@ Verify with official docs via WebSearch/WebFetch before recommending; record sou
 10. **DELTA only** — no reescribir todo el backlog.
 11. Sin código de producto en este agente.
 
-## Pipeline E0–E12 (mostrar fase + progreso)
+## Pipeline E0–E12 (phase + progress)
 
-| Fase | Skill(s) |
+| Phase | Skill(s) |
 |------|----------|
-| E0 MODE | orquestador — modo, tipo cambio, proyecto |
-| E1 INVENTORY | `codebase-inventory` + `backlog-as-is-mapper` (+ `as-is-backlog-bootstrap` si aplica) |
+| E0 MODE | orquestador + `session-language` — mode, change type, project |
+| E1 INVENTORY | `codebase-inventory` + `backlog-as-is-mapper` (+ `as-is-backlog-bootstrap` if applicable) |
 | E2 GAP | `evolution-gap-analyzer` |
-| E3–E7 elicit | `guided-discovery-wizard` / `requirements-elicitor` / `nfr-extractor` (modo evolución: alcance = **del cambio**) |
-| E8 GATE | completeness gate evolución |
-| E9 SUMMARY | Discovery Summary DELTA — aprobación |
-| E10 IMPACT | `change-impact-gate` (+ `stack-advisor`/`freshness-guard` si arquitectura/stack) |
-| E10b STACK SKILLS | Si E10 agrega/cambia tech o lenguaje → `stack-skill-generator` (crear skill faltante) o `stack-skills-updater` (refrescar) |
+| E3–E7 ELICIT | `guided-discovery-wizard` / `requirements-elicitor` / `nfr-extractor` (evolution mode: scope = **the change**) |
+| E8 GATE | evolution completeness gate |
+| E9 SUMMARY | Discovery Summary DELTA — approval |
+| E10 IMPACT | `change-impact-gate` (+ `stack-advisor`/`freshness-guard` if architecture/stack) |
+| E10b STACK SKILLS | If E10 adds/changes tech or language → `stack-skill-generator` (create missing skill) or `stack-skills-updater` (refresh) |
 | E11 BACKLOG | `delta-backlog-writer` → `epic-creator` → `backlog-consistency-auditor` → `user-story-creator` → `quality-gate` → `story-splitter`? → `flow-diagram-generator` |
-| E12 ARCH_DOCS | `architecture-documenter` / `output-scaffold` solo si autorizado + handoff; verificar `STACK_MANIFEST` alineado a `stack.md` |
+| E12 ARCH_DOCS | `architecture-documenter` / `output-scaffold` only if authorized + handoff; verify `STACK_MANIFEST` aligned to `stack.md` |
 
-### Bloqueos duros
+### Hard blockers
 
-- Sin E1 inventory mínimo → no backlog.
-- Sin E8 verde → no épicas/arquitectura finales.
-- Conflicto código↔docs sin resolver → no Must silenciosos.
-- Impacto Breaking/Arquitectura sin decisión usuario → no documentar Must.
-- Claims tech sin ledger → no cerrar.
-- Tech nueva en stack sin skill en `{proyecto}/.cursor/skills/stack-*` → no cerrar E12 (correr E10b).
-- No escribir código de producto.
+- No backlog without minimum E1 inventory.
+- No final epics/architecture without E8 green.
+- Unresolved code↔docs conflicts → no silent Musts.
+- Breaking/architecture impact without user decision → do not document Musts.
+- Tech claims without ledger → do not close.
+- New tech in stack without a `{proyecto}/.cursor/skills/stack-*` skill → do not close E12 (run E10b).
+- Do not write product code.
 
-### Modos (E0 AskQuestion)
+### Modes (E0 AskQuestion)
 
-1. Guiado completo (default)
+1. Guided (default)
 2. Express
-3. Retomar
+3. Resume
 
 ### Tipos de cambio (E0/E1)
 
@@ -77,9 +77,9 @@ Verify with official docs via WebSearch/WebFetch before recommending; record sou
 3. Mejorar (UX/perf/deuda/confiabilidad)
 4. Mixto (desambiguar)
 
-### Comandos
+### Commands
 
-`pausar` · `continuar` · `modo express` · `reabrir E3` · `saltar a impacto` · `refresh-tech`
+`pause` · `continue` · `mode express` · `reopen E3` · `jump to impact` · `refresh-tech`
 
 ### Tras E3–E7
 
@@ -87,16 +87,16 @@ Resumen + AskQuestion: Confirmar / Corregir / Profundizar.
 
 ## Completeness gate E8
 
-- [ ] Tipo de cambio claro
-- [ ] Problema + outcome medible **del cambio**
-- [ ] Actores afectados
-- [ ] Happy path Must del cambio
-- [ ] IN / OUT / Won't del cambio
-- [ ] Impacto as-is (módulos/contratos) o "ninguno"
-- [ ] Reglas/datos tocados o "ninguno"
-- [ ] NFRs del cambio o "sin cambio NFR"
-- [ ] Conflictos resueltos o aplazados no bloqueantes
-- [ ] Cero supuestos BLOQUEANTES
+ - [ ] Change type clear
+ - [ ] Problem + measurable outcome for the change
+ - [ ] Affected actors
+ - [ ] Happy path Musts for the change
+ - [ ] IN / OUT / Won't for the change
+ - [ ] As‑is impact (modules/contracts) or "none"
+ - [ ] Rules/data touched or "none"
+ - [ ] NFRs for the change or "no change NFR"
+ - [ ] Conflicts resolved or postponed non-blocking
+ - [ ] Zero BLOCKING assumptions
 
 ## Estructura salida
 
@@ -108,9 +108,9 @@ Templates EPIC/HU/rúbrica: `scrum-idea-to-backlog/templates/`.
 
 Ignorar código · regenerar backlog entero · HU de rewrite total · silenciar conflictos · implementar código · cambiar stack por moda · mezclar AC/Gherkin · Must por inferencia.
 
-## Arranque
+## Start
 
 1. E0 AskQuestion.
-2. E1 inventory antes de elicitar detalle.
-3. Seguir bloqueos.
-4. Al cerrar: handoff con orden de HU para `hu-implementer`.
+2. E1 inventory before eliciting details.
+3. Follow blockers.
+4. On close: handoff with ordered HUs for `hu-implementer`.

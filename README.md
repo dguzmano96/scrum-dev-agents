@@ -1,40 +1,119 @@
 # Scrum Dev Agents
 
-**Lleva una idea (o un producto que ya existe) hasta software implementado y verificado**, con orden Scrum y sin que el chat principal se convierta en un “hazlo todo ya”.
+Take an idea (or an existing product) to implemented, verified software using a Scrum-aligned flow — without turning the main chat into "do everything now."
 
-Plugin de agentes y skills para [Cursor](https://cursor.com). Hablas en **español**; cada agente tiene un rol claro: planificar, investigar, codear o verificar. El backlog queda documentado, el código pasa chequeos antes de darse por bueno, y las librerías que uses tienen guías escritas en tu propio proyecto — no memorias genéricas del modelo.
+This is a plugin of agents and skills for [Cursor](https://cursor.com). Plugin instructions are English; chat, AskQuestion, and **new** artifacts use the language of the user's **first message** (skill `session-language`). Existing backlog content is left as-is unless you ask to rewrite it. Each agent has a clear role: plan, research, implement, or verify. The backlog is documented, code passes checks before marking done, and tech-specific skills are generated inside your project rather than relying on model memory.
 
-**Para quién:** un dev que ya usa git y Cursor, conoce historias de usuario, y quiere separar *“¿qué construimos?”* de *“vamos a codearlo”* — sin aprender un framework interno de siglas.
-
----
-
-## Instalar
-
-**Requisito:** Cursor con soporte de Plugins.
-
-1. Abre **Cursor** → **Customize → Plugins** → **Add from GitHub**
-2. Pega: `https://github.com/dguzmano96/scrum-dev-agents`
-3. Abre el **workspace de tu proyecto** (no solo este repo del plugin) cuando vayas a generar skills de tu stack
-
-Al instalar verás **8 agentes que tú invocas en el chat** y **5 que trabajan detrás** cuando hace falta. Las skills del plugin se cargan solas; las de tu stack (Next.js, .NET, Cloudflare, PostgreSQL, etc.) se crean en tu proyecto cuando eliges tecnologías.
+**Who it's for:** a developer who uses git and Cursor, understands user stories, and wants to separate "what do we build?" from "let's go implement it" — without learning an internal acronym-heavy framework.
 
 ---
 
-## El truco (en 30 segundos)
+## Install
 
-1. **Tú pides en español** con `Usa agent-{nombre}:` y lo que necesitas.
-2. **Cursor elige al especialista** — Scrum arma el plano, el Implementador construye un cuarto, Épicas levanta toda la planta, el Verificador no se cree el “ya está”.
-3. **El chat principal no debería codear tu producto.** Los agentes de backlog planifican; los de implementación codean con reglas; el verificador mira con lupa.
+**Requirement:** Cursor with Plugin support.
 
-No tienes que memorizar pipelines internos (W0–W8, I0–I9…). Esos pasos los ejecutan las skills por detrás.
+### 1. Plugin (agents + skills)
+
+1. Open **Cursor** → **Customize → Plugins** → **Add from GitHub**
+2. Paste: `https://github.com/dguzmano96/scrum-dev-agents`
+3. Open your **product** workspace (not only this plugin repo) when you generate stack skills
+
+You should see **8 agents you call from chat** and **5 that run behind the scenes**. Plugin skills load automatically; stack-specific skills (Next.js, .NET, Cloudflare, PostgreSQL, etc.) are created inside your project when you choose technologies.
+
+### 2. Model policy (required for nested Tasks)
+
+Scrum decides **how** (which agent, which pipeline, one HU vs one epic). The policy decides **with what** (`model` = mode × work type). Plugin `alwaysApply` rules are **not** always injected into custom subagents, so install the policy on the machine or into the product repo.
+
+Clone this repo first (or `cd` into an existing clone), then pick **global**, **local**, or both.
+
+#### Global (recommended) — all Cursor windows on this PC
+
+Run once per machine. Re-run after `git pull` if `AGENTS.md` changed.
+
+**Windows (PowerShell)** — from the plugin repo root:
+
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass
+.\scripts\install-global.ps1
+```
+
+If the script is blocked:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\install-global.ps1
+```
+
+**macOS / Linux:**
+
+```bash
+chmod +x ./scripts/install-global.sh
+./scripts/install-global.sh
+```
+
+Writes:
+
+| Path | Role |
+|---|---|
+| `%USERPROFILE%\.cursor\AGENTS.md` (Windows) / `~/.cursor/AGENTS.md` (macOS/Linux) | Canonical policy text |
+| `%USERPROFILE%\.cursor\rules\cursor-agent-policy.mdc` / `~/.cursor/rules/cursor-agent-policy.mdc` | User rule (`alwaysApply: true`) |
+
+#### Local — one product repo only
+
+Use this when the team should share the mandate in git, or you do not want a machine-wide rule. Does **not** replace global; run global as well if you want every window covered.
+
+**Windows (PowerShell)** — from the plugin repo root:
+
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass
+.\scripts\install-project.ps1 -ProjectPath "C:\path\to\your\product"
+```
+
+Keep the product file pointed at the machine copy:
+
+```powershell
+.\scripts\install-project.ps1 -ProjectPath "C:\path\to\your\product" -Symlink
+```
+
+**macOS / Linux:**
+
+```bash
+chmod +x ./scripts/install-project.sh
+./scripts/install-project.sh /path/to/your/product
+./scripts/install-project.sh /path/to/your/product --symlink
+```
+
+Writes:
+
+| Path | Role |
+|---|---|
+| `{product}/AGENTS.md` | Policy text in the product repo |
+| `{product}/.cursor/rules/cursor-agent-policy.mdc` | Project rule (`alwaysApply: true`) |
+
+Optional: commit those two files so teammates get the same matrix.
+
+### 3. New Multitask chat
+
+1. Confirm **Customize → Rules** lists `cursor-agent-policy` (Always Apply).
+2. Start a **new** Multitask chat (`/multitask`) in the product workspace.
+3. The orchestrator asks **once** for mode **low / mid / high / cursor** (in the language of your first message).
+4. Every `Task` must set `model` from the matrix. Scrum does not pick slugs. Details: [docs/orquestacion.md](docs/orquestacion.md), [`AGENTS.md`](AGENTS.md).
+
+---
+
+## The trick (in 30 seconds)
+
+1. You request in your language using `Usa agent-{name}:` (examples below). Session language = first chat message.
+2. The chat asks the model mode (**low / mid / high / cursor**) once per Multitask session.
+3. Scrum picks the specialist and the pipeline. The **model policy** maps `modo activo` × work type to a slug on **every** `Task` (including nested). Never omit `model`.
+4. The main chat should not implement your product. Backlog agents plan; implementer agents write code under rules; the verifier inspects thoroughly.
 
 ```mermaid
 flowchart TB
-    subgraph tu["Tú en el chat"]
-        U[Pedido en español]
+    subgraph tu["You in the chat"]
+        U[User request]
     end
 
-    subgraph llamas["Agentes que tú llamas"]
+    subgraph llamas["Agents you call"]
         scrum[agent-scrum]
         evo[agent-evolucion]
         ide[agent-investigador-ideador]
@@ -45,7 +124,7 @@ flowchart TB
         ref[agent-refactor-malas-practicas]
     end
 
-    subgraph detras["Los que otros agentes llaman solos"]
+    subgraph detras["Those agents call behind the scenes"]
         arq[agent-arquitecto-hu]
         scout[agent-research-scout]
         adv[agent-debate-advocate]
@@ -64,262 +143,322 @@ flowchart TB
 
 ---
 
-## Receta típica
+## How the model policy acts
 
-### App nueva (empiezas desde cero)
+Two layers. Do not mix them.
 
-Piensa en Scrum como el arquitecto que dibuja planos y corta el trabajo en historias. Cuando el backlog está listo, el Implementador toma **una historia de usuario (HU)** a la vez; si quieres toda una épica de golpe, Épicas coordina varias HU sin saltarse pasos. Al final, el Verificador ejecuta tests y revisa que los **criterios de aceptación** (lo que debe cumplir la HU) estén cubiertos — no acepta un “listo” sin evidencia.
+| Layer | Question | Who |
+|---|---|---|
+| **How** | Which agent, which phase, one HU vs one epic? | Scrum (`agent-*`, pipelines W / I / Epi) |
+| **With what** | Which model slug? | `matrix[mode][type]` — skill `cursor-agent-policy` |
+| **In which language** | Chat and new artifacts? | First message — skill `session-language` |
 
-**Prompts para copiar:**
+Every `Task` (child and grandchild) must include `model`, `modo activo: low|mid|high|cursor`, and `session language: {tag}`. Nesting is **not** a cheaper row: an architect grandchild uses the **`decide`** row, not the parent's `implement` slug.
+
+| You call | Matrix type | Example slug in **low** |
+|---|---|---|
+| `agent-scrum` / `agent-evolucion` / `agent-implementador-epicas` | `plan` | `composer-2.5` |
+| `agent-implementador` | `implement` | `gemini-3.7-flash-high` |
+| `agent-arquitecto-hu` (nested) | `decide` | `gemini-3.8-flash-high` |
+| `agent-verificador` | `verify` | `claude-4.5-haiku-thinking` |
+| `agent-investigador-ideador` | `research` | `gpt-5.4-mini-medium` |
+
+If you do not pick a mode, the orchestrator stays on **low** and says so. Naming a model or "use Fast" wins **on that** `Task` only.
+
+---
+
+## Sample chat
+
+**You** (first message — this sets Spanish for the session):
 
 ```
 Usa agent-scrum: convierte esta idea en backlog Scrum (modo guiado completo):
-[describe tu producto — usuarios, problema, restricciones]
+una app para apuntar bloqueos del daily. Interno, 20 personas, sin login el primer mes.
 ```
 
+**Scrum Dev:** asks mode once (policy). Until you answer it operates in **low**.
+
+**You:** `mid`
+
+**Scrum Dev:** launches `agent-scrum` with `model` = `matrix[mid][plan]`, `modo activo: mid`, `session language: es`. Discovery questions in Spanish. No product code.
+
+Later, same chat (mode and language are **not** re-asked):
+
 ```
-Usa agent-implementador: implementa HU-001 del proyecto [nombre].
+Usa agent-implementador: implementa HU-001. Modo guiado.
 ```
+
+Lookup: `implement` × `mid`. Before code it launches `agent-arquitecto-hu` with a **new** lookup (`decide` × `mid`) and waits for `arch-ok`. You approve the plan; then slices; then:
 
 ```
 Usa agent-verificador: valida HU-001 — no aceptes claims sin evidencia.
 ```
 
-Si la épica entera va junta:
+Lookup: `verify` × `mid`. Narrative in Spanish; tokens stay `PASS` / `FAIL` / `verify-ok`.
+
+Same pipeline if the first message is English — only the user-facing text changes. IDs (`HU-001`), folders (`01-backlog/`), and Gherkin (`Given` / `When` / `Then`) are never localized.
+
+---
+
+## Typical recipe
+
+### New app (starting from zero)
+
+Think of Scrum as the architect who draws blueprints and slices work into stories. When the backlog is ready, the Implementer takes **one user story (HU)** at a time; if you want an entire epic at once, Epics coordinates multiple HUs without skipping steps. At the end, the Verifier runs tests and checks that the **acceptance criteria** are met — it will not mark done without evidence.
+
+**Copy-paste prompts (Spanish and English both route; session language follows your first message):**
+
+```
+Usa agent-scrum: convierte esta idea en backlog Scrum (modo guiado completo):
+[describe tu producto — usuarios, problema, restricciones]
+
+Use agent-scrum: convert this idea into a Scrum backlog (full guided mode):
+[describe your product — users, problem, constraints]
+```
+
+```
+Usa agent-implementador: implementa HU-001 del proyecto [nombre].
+Use agent-implementador: implement HU-001 for project [name].
+```
+
+```
+Usa agent-verificador: valida HU-001 — no aceptes claims sin evidencia.
+Use agent-verificador: validate HU-001 — do not accept claims without evidence.
+```
+
+If the epic must go as a single job:
 
 ```
 Usa agent-implementador-epicas: implementa la épica EP-001 (todas las HU Must).
+Use agent-implementador-epicas: implement epic EP-001 (all Must HUs).
 ```
 
-### App que ya existe (quieres agregar o cambiar algo)
+### Existing app (you want to add or change something)
 
-Aquí entra **agent-evolucion**: mira qué hay (código y backlog), define la brecha del cambio y escribe solo lo **nuevo** — no reescribe todo el backlog desde cero. Luego el flujo es el mismo: implementar y verificar.
+Use **agent-evolucion**: it inventories what exists, defines the change gap, and writes only the **new** backlog items — it does not rewrite the whole backlog. Then the flow is the same: implement and verify.
 
 ```
 Usa agent-evolucion: evoluciona este producto — quiero agregar exportación CSV.
 Hay código existente. Modo guiado.
+
+Use agent-evolucion: evolve this product — I want to add CSV export.
+Code exists. Guided mode.
 ```
 
-Si antes de decidir necesitas comparar enfoques técnicos:
+If you need to compare technical approaches before deciding:
 
 ```
 Usa agent-investigador-ideador: investiga la mejor forma de agregar autenticación OAuth
 a este repo. Entrega reporte con opción #1 y #2. No toques código.
+
+Use agent-investigador-ideador: research the best way to add OAuth authentication
+to this repo. Deliver a report with option #1 and #2. Do not modify code.
 ```
 
 ---
 
-## Los 8 especialistas (los que tú llamas)
+## The 8 specialists (those you call)
 
-Invócalos con **`Usa agent-{nombre}:`** + tu pedido.
+Invoke them with **`Usa agent-{name}:`** + your request.
 
 ### agent-scrum
 
-**Para qué:** convierte una idea en backlog Scrum documentado — discovery, épicas, HU bien escritas, diagramas, arquitectura y elección de stack (te pregunta; no elige solo).
+**Purpose:** convert an idea into a documented Scrum backlog — discovery, epics, well-written user stories (acceptance criteria + separate Given/When/Then scenarios), diagrams, architecture, and stack selection (the agent asks; it does not choose on its own).
 
-**No lo uses si:** ya tienes backlog cerrado y solo quieres codear una HU concreta → ve al Implementador.
-
-**Prueba a decir:**
-
-```
-Usa agent-scrum: convierte esta idea en backlog Scrum (modo guiado completo):
-[describe tu producto]
-```
-
-**Te deja:** carpetas `00-discovery/`, `01-backlog/`, `02-arquitectura/`, `03-calidad/`, `04-sesion/` y skills de tu stack en `.cursor/skills/` del proyecto.
+**Produces:** folders `00-discovery/`, `01-backlog/`, `02-arquitectura/`, `03-calidad/`, `04-sesion/` and tech skills in `.cursor/skills/` inside your project.
 
 ---
 
 ### agent-evolucion
 
-**Para qué:** producto con código y/o backlog existente. Inventario → brecha → épicas y HU **nuevas o que reemplazan** las anteriores (backlog delta).
+**Purpose:** product with existing code/backlog. Inventory → gap → epics and HUs **new or replacing** old ones (backlog delta).
 
-**No lo uses si:** es idea desde cero → usa Scrum.
-
-**Prueba a decir:**
+**Try saying:**
 
 ```
 Usa agent-evolucion: evoluciona este producto — quiero agregar [feature].
 Hay código existente. Modo guiado.
+
+Use agent-evolucion: evolve this product — I want to add [feature].
+Code exists. Guided mode.
 ```
 
 ---
 
 ### agent-investigador-ideador
 
-**Para qué:** “¿cómo hago X?”, “¿qué tecnología conviene?”. Escanea el repo, busca en documentación oficial y arma un reporte con **opción #1 recomendada y opción #2** — sin tocar código.
+**Purpose:** "how do I do X?", "which tech fits best?". Scans the repo, searches official docs, and delivers a report with **option #1 recommended and option #2** — does not touch code.
 
-**No lo uses si:** ya sabes qué hacer y solo falta implementar.
-
-**Prueba a decir:**
+**Try saying:**
 
 ```
 Usa agent-investigador-ideador: investiga la mejor forma de agregar [feature]
 a este repo. Entrega reporte con opción #1 y #2. No toques código.
+
+Use agent-investigador-ideador: research the best way to add [feature]
+to this repo. Deliver a report with option #1 and #2. Do not modify code.
 ```
 
 ---
 
 ### agent-implementador
 
-**Para qué:** implementa **una sola HU**. Antes de codear pasa un **chequeo de diseño sucio** (motores por keywords, clases gigantes, acoplamiento raro…) y escribe un briefing arquitectónico. Luego codea en trozos pequeños con evidencia de criterios de aceptación.
+**Purpose:** implements **a single user story (HU)**. Before coding it runs a dirty-design check (keyword engines, giant classes, odd coupling...) and writes an architectural briefing. Then it codes in small slices with evidence for acceptance criteria.
 
-**No lo uses si:** quieres toda una épica de una vez → usa Implementador-Épicas.
-
-**Prueba a decir:**
+**Try saying:**
 
 ```
 Usa agent-implementador: implementa HU-003 del proyecto [nombre]. Modo guiado.
+Use agent-implementador: implement HU-003 for project [name]. Guided mode.
 ```
 
-Modo rápido solo si la HU es pequeña y sin riesgos:
+Quick mode only for small, low-risk HUs:
 
 ```
 Usa agent-implementador: implementa HU-003 en modo express
+Use agent-implementador: implement HU-003 in express mode
 ```
 
 ---
 
 ### agent-implementador-epicas
 
-**Para qué:** coordina **toda una épica**, lanzando un Implementador por cada HU, con build y tests tras cada una. No avanza si algo queda rojo.
+**Purpose:** coordinate an entire epic, launching an Implementer per HU, with build and tests after each one. It stops on failures.
 
-**No lo uses si:** es una sola HU → usa Implementador.
-
-**Prueba a decir:**
+**Try saying:**
 
 ```
 Usa agent-implementador-epicas: implementa la épica EP-001 del proyecto [nombre]. Modo guiado.
+Use agent-implementador-epicas: implement epic EP-001 for project [name]. Guided mode.
 ```
 
-Reanudar:
+Resume:
 
 ```
 Usa agent-implementador-epicas: reanudar épica EP-001 desde HU-003
+Use agent-implementador-epicas: resume epic EP-001 from HU-003
 ```
 
 ---
 
 ### agent-verificador
 
-**Para qué:** el escéptico del equipo. Ejecuta tests, revisa cada criterio de aceptación obligatorio y vuelve a pasar el chequeo de diseño. Veredicto **PASS** o **FAIL** con huecos concretos — no edita código.
+**Purpose:** the team's skeptic. Runs tests, checks each mandatory acceptance criterion, and re-runs the design check. Verdict **PASS** or **FAIL** with concrete gaps — does not edit code.
 
-**No lo uses si:** aún no hay implementación que revisar.
-
-**Prueba a decir:**
+**Try saying:**
 
 ```
 Usa agent-verificador: valida HU-003 — no aceptes claims sin evidencia.
+Use agent-verificador: validate HU-003 — do not accept claims without evidence.
 ```
 
-Antes de release:
+Before release:
 
 ```
 Usa agent-verificador: pre-release check — valida que EP-002 está done con evidencia.
+Use agent-verificador: pre-release check — validate that EP-002 is done with evidence.
 ```
 
 ---
 
 ### agent-auditor-oportunidades
 
-**Para qué:** health check del proyecto — seguridad, tests faltantes, dependencias, calidad de código. Entrega **tarjetas de mejora** priorizadas (OPP-001, OPP-002…); **tú eliges** cuáles adoptar.
+**Purpose:** project health check — security, missing tests, dependencies, code quality. Delivers prioritized improvement cards (OPP-001, OPP-002...); you choose which to adopt.
 
-**No lo uses si:** solo quieres implementar una HU puntual.
-
-**Prueba a decir:**
+**Try saying:**
 
 ```
 Usa agent-auditor-oportunidades: audita oportunidades de mejora en el proyecto [nombre].
 Modo completo. Foco seguridad y tests.
+
+Use agent-auditor-oportunidades: audit improvement opportunities in project [name].
+Full mode. Focus security and tests.
 ```
 
 ---
 
 ### agent-refactor-malas-practicas
 
-**Para qué:** escanea código buscando olores (lógica frágil, clases que hacen de todo, textos hardcodeados…) y genera un **plan de refactor** priorizado en Markdown. No implementa salvo que se lo pidas.
+**Purpose:** scans code for smells (fragile logic, classes doing everything, hardcoded texts...) and produces a prioritized refactor plan in Markdown. It does not implement unless explicitly requested.
 
-**Prueba a decir:**
+**Try saying:**
 
 ```
 Usa agent-refactor-malas-practicas: escanea el módulo src/api y genera plan de refactor
 priorizado. Solo reporte, no implementes.
+
+Use agent-refactor-malas-practicas: scan module src/api and generate a prioritized
+refactor plan. Report only, do not implement.
 ```
 
 ---
 
-## Los que trabajan detrás
+## Agents that run behind the scenes
 
-En el flujo normal **no tienes que llamarlos**. Otros agentes los invocan cuando hace falta — por ejemplo, el arquitecto escribe el briefing antes de codear, o el panel de debate cuando investigas opciones técnicas.
+In normal flow you don't call them. Other agents invoke them when needed — for example, the architect writes the briefing before coding, or the debate panel when researching options.
 
-| Agente | Qué hace | ¿Cuándo llamarlo tú? |
+| Agent | What it does | When to call directly |
 |--------|----------|----------------------|
-| **agent-arquitecto-hu** | Briefing vinculante por HU (patrones, límites, anti-patrones) | Solo si quieres arquitectura sin implementar |
-| **agent-research-scout** | Busca libs y docs oficiales | Casi nunca; lo usa el investigador |
-| **agent-debate-advocate** | Argumenta a favor de una opción | Panel del investigador-ideador |
-| **agent-debate-skeptic** | Riesgos y “por qué no” | Panel del investigador-ideador |
-| **agent-debate-fit** | ¿Encaja con tu stack y código actual? | Panel del investigador-ideador |
+| **agent-arquitecto-hu** | Briefing tied to a HU (patterns, seams, anti-patterns) | Only if you want an architecture brief without implementation |
+| **agent-research-scout** | Finds libs and official docs | Mostly used by the investigator |
+| **agent-debate-advocate** | Argues in favor of a candidate option | Investigator's panel |
+| **agent-debate-skeptic** | Risks and "why not" | Investigator's panel |
+| **agent-debate-fit** | Fit with your stack and existing code | Investigator's panel |
 
-Solo arquitectura (sin código):
-
-```
-Usa agent-arquitecto-hu: genera arch-brief para HU-005 — patrones, seams y anti-patrones.
-No implementes código.
-```
-
-Más prompts y diagramas: [docs/primera-linea.md](docs/primera-linea.md).
+More prompts and diagrams: [docs/primera-linea.md](docs/primera-linea.md).
 
 ---
 
-## Por qué no es “otro chatbot con nombres bonitos”
+## Why this is not "another chatbot with pretty names"
 
-**Skills de tu stack, en tu repo.** Cuando eliges tecnologías, el pack **escribe skills de esas techs en tu proyecto** para que quien codea no alucine APIs. No trae guías genéricas embebidas: las genera consultando documentación oficial del día. Si se quedan viejas, puedes pedir refrescarlas.
+**Stack skills inside your repo.** When you choose technologies, the pack writes skills for those techs in your project so implementers don't have to guess APIs. It does not embed generic vendor guides; it generates them using official docs. If they get stale you can ask to refresh them.
 
-**No inventa versiones.** Antes de nombrar una versión, API o librería, consulta fuentes oficiales y deja rastro en `sources-ledger.md` — no confía en blogs SEO ni en “creo que es la v3”.
+**It does not invent versions.** Before naming a version, API, or library, it consults official sources and records them in `sources-ledger.md` — it does not rely on blog memory.
 
-**Backlog que se puede implementar.** Las historias siguen INVEST (independientes, acotadas, con valor). Los **criterios de aceptación** (checklist de lo que debe cumplir) van separados de los **escenarios BDD** (Given/When/Then) — no mezclados en el mismo bloque. Si algo suena vago (“rápido”, “seguro”), te pregunta umbrales concretos en lugar de inventar requisitos.
+**Backlog that can be implemented.** Stories follow INVEST. Acceptance criteria (what the HU must meet) are separate from BDD scenarios. Vague terms ("fast", "secure") trigger follow-up questions for measurable thresholds.
 
-**Te pregunta en lotes, no adivina.** Usa AskQuestion: bloques de 5–12 preguntas. Sin respuestas claras no cierra épicas ni marca Must.
+**AskQuestion in batches.** Use AskQuestion for 5-12 questions. Without clear answers the agents do not close epics or mark Must.
 
-**Chequeo de diseño antes de codear.** El *craft gate* es un filtro binario: ¿el diseño propuesto huele mal? Sin PASS no hay plan ni “done”. Motores por keywords, clases gigantes y acoplamientos raros suelen caer aquí.
+**Design gate before code.** The craft gate is a binary filter: does the proposed design smell? Without PASS there is no plan. Common triggers: keyword engines, giant classes, odd coupling.
 
-**Verificación que no se cree el “listo”.** El Verificador corre tests, revisa cada criterio obligatorio y mira el diff con ojos de quien no implementó. Sin PASS no hay done.
+**Verification that does not accept "done".** The Verifier runs tests, checks each mandatory acceptance criterion, and inspects diffs with a neutral reviewer mindset. Without PASS there is no done.
 
-**Brownfield sin reescribir el mundo.** En productos existentes solo documenta el delta — épicas y HU nuevas o que reemplazan las viejas, no un backlog entero desde cero.
+**Brownfield without rewriting the world.** In existing products it documents the delta — epics and HUs that are new or replace old ones, not a full backlog rewrite.
 
-**Investigación con dos opciones.** Cuando hay duda técnica, el reporte trae opción #1 y #2 con argumentos — no una recomendación a ciegas.
+**Research with two options.** When there is uncertainty, the report delivers option #1 and option #2 with arguments — not a blind recommendation.
 
-**Tarjetas de mejora, tú decides.** La auditoría prioriza oportunidades (OPP-*) pero no convierte todo en obligatorio automáticamente.
+**Improvement cards, you decide.** The audit prioritizes opportunities (OPP-*) but does not auto-make them mandatory.
 
-**Estructura de proyecto predecible.** Al planificar, crea carpetas estándar para discovery, backlog, arquitectura, calidad y sesión — para que no pierdas artefactos entre chats.
-
----
-
-## Qué no incluye
-
-- **No es un runtime ni un servidor** — solo agentes y skills dentro de Cursor.
-- **No trae SonarQube** — análisis estático estilo Sonar no está publicado en este repo.
-- **No configura tu máquina** — no toca `AGENTS.md` global, políticas ni extensiones.
-- **No commitea por ti** salvo que lo pidas explícitamente.
+**Predictable project layout.** Planning creates standard folders for discovery, backlog, architecture, quality and session so artifacts don't get lost between chats.
 
 ---
 
-## Referencia rápida
+## What it does not include
 
-| Si quieres… | Usa… |
+- **Not a runtime or server** — only agents, skills and the model policy inside Cursor.
+- **No SonarQube** — Sonar-style static analysis is not in this repo.
+- **It does include the model policy** — `AGENTS.md` + skill `cursor-agent-policy`. Install it globally and/or locally (commands above).
+- **Does not commit on your behalf** unless you explicitly ask it to.
+
+---
+
+## Quick reference
+
+| If you want... | Use... |
 |-------------|------|
-| Idea → backlog completo | `agent-scrum` |
-| Feature en producto existente | `agent-evolucion` |
-| Investigar enfoques sin codear | `agent-investigador-ideador` |
-| Implementar una HU | `agent-implementador` |
-| Implementar una épica entera | `agent-implementador-epicas` |
-| Confirmar que está done | `agent-verificador` |
-| Health check / deuda | `agent-auditor-oportunidades` |
-| Plan de refactor | `agent-refactor-malas-practicas` |
-| Solo briefing arquitectónico | `agent-arquitecto-hu` |
+| Idea → complete backlog | `agent-scrum` |
+| Feature in existing product | `agent-evolucion` |
+| Research approaches without coding | `agent-investigador-ideador` |
+| Implement one HU | `agent-implementador` |
+| Implement an entire epic | `agent-implementador-epicas` |
+| Confirm something is truly done | `agent-verificador` |
+| Health check / technical debt | `agent-auditor-oportunidades` |
+| Refactor plan | `agent-refactor-malas-practicas` |
+| Only an architecture brief | `agent-arquitecto-hu` |
+| How models are chosen | [`AGENTS.md`](AGENTS.md) · [docs/orquestacion.md](docs/orquestacion.md) |
 
 ---
 
-## Licencia
+## License
 
-MIT — ver [LICENSE](LICENSE). Copyright (c) 2026 Diego Guzman.
+MIT — see [LICENSE](LICENSE). Copyright (c) 2026 Diego Guzman.

@@ -1,41 +1,41 @@
-# EP-{NN} — {Título}
+# EP-{NN} — {Title}
 
-| Campo | Valor |
+| Field | Value |
 |-------|--------|
 | ID | EP-XXX |
-| Título | |
-| Outcome de negocio | |
-| Métrica de éxito | |
+| Title | |
+| Business outcome | |
+| Success metric | |
 | MoSCoW | Must / Should / Could / Won't |
 
 ## Problem statement
 
-## Personas involucradas
+## Personas involved
 
-## Alcance IN
+## In scope
 
-## Alcance OUT / Won't
+## Out of scope / Won't
 
-## Capacidades / Features (opcional)
+## Capabilities / Features (optional)
 
-## NFRs heredados
+## Inherited NFRs
 
-## Dependencias entre épicas
+## Dependencies between epics
 
-## Riesgos y supuestos
+## Risks and assumptions
 
-## HU hijas
+## Child HUs
 
-| ID | Título | MoSCoW |
+| ID | Title | MoSCoW |
 |----|--------|--------|
 | HU-XXX | | |
 
-## Definition of Done (épica)
+## Definition of Done (epic)
 
-- [ ] Todas las HU Must en ready (≥9.0) o explícitamente aplazadas
-- [ ] Flujo Mermaid actualizado (`flujo.mmd`)
-- [ ] Sin contradicciones abiertas en auditoría
+- [ ] All Must HUs ready (≥9.0) or explicitly deferred
+- [ ] Mermaid flow updated (`flujo.mmd`)
+- [ ] No open contradictions in the audit
 
-## Flujo
+## Flow
 
-Ver `flujo.mmd`.
+See `flujo.mmd`.

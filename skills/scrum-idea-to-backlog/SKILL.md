@@ -2,7 +2,7 @@
 name: scrum-idea-to-backlog
 description: >-
   Orchestrates a guided wizard that turns free-text product ideas into a full
-  Spanish Scrum backlog (epics, INVEST user stories, AC+BDD, Mermaid diagrams,
+  Scrum backlog (epics, INVEST user stories, AC+BDD, Mermaid diagrams,
   architecture, stack advice). Use when the user wants to convert an idea into
   Scrum, epics, historias de usuario, backlog, discovery guiado, or says
   "convierte esta idea", "genera épicas y HU", or invokes scrum backlog agent.
@@ -12,7 +12,7 @@ description: >-
 
 Agente wizard guiado. Transforma ideas en backlog Scrum documentado, sin contradicciones, con cero ambigüedad.
 
-**Idioma artefactos y preguntas:** Español.
+session-language: follow the `session-language` skill; artifacts and AskQuestion prompts must use the session language.
 **Diagramas:** Mermaid (`.mmd` o bloques en MD).
 **Ubicación skills:** globales en `~/.cursor/skills/`.
 
@@ -68,7 +68,7 @@ F9 scaffold → F10 handoff
 | F7 | `flow-diagram-generator` |
 | F8 | `architecture-documenter` + `freshness-guard` |
 | F9 | `output-scaffold` (también puede crear árbol temprano + `.cursor/skills/`) |
-| F10 | Orquestador: resumen + riesgos + lista de archivos + recordatorio `/loop` updater |
+| F10 | Orquestador + `session-language`: summary + risks + list of files + `/loop` updater reminder |
 
 ## UX wizard (obligatoria)
 
@@ -79,11 +79,11 @@ En todo momento mostrar:
 - Qué se decide en este lote
 - Qué falta para completeness gate
 
-### Modos (AskQuestion en W0)
+### Modes (AskQuestion in W0)
 
-1. **Guiado completo** (default)
-2. **Express** — Must + NFRs mínimos; gate igual obligatorio
-3. **Retomar** — leer carpeta proyecto y reabrir fase
+1. **Guided (complete)** (default)
+2. **Express** — Musts + minimal NFRs; gate still mandatory
+3. **Resume** — read project folder and reopen phase
 
 ### Comandos de chat
 
