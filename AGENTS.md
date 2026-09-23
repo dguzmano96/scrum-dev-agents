@@ -12,12 +12,13 @@ Operational document for the **principal agent** (Multitask Mode chat, or any cu
 
 Scrum **classifies the work type**. This policy **picks the slug**. Plugin instructions are English. User-facing text follows `session-language` (first chat message). Do not hardcode model slugs in process `agents/` or `skills/`.
 
-- `precios_consultados`: 2026-09-07
-- `benchmarks_consultados`: 2026-09-07
-- `vence`: 2026-10-07
+- `precios_consultados`: 2026-09-22
+- `benchmarks_consultados`: 2026-09-22
+- `vence`: 2026-10-22
+- `vence` is **one calendar month** after `precios_consultados`. It refreshes the **price table only**. It does not mark benchmarks expired and is not a ranking penalty.
 - Price source: https://cursor.com/docs/models-and-pricing
 - Full matrix: [`docs/matriz.md`](docs/matriz.md)
-- Ledger: [`docs/fuentes.md`](docs/fuentes.md)
+- Registry + math (canonical): [`docs/fuentes.md`](docs/fuentes.md)
 - Model lookup: skill [`cursor-agent-policy`](skills/cursor-agent-policy/SKILL.md)
 - Language: skill [`session-language`](skills/session-language/SKILL.md)
 
@@ -36,25 +37,26 @@ Do not use Auto on subagents. Fast vs non-Fast are **distinct rows**. User overr
 
 Before substantial work, ask **once**, in the **session language** (skill `session-language`):
 
-> Mode **low** (price), **mid** (quality/price), **high** (performance), or **cursor** (Cursor Models pool only)?
+> Mode **budget** (cheapest; free cache-write + cheap cache-read), **low** (price), **mid** (quality/price), **high** (performance), or **cursor** (Cursor Models pool only)?
 
 - If the user picks a mode: use it for the orchestrator and **all** `Task`s this session (except a one-off override).
 - If **no answer**: operate in **low** and **say so on every reply** (“default policy: low mode”).
-- When fixing or suggesting a mode, propose **exactly 1** orchestrator model (the matrix row for that mode). **Repeat the suggestion until the user selects it.** Until then: stay on **low** + keep suggesting the orchestrator.
-- **Propagate** `modo activo: low|mid|high|cursor` and `session language: {tag}` in every child prompt. Subagents **do not** re-ask mode or language.
+- When fixing or suggesting a mode, propose **exactly 1** orchestrator model (the matrix row for that mode). **Repeat the suggestion until the user selects it.** Until then: stay on **low** + keep suggesting the orchestrator. If that mode’s orchestrator cell is empty, say so; do not invent a proxy.
+- **Propagate** `modo activo: budget|low|mid|high|cursor` and `session language: {tag}` in every child prompt. Subagents **do not** re-ask mode or language.
 
 Orchestrators (use the row for the active mode; do not change rows until the user selects):
 
 | Mode | Orchestrator | Slug | Why |
 |---|---|---|---|
-| **low** | Composer 2.5 | `composer-2.5` | `cost` 1.83; tags implement → orchestrate; extra tool-use; cheap for long threads |
-| **mid** | Grok 4.6 | `cursor-grok-4.6-xhigh` | `cost` 4.67; interpret → implement → orchestrate; extras long-context + tool-use; 500k |
-| **high** | Claude Fable 5.1 | `claude-fable-5.1-thinking-high` | `cost` 36.67; orchestrate → implement; extra tool-use; 1M; current evals; confidence 0.81 |
-| **cursor** | Composer 2.5 | `composer-2.5` | `cost` 1.83; tags implement → orchestrate; extra tool-use; cheap; only allowed Cursor pool. Higher-capacity alt: Grok 4.6 (`cursor-grok-4.6-xhigh`) |
+| **budget** | GPT-5.4 Nano | `gpt-5.4-nano-xhigh` | `cost` 0.90; AutomationBench-AA + GDPval-AA (2 ids). Luna cheaper but billed cache write (not budget). |
+| **low** | Gemini 3.8 Flash | `gemini-3.8-flash-high` | `cost` 2.58; orquestar 76.19 (2 ids) after whole-set rescoring. Beats 3.7 74.21; neither dominates. Default until they pick a mode. |
+| **mid** | Grok 4.6 | `cursor-grok-4.6-medium` | `cost` 4.67; orquestar 92.86 (AutomationBench-AA 63% + GDPval-AA). Dominates 4.5 on both shared ids. |
+| **high** | Grok 4.6 | `cursor-grok-4.6-medium` | Best absolute strong `orquestar` (not Nano/Mini). 4.7 is 1 id (W). |
+| **cursor** | Grok 4.6 | `cursor-grok-4.6-medium` | Same pool row. Composer has no `orquestar` datum. |
 
-Default suggestion until they pick a mode: **Composer 2.5**.
+Default suggestion until they pick a mode: **Gemini 3.8 Flash** (`gemini-3.8-flash-high`).
 
-Thinking: Cursor binds effort to the user picker. Do not duplicate thinking variants; use this matrix’s family slug.
+Thinking: Cursor binds effort to the user picker. Do not duplicate thinking variants; use this matrix’s family slug. Map published effort to the Task slug (medium ≠ max).
 
 ## 2. Formula and freshness
 
@@ -62,18 +64,30 @@ Thinking: Cursor binds effort to the user picker. Do not duplicate thinking vari
 cost = (input_usd_per_M + 2 * output_usd_per_M) / 3
 ```
 
-Agents are output-heavy. Fast costing more = worse on **low**.
+Agents are output-heavy. Fast costing more = worse on **budget** / **low**. Regional residency +10% does not enter `cost`.
 
-Capacity: ficha tags + `confianza`. Strong penalty if **all** evals are EXPIRED or `confianza < 0.60`: **not for high**; low/mid only if price is excellent and the role is simple.
+Capacity: tag percentiles from the **admitted registry** in [`docs/fuentes.md`](docs/fuentes.md) (open URL set, closed math). The original ten URLs are examples, not a ceiling. Score date is stored for audit and **does not** enter the score. There is **no** `evals=VENCIDAS` ranking penalty.
 
-- Low **must not** be a $10/$50 model (Fable 5 / 5.1).
-- High **must not** be Nano/Mini unless exceptional evidence (none here).
-- Preview/Beta: ficha yes, **outside** the low/mid/high matrix.
-- Cursor pool vs API: **ignored** on low/mid/high. On **cursor** mode: **only** Cursor Models (`composer-2.5`, `composer-2.5-fast`, `cursor-grok-4.6-xhigh`, `cursor-grok-4.6-xhigh-fast`, `cursor-grok-4.5-high`, `cursor-grok-4.5-high-fast`). Auto forbidden, and any Other/API model (Claude, GPT, Gemini, Kimi, GLM, Fable, etc.).
-- Fast on cursor mode: same family, more expensive; only if latency matters and the user did not prioritize price. Default non-Fast.
-- If prices or benchmarks are **older than 30 days** (`vence` passed): **warn and offer a refresh**. If the user says continue, work with what you have.
+- **budget**: `cost` < 2, cache write free/`-`/$0, cache read cheaper than that model’s uncached input. No Fast. No preview.
+- **low**: `cost` ≤ 4. No Fast. No preview. No $10/$50 class.
+- **mid**: 4 < `cost` ≤ 12. No Fast. No published input or output ≥ $18/M. No $10/$50 class.
+- **high**: best absolute tag score. No Nano/Mini. No preview. Fast loses to its non-Fast sibling when the page says same checkpoint.
+- **cursor**: only `composer-2.5`, `grok-4.7-xhigh`, `cursor-grok-4.6-medium`, `cursor-grok-4.5-high`. Fast is out.
+- If today is after `vence`, or `precios_consultados` is more than one calendar month old, run **§2.1 Price refresh** before assigning or suggesting any slug.
 
-As of 2026-09-07, data is current through **2026-10-07**.
+As of 2026-09-22, the price table is current through **2026-10-22**.
+
+### 2.1 Price refresh (monthly)
+
+`benchmarks_consultados` is an audit stamp. Benchmark scores do **not** expire by date. `vence` does **not** mark benchmarks as VENCIDAS.
+
+1. If today is after `vence`, or `precios_consultados` is more than one calendar month old, the policy is **stale on price**. Before assigning or suggesting any slug, open https://cursor.com/docs/models-and-pricing and contrast the Spanish variant of that same page.
+2. Update input, output, cache write, and cache read. Recompute `cost = (input + 2 * output) / 3`. Regional residency +10% stays out of `cost`.
+3. Re-check tier eligibility with the new costs (budget gates; low `cost` ≤ 4; mid 4 < `cost` ≤ 12; high; cursor allow-list). Recalculate who wins each cell if eligibility, dominance, or the cost tie-break changed. Record the new `precios_consultados` and set `vence` to **one month** after that date.
+4. If the pricing page brings models that were not in the policy set (new Task-catalog slug, or a docs name whose Task slug you resolve and note): do **not** drop them in with price alone. Score them from the **registry + discovery** in [`docs/fuentes.md`](docs/fuentes.md): same `benchmark_id` only, unknown stays unknown, no sibling-score copy unless the page says same checkpoint, one tag per the closed map, percentile **only** among policy models that have that datum. Because percentiles are relative, recompute percentiles and tag scores for the **whole** policy set after the new models are included, then redo categorization and cell assignment. A new model with no benchmark on a tag does not fill that cell by proxy.
+5. A price-only refresh of models already in the set does **not** require re-fetching benchmarks. It **does** require re-checking gates, dominance, and tie-break, because `cost` changed.
+6. The same monthly pass **also** re-fetches every admitted URL, discovers new URLs for the tag-map families (admit only if all gates pass), replaces a score only with a newer number of the **same** `benchmark_id`, and reassigns a cell only when eligibility, a percentile, dominance, or the cost tie-break changed. A dead URL is marked dead; replace it only with that benchmark’s new official host.
+7. **Who fetches vs who decides:** the orchestrator lists the slugs to query, then launches **one collector per slug** (parallel, cheap web-search slug — §5.1). After every collector returns, **this** orchestrator (the mode’s orchestrator row) merges records and applies the written math. Collectors never assign tiers.
 
 ## 3. Subagent types, ceilings, and Scrum map
 
@@ -123,35 +137,32 @@ When launching the custom agent, `model` = this type’s row × active mode. The
 | Native `generalPurpose` (read/map) | `explore` | — |
 | Native `shell` | `debug` or `verify` by symptom | One failure or one check. |
 
-## 4. Matrix low / mid / high / cursor by type
+## 4. Matrix budget / low / mid / high / cursor by type
 
-Use the slug. Do not swap Fast for non-Fast (or the reverse) without override.
+Use the slug. Do not swap Fast for non-Fast (or the reverse) without override. `—` = empty cell.
 
-| Type | low | mid | high | cursor |
-|---|---|---|---|---|
-| **orchestrator** | `composer-2.5` | `cursor-grok-4.6-xhigh` | `claude-fable-5.1-thinking-high` | `composer-2.5` |
-| `explore` | `gpt-5.4-mini-medium` | `gemini-3.1-pro` | `gpt-5.6-sol-medium` | `cursor-grok-4.6-xhigh` |
-| `implement` | `gemini-3.7-flash-high` | `cursor-grok-4.6-xhigh` | `claude-opus-5-thinking-high` | `cursor-grok-4.6-xhigh` |
-| `decide` | `gemini-3.8-flash-high` | `gemini-3.1-pro` | `claude-opus-5-thinking-high` | `cursor-grok-4.6-xhigh` |
-| `debug` | `composer-2.5` | `claude-sonnet-5-thinking-high` | `gpt-5.3-codex` | `cursor-grok-4.5-high` |
-| `interpret` | `gpt-5.4-nano-medium` | `cursor-grok-4.6-xhigh` | `gemini-3.1-pro` | `cursor-grok-4.6-xhigh` |
-| `verify` | `claude-4.5-haiku-thinking` | `claude-opus-4.8-thinking-high` | `claude-fable-5.1-thinking-high` | `cursor-grok-4.6-xhigh` |
-| `plan` | `composer-2.5` | `cursor-grok-4.6-xhigh` | `claude-opus-5-thinking-high` | `composer-2.5` |
-| `research` | `gpt-5.4-mini-medium` | `gemini-3.1-pro` | `gpt-5.6-sol-medium` | `cursor-grok-4.6-xhigh` |
-| `review` | `claude-4.5-haiku-thinking` | `claude-sonnet-5-thinking-high` | `claude-opus-4.8-thinking-high` | `cursor-grok-4.5-high` |
-| `write` | `gpt-5-mini` | `gemini-3.5-flash` | `claude-4.6-opus-high-thinking` | `composer-2.5` |
+| Type | budget | low | mid | high | cursor |
+|---|---|---|---|---|---|
+| **orchestrator** | `gpt-5.4-nano-xhigh` | `gemini-3.8-flash-high` | `cursor-grok-4.6-medium` | `cursor-grok-4.6-medium` | `cursor-grok-4.6-medium` |
+| `explore` | `gpt-5.4-nano-xhigh` | `gemini-3.7-flash-high` | `cursor-grok-4.5-high` | `cursor-grok-4.5-high` | `cursor-grok-4.5-high` |
+| `implement` | `gpt-5.4-nano-xhigh` | `gemini-3.8-flash-high` | `cursor-grok-4.6-medium` | `claude-fable-5-1-thinking-high` | `cursor-grok-4.6-medium` |
+| `decide` | `gpt-5.4-nano-xhigh` | `gemini-3.7-flash-high` | `kimi-k3-max` | `claude-fable-5-1-thinking-high` | `cursor-grok-4.6-medium` |
+| `debug` | `gpt-5.4-nano-xhigh` | `gemini-3.8-flash-high` | `grok-4.7-xhigh` | `claude-fable-5-1-thinking-high` | `grok-4.7-xhigh` |
+| `interpret` | — | — | — | — | — |
+| `verify` | `gpt-5-mini` | `gemini-3.8-flash-high` | `gemini-3.1-pro` | `gemini-3.1-pro` | `grok-4.7-xhigh` |
+| `plan` | `gpt-5.4-nano-xhigh` | `gemini-3.8-flash-high` | `cursor-grok-4.6-medium` | `claude-fable-5-1-thinking-high` | `cursor-grok-4.6-medium` |
+| `research` | `gpt-5.4-nano-xhigh` | `gemini-3.7-flash-high` | `kimi-k3-max` | `kimi-k3-max` | `cursor-grok-4.5-high` |
+| `review` | `gpt-5-mini` | `gemini-3.8-flash-high` | `gemini-3.1-pro` | `gemini-3.1-pro` | `grok-4.7-xhigh` |
+| `write` | `gemini-2.5-flash` | `gemini-3.8-flash-high` | `gpt-5.2` | `claude-4.6-opus-high-thinking` | — |
 
 Honest selection notes:
 
-- **cursor mode**: only the 6 Cursor Models pool slugs. No other catalog slug.
-- **Composer 2.5** orchestrates cheaply; DeepSWE 16% → not high for implement; on cursor it is orchestrator/plan/write for price + tags.
-- **Grok 4.6** on cursor: interpret → implement → orchestrate; explore/research/interpret/implement/decide/verify.
-- **Grok 4.5** on cursor: implement → debug → orchestrate; debug/review (no cursor slug has tag `verificar`; Grok 4.6 covers verify by general capacity).
-- **Grok 4.6 Fast** and **Composer 2.5 Fast** are the same quality as non-Fast at 2×–6× price → not in low; on cursor only with override or interactive debug (`cursor-grok-4.6-xhigh-fast` / `cursor-grok-4.5-high-fast`).
-- **GPT-5.6 Sol**: Cursor promo through 2026-11-21; `cost` 14.67.
-- **Fable 5 / 5.1** ($10/$50): high only (or override). Anthropic retention 30 days.
-- Nano/Mini: low only (or mid for a simple role). Never high.
-- **Nesting is not a row.** A grandchild `explore` uses the mode’s `explore` row, not “Composer because it is nested”. A grandchild `verify` uses `verify`.
+- **cursor mode**: only the four Task slugs above. Docs vs Task: pricing page says Grok 4.7; Task accepts `grok-4.7-xhigh`, not `grok-4.7-high`. Old slug `cursor-grok-4.6-xhigh` is not in this Task catalog; use `cursor-grok-4.6-medium`.
+- **Dominance:** Grok 4.6 Medium is better than Grok 4.5 on both shared `orquestar` ids and the same `cost` → 4.5 cannot occupy orchestrator. Grok 4.7’s `orquestar` / `implementar` are 1 id (W) and cannot beat 4.6’s 2–3 ids. Gemini 3.8 Flash is better than Grok 4.6 on shared CursorBench + DeepSWE and cheaper → 4.6 cannot occupy **low** implement. After the five late records, 3.8’s orquestar 76.19 beats 3.7 74.21 (neither dominates). K3 takes **mid decide** (ARC 2 ids, 43.18 &gt; 4.6 41.82, split/no dominance) and **mid/high research** W (LCR 88.7%; no `interpretar` anywhere). 4.5 keeps explore (2 ids).
+- **GPT-5.6 Luna vs GPT-5.4 Nano:** Luna `cost` 0.87, cache write **$0.25** (fails budget gate 2). Nano `cost` 0.90, cache write `-`. This run’s collector was Luna (log only; not pinned). Composites stay `sin-tag`.
+- **Vals Index** is `sin-tag` on the closed map. Orchestrator cells use AutomationBench-AA + GDPval-AA.
+- **Empty `interpret`:** no `interpretar` contest (N≥2) after the map. **Empty cursor write:** no pool slug has `redactar`.
+- **Nesting is not a row.** A grandchild `explore` uses the mode’s `explore` row.
 
 ## 5. How to delegate (context + model)
 
@@ -171,15 +182,32 @@ Do not copy the whole thread into the subagent. If context does not fit the ceil
 
 Parallel: independent explore/research yes; edits to the same file **in series**. Epic: one HU at a time (Scrum ceiling), each HU with `implement` `model`.
 
+### 5.1 Collector vs orchestrator (policy refresh / scoring)
+
+Fetching facts and assigning tiers are **different jobs**. Do not hardcode a collector slug in `agents/` or process skills. Do not tell Scrum agents or process skills to use a collector.
+
+**When:** only at the start of a **model-policy update** (§2.1 / new-model path). This role is **not** used by any scrum-dev-agents agent or process (implementer, verifier, discovery, epic, story, auditor, pipeline, or any other `agent-*`).
+
+**Collector model (chosen each update, never pinned):** at the start of that update, fetch https://cursor.com/docs/models-and-pricing and contrast the Spanish variant. Criterion: cheapest `cost` among slugs that (1) the Task catalog accepts and (2) can WebSearch/WebFetch. `cost = (input + 2 * output) / 3`. Tiers do **not** apply. The universe is the whole Cursor list, not the active mode’s column and not the four-model cursor pool. Fast loses to its cheaper non-Fast sibling. If the cheapest row cannot web-search or has no Task slug, skip it, note the skip in [`docs/fuentes.md`](docs/fuentes.md), and take the next. Write the chosen slug in **that update’s log only**. It is not a matrix cell and not a frozen default. Do not pin any slug as the collector.
+
+**Collector job** (one `Task` per target model, in parallel):
+
+- Ceiling: exactly one Task slug. Do not paste the catalog. Do not score a second model.
+- Rescue only: Cursor price row (input, output, cache write, cache read) and, from **admitted** sources only, each `benchmark_id` with score, date, url, variant/harness, and whether the page says lower-is-better. No row → `unknown`. Do not copy a sibling checkpoint unless the page says same checkpoint.
+- Does **not** assign tiers, percentiles, or dominance. Does **not** edit policy files. Returns a fixed record.
+
+**Orchestrator** (after every collector has returned): apply the written math and assign tiers. That step is **deterministic** (percentiles, tag scores, coverage, weak evidence, budget gates, dominance, tie-break, cells). Use the **active mode’s orchestrator row** (`matrix[mode][orchestrator]`), **not** the collector slug. Empty orchestrator cell → do not invent a proxy; ask or wait. One collector never scores a second model.
+
+Refresh / new-model hook: (1) orchestrator fetches the price list and picks the collector for **this** run; (2) lists slugs to query; (3) one collector per slug, in parallel; (4) orchestrator recomputes tiers only from those records plus the written math in [`docs/fuentes.md`](docs/fuentes.md).
+
 ## 6. Exclusions
 
-Outside the low/mid/high/cursor matrix (ficha in `docs/matriz.md`, do not assign):
+Outside the budget/low/mid/high/cursor assignment (ficha may exist; do not assign):
 
 - `auto` — router; **forbidden on subagents**.
-- `claude-opus-4.7-thinking-xhigh` — Preview (limited fast mode).
+- `claude-opus-4-7-thinking-xhigh` — Preview (limited fast mode). Outside every tier including cursor.
 - `gemini-3-pro-image-preview` — Image preview; not agentic code/text.
-
-Do not use on **high** (all evals EXPIRED or `confianza < 0.60`): `claude-4-sonnet`, `claude-4-sonnet-1m`, `claude-4.7-opus`, `gpt-5-codex`, `gpt-5.1-codex`, `gemini-3-flash`, `cursor-grok-4.5-high-fast`, `gpt-5.1-codex-mini`.
+- Any slug that is on the pricing page but **not** in the Task catalog.
 
 Do not implement the product in the orchestrator. Do not delete Scrum artifacts in the **project** (backlog, arch-brief, stack skills). Do not put model slugs in Scrum pipelines (that is this policy).
 
@@ -187,8 +215,10 @@ Do not implement the product in the orchestrator. Do not delete Scrum artifacts 
 
 If the user names a model, a different mode for one task, or “use Fast”: **obey**. Note the override in the reply. The rest of the session returns to the matrix unless they say otherwise.
 
-## 8. Tags (hybrid)
+## 8. Tags
 
-Three **work-role** tags (best → 3rd): `orquestar`, `explorar`, `implementar`, `decidir`, `depurar`, `interpretar`, `verificar`, `redactar`.
+Tag scores come from the **admitted registry** ([`docs/fuentes.md`](docs/fuentes.md)). One behavior per `benchmark_id`, **only** by the closed map in that file. Name matches no row → `sin-tag`, exclude from the score.
 
-Separate: `contexto-largo`, `tool-use` (extras). If a ficha put extras in the top-3, they were remapped to work roles and extras kept aside — see `docs/matriz.md`.
+- `orquestar`, `explorar`, `implementar`, `decidir`, `depurar`, `interpretar`, `verificar`, `redactar`
+
+`plan` = mean of `orquestar` and `decidir` the model actually has (one of two = weak). `research` = mean of `explorar` and `interpretar` (same). `review` = `verificar`. Composites (AA Intelligence Index, BenchLM overall, Coding Agent Index) stay `sin-tag`.

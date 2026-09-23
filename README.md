@@ -95,15 +95,15 @@ Optional: commit those two files so teammates get the same matrix.
 
 1. Confirm **Customize → Rules** lists `cursor-agent-policy` (Always Apply).
 2. Start a **new** Multitask chat (`/multitask`) in the product workspace.
-3. The orchestrator asks **once** for mode **low / mid / high / cursor** (in the language of your first message).
-4. Every `Task` must set `model` from the matrix. Scrum does not pick slugs. Details: [docs/orquestacion.md](docs/orquestacion.md), [`AGENTS.md`](AGENTS.md).
+3. The orchestrator asks **once** for mode **budget / low / mid / high / cursor** (in the language of your first message).
+4. Every `Task` must set `model` from the matrix. Scrum does not pick slugs. Details: [docs/orquestacion.md](docs/orquestacion.md), [`AGENTS.md`](AGENTS.md), full cells in [docs/matriz.md](docs/matriz.md), registry + math in [docs/fuentes.md](docs/fuentes.md).
 
 ---
 
 ## The trick (in 30 seconds)
 
 1. You request in your language using `Use agent-{name}:` (examples below). Session language = first chat message. Legacy Spanish ids (`agent-implementador`, …) still route.
-2. The chat asks the model mode (**low / mid / high / cursor**) once per Multitask session.
+2. The chat asks the model mode (**budget / low / mid / high / cursor**) once per Multitask session.
 3. Scrum picks the specialist and the pipeline. The **model policy** maps `modo activo` × work type to a slug on **every** `Task` (including nested). Never omit `model`.
 4. The main chat should not implement your product. Backlog agents plan; implementer agents write code under rules; the verifier inspects thoroughly.
 
@@ -153,15 +153,21 @@ Two layers. Do not mix them.
 | **With what** | Which model slug? | `matrix[mode][type]` — skill `cursor-agent-policy` |
 | **In which language** | Chat and new artifacts? | First message — skill `session-language` |
 
-Every `Task` (child and grandchild) must include `model`, `modo activo: low|mid|high|cursor`, and `session language: {tag}`. Nesting is **not** a cheaper row: an architect grandchild uses the **`decide`** row, not the parent's `implement` slug.
+Every `Task` (child and grandchild) must include `model`, `modo activo: budget|low|mid|high|cursor`, and `session language: {tag}`. Nesting is **not** a cheaper row: an architect grandchild uses the **`decide`** row, not the parent's `implement` slug.
 
 | You call | Matrix type | Example slug in **low** |
 |---|---|---|
-| `agent-scrum` / `agent-evolution` / `agent-epic-implementer` | `plan` | `composer-2.5` |
-| `agent-implementer` | `implement` | `gemini-3.7-flash-high` |
-| `agent-story-architect` (nested) | `decide` | `gemini-3.8-flash-high` |
-| `agent-verifier` | `verify` | `claude-4.5-haiku-thinking` |
-| `agent-investigator-ideator` | `research` | `gpt-5.4-mini-medium` |
+| `agent-scrum` / `agent-evolution` / `agent-epic-implementer` | `plan` | `gemini-3.8-flash-high` |
+| `agent-implementer` | `implement` | `gemini-3.8-flash-high` |
+| `agent-story-architect` (nested) | `decide` | `gemini-3.7-flash-high` |
+| `agent-verifier` | `verify` | `gemini-3.8-flash-high` |
+| `agent-investigator-ideator` | `research` | `gemini-3.7-flash-high` |
+
+**Orchestrator** (main chat) in **low** until you pick a mode: `gemini-3.8-flash-high`. In **cursor** mode: `cursor-grok-4.6-medium`. See the orchestrator row in [docs/matriz.md](docs/matriz.md).
+
+**Prices and capacity:** token prices come from [Cursor models and pricing](https://cursor.com/docs/models-and-pricing); `cost = (input + 2 × output) / 3` (regional +10% is not in `cost`). The price table is stamped `precios_consultados` and expires one calendar month later (`vence`); benchmark dates are audit-only and do not expire scores. Tag capacity uses an open admitted-source registry with fixed math ([docs/fuentes.md](docs/fuentes.md)), not a closed list of ten URLs.
+
+**Policy refresh only:** when updating the matrix, a **collector** model (cheapest Task slug on the live price list that can web-search) fetches one model’s prices and benchmark rows; it does not assign tiers and is not used by Scrum agents. The mode’s **orchestrator** slug merges collector output and applies the written rules after all collectors return ([`AGENTS.md`](AGENTS.md) §5.1).
 
 If you do not pick a mode, the orchestrator stays on **low** and says so. Naming a model or "use Fast" wins **on that** `Task` only.
 
@@ -475,7 +481,7 @@ More prompts and diagrams: [docs/primera-linea.md](docs/primera-linea.md).
 | Only an architecture brief | `agent-story-architect` |
 | Create stack skills after W8 | `stack-skill-generator` |
 | Refresh stale stack skills | `stack-skills-updater` / `refresh-tech` |
-| How models are chosen | [`AGENTS.md`](AGENTS.md) · [docs/orquestacion.md](docs/orquestacion.md) |
+| How models are chosen | [`AGENTS.md`](AGENTS.md) · [docs/matriz.md](docs/matriz.md) · [docs/fuentes.md](docs/fuentes.md) · [docs/orquestacion.md](docs/orquestacion.md) |
 
 ---
 
