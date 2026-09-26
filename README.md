@@ -22,9 +22,11 @@ You should see **8 agents you call from chat** and **5 that run behind the scene
 
 ### 2. Model policy (required for nested Tasks)
 
-Scrum decides **how** (which agent, which pipeline, one HU vs one epic). The policy decides **with what** (`model` = mode × work type). Plugin `alwaysApply` rules are **not** always injected into custom subagents, so install the policy on the machine or into the product repo.
+Scrum decides **how** (which agent, which pipeline, one HU vs one epic). The policy decides **with what** (`model` = mode × work type). The plugin **does not** register `rules/` in `plugin.json` (v1.3.1+), so **Customize → Rules** shows **one** `cursor-agent-policy`, not a duplicate from the plugin plus your machine copy.
 
-Clone this repo first (or `cd` into an existing clone), then pick **global**, **local**, or both.
+Custom subagents do not always receive plugin context, so install the policy **globally** (recommended) **or** into the product repo — not both as two Always Apply rules.
+
+Clone this repo first (or `cd` into an existing clone), then pick **global** or **local** (see below).
 
 #### Global (recommended) — all Cursor windows on this PC
 
@@ -59,7 +61,7 @@ Writes:
 
 #### Local — one product repo only
 
-Use this when the team should share the mandate in git, or you do not want a machine-wide rule. Does **not** replace global; run global as well if you want every window covered.
+Use this when the team should share the mandate in git. If you already ran **global** install, skip the project `.mdc` (or disable one of the two in Customize → Rules) so only **one** Always Apply rule remains.
 
 **Windows (PowerShell)** — from the plugin repo root:
 
@@ -93,7 +95,7 @@ Optional: commit those two files so teammates get the same matrix.
 
 ### 3. New Multitask chat
 
-1. Confirm **Customize → Rules** lists `cursor-agent-policy` (Always Apply).
+1. Confirm **Customize → Rules** lists **exactly one** `cursor-agent-policy` (Always Apply). If you see two, disable or remove the extra (old plugin rule + global copy, or global + project).
 2. Start a **new** Multitask chat (`/multitask`) in the product workspace.
 3. The orchestrator asks **once** for mode **budget / low / mid / high / cursor** (in the language of your first message).
 4. Every `Task` must set `model` from the matrix. Scrum does not pick slugs. Details: [docs/orquestacion.md](docs/orquestacion.md), [`AGENTS.md`](AGENTS.md), full cells in [docs/matriz.md](docs/matriz.md), registry + math in [docs/fuentes.md](docs/fuentes.md).

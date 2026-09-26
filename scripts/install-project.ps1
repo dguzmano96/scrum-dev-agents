@@ -21,22 +21,18 @@ $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path $PSScriptRoot -Parent
 $source = Join-Path $repoRoot "AGENTS.md"
+$ruleSource = Join-Path $repoRoot "rules\cursor-agent-policy.mdc"
 
 if (-not (Test-Path $source)) {
     throw "Source AGENTS.md not found. Run from the scrum-dev-agents plugin repo."
+}
+if (-not (Test-Path $ruleSource)) {
+    throw "Source rule not found: $ruleSource"
 }
 
 if (-not (Test-Path $ProjectPath)) {
     throw "Project path does not exist: $ProjectPath"
 }
-
-$frontmatter = @"
----
-description: Cursor agent orchestration policy (Multitask) - low/mid/high/cursor models. Scrum = how; this rule = with what. User-facing language = first chat message.
-alwaysApply: true
----
-
-"@
 
 function Backup-IfExists([string]$Path) {
     if (-not (Test-Path $Path)) { return }
@@ -82,15 +78,14 @@ if (-not (Test-Path $projectRulesDir)) {
 $ruleFile = Join-Path $projectRulesDir "cursor-agent-policy.mdc"
 Backup-IfExists $ruleFile
 
-$agentsBody = Get-Content -Path $source -Raw -Encoding utf8
-$utf8NoBom = New-Object System.Text.UTF8Encoding $false
-[System.IO.File]::WriteAllText($ruleFile, $frontmatter + $agentsBody, $utf8NoBom)
+Copy-Item -Force $ruleSource $ruleFile
 Write-Host "Project rule:   $ruleFile"
 
 Write-Host ""
 Write-Host "Next steps:"
 Write-Host "  1. Open this product as a workspace in Cursor (File > Open Folder)."
-Write-Host "  2. Prefer also: .\scripts\install-global.ps1 so nested Task lookups work in every window."
-Write-Host "  3. Start a NEW Multitask chat (type /multitask or use Multitask Mode)."
-Write-Host "  4. Confirm the agent asks for low / mid / high / cursor mode."
-Write-Host "  5. Optional: commit AGENTS.md and .cursor/rules/cursor-agent-policy.mdc in the product repo."
+Write-Host "  2. For nested Tasks in every window: .\scripts\install-global.ps1 (machine rule)."
+Write-Host "  3. Use global OR committed project rule in Customize -> Rules, not both Always Apply."
+Write-Host "  4. Start a NEW Multitask chat (type /multitask or use Multitask Mode)."
+Write-Host "  5. Confirm the agent asks for budget / low / mid / high / cursor mode."
+Write-Host "  6. Optional: commit AGENTS.md and .cursor/rules/cursor-agent-policy.mdc in the product repo."

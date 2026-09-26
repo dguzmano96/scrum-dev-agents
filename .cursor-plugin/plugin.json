@@ -1,7 +1,7 @@
 {
   "name": "scrum-dev-agents",
   "displayName": "Scrum Dev Agents",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "license": "MIT",
   "author": {
     "name": "Diego Guzman"
@@ -16,7 +16,6 @@
     "multilingual",
     "model-routing"
   ],
-  "rules": "./rules/",
   "agents": "./agents/",
   "skills": "./skills/",
   "repository": "https://github.com/dguzmano96/scrum-dev-agents"

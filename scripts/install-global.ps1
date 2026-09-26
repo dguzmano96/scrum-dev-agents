@@ -1,7 +1,7 @@
 # Install cursor-agent-policy globally on this machine (all Cursor windows/projects).
 # Mechanism: %USERPROFILE%\.cursor\rules\cursor-agent-policy.mdc (alwaysApply: true)
 # Canonical copy: %USERPROFILE%\.cursor\AGENTS.md
-# Source of truth: this plugin repo (scrum-dev-agents/AGENTS.md)
+# Source of truth: rules/cursor-agent-policy.mdc (+ AGENTS.md body kept in sync)
 #
 # Usage (from plugin repo root):
 #   Set-ExecutionPolicy -Scope Process Bypass
@@ -16,6 +16,11 @@ param(
 $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path $PSScriptRoot -Parent
+$ruleSource = Join-Path $repoRoot "rules\cursor-agent-policy.mdc"
+if (-not (Test-Path $ruleSource)) {
+    throw "Source rule not found: $ruleSource"
+}
+
 if (-not $SourcePath) {
     $SourcePath = Join-Path $repoRoot "AGENTS.md"
 }
@@ -38,24 +43,13 @@ foreach ($dir in @($cursorDir, $rulesDir)) {
 Copy-Item -Force $SourcePath $canonical
 Write-Host "Canonical copy: $canonical"
 
-$agentsBody = Get-Content -Path $SourcePath -Raw -Encoding utf8
-
-$frontmatter = @"
----
-description: Cursor agent orchestration policy (Multitask) - low/mid/high/cursor models. Scrum = how; this rule = with what. User-facing language = first chat message.
-alwaysApply: true
----
-
-"@
-
 if (Test-Path $ruleFile) {
     $backup = "$ruleFile.bak.$(Get-Date -Format 'yyyyMMdd-HHmmss')"
     Write-Warning "Existing rule backed up to $backup"
     Copy-Item -Force $ruleFile $backup
 }
 
-$utf8NoBom = New-Object System.Text.UTF8Encoding $false
-[System.IO.File]::WriteAllText($ruleFile, $frontmatter + $agentsBody, $utf8NoBom)
+Copy-Item -Force $ruleSource $ruleFile
 Write-Host "Global rule:    $ruleFile"
 
 Write-Host ""
@@ -68,5 +62,6 @@ Write-Host "  2. Start a NEW Multitask chat (/multitask) in any window or projec
 Write-Host "  3. The orchestrator should ask once for low / mid / high / cursor mode."
 Write-Host "  4. Every Task must pass model from the matrix (Scrum does not pick slugs)."
 Write-Host ""
-Write-Host "Re-run this script after pulling plugin updates that change AGENTS.md."
+Write-Host "Re-run after git pull when rules/cursor-agent-policy.mdc or AGENTS.md change."
+Write-Host "The plugin does not register this rule (avoids duplicate in Customize -> Rules)."
 Write-Host "Optional one-repo overlay: .\scripts\install-project.ps1 -ProjectPath <product>"

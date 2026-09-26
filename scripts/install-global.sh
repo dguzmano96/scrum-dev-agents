@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Install cursor-agent-policy globally on this machine (all Cursor windows/projects).
+# Source of truth: rules/cursor-agent-policy.mdc (+ AGENTS.md body kept in sync)
 # Usage (from plugin repo root):
 #   chmod +x ./scripts/install-global.sh
 #   ./scripts/install-global.sh
@@ -8,7 +9,13 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+RULE_SOURCE="${ROOT}/rules/cursor-agent-policy.mdc"
 SOURCE="${1:-$ROOT/AGENTS.md}"
+
+if [[ ! -f "$RULE_SOURCE" ]]; then
+  echo "Source rule not found: $RULE_SOURCE" >&2
+  exit 1
+fi
 
 if [[ ! -f "$SOURCE" ]]; then
   echo "Source AGENTS.md not found: $SOURCE" >&2
@@ -30,27 +37,18 @@ if [[ -f "$RULE_FILE" ]]; then
   echo "Warning: existing rule backed up to $BACKUP" >&2
 fi
 
-{
-  cat <<'EOF'
----
-description: Cursor agent orchestration policy (Multitask) - low/mid/high/cursor models. Scrum = how; this rule = with what. User-facing language = first chat message.
-alwaysApply: true
----
-
-EOF
-  cat "$SOURCE"
-} > "$RULE_FILE"
-
+cp "$RULE_SOURCE" "$RULE_FILE"
 echo "Global rule:    $RULE_FILE"
 echo
 echo "Installed. Cursor loads machine-local user rules from:"
 echo "  $RULES"
 echo
 echo "Next steps:"
-echo "  1. Open Customize -> Rules and confirm 'cursor-agent-policy' is listed (Always Apply)."
+echo "  1. Open Customize -> Rules and confirm exactly one 'cursor-agent-policy' (Always Apply)."
 echo "  2. Start a NEW Multitask chat (/multitask) in any window or project."
-echo "  3. The orchestrator should ask once for low / mid / high / cursor mode."
+echo "  3. The orchestrator should ask once for budget / low / mid / high / cursor mode."
 echo "  4. Every Task must pass model from the matrix (Scrum does not pick slugs)."
 echo
-echo "Re-run this script after pulling plugin updates that change AGENTS.md."
+echo "Re-run after git pull when rules/cursor-agent-policy.mdc or AGENTS.md change."
+echo "The plugin does not register this rule (avoids duplicate in Customize -> Rules)."
 echo "Optional one-repo overlay: ./scripts/install-project.sh /path/to/product"

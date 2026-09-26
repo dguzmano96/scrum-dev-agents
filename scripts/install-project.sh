@@ -9,6 +9,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SOURCE="${ROOT}/AGENTS.md"
+RULE_SOURCE="${ROOT}/rules/cursor-agent-policy.mdc"
 PROJECT=""
 SYMLINK=0
 
@@ -25,6 +26,11 @@ fi
 
 if [[ ! -f "$SOURCE" ]]; then
   echo "Source AGENTS.md not found. Run from the scrum-dev-agents plugin repo." >&2
+  exit 1
+fi
+
+if [[ ! -f "$RULE_SOURCE" ]]; then
+  echo "Source rule not found: $RULE_SOURCE" >&2
   exit 1
 fi
 
@@ -73,22 +79,13 @@ mkdir -p "$RULES_DIR"
 RULE_FILE="${RULES_DIR}/cursor-agent-policy.mdc"
 backup_if_exists "$RULE_FILE"
 
-{
-  cat <<'EOF'
----
-description: Cursor agent orchestration policy (Multitask) - low/mid/high/cursor models. Scrum = how; this rule = with what. User-facing language = first chat message.
-alwaysApply: true
----
-
-EOF
-  cat "$SOURCE"
-} > "$RULE_FILE"
-
+cp "$RULE_SOURCE" "$RULE_FILE"
 echo "Project rule:   $RULE_FILE"
 echo
 echo "Next steps:"
 echo "  1. Open this product as a workspace in Cursor (File > Open Folder)."
-echo "  2. Prefer also: ./scripts/install-global.sh so nested Task lookups work in every window."
-echo "  3. Start a NEW Multitask chat (type /multitask or use Multitask Mode)."
-echo "  4. Confirm the agent asks for low / mid / high / cursor mode."
-echo "  5. Optional: commit AGENTS.md and .cursor/rules/cursor-agent-policy.mdc in the product repo."
+echo "  2. For nested Tasks in every window, run ./scripts/install-global.sh (machine rule)."
+echo "  3. Use global OR committed project rule in Customize -> Rules, not both Always Apply."
+echo "  4. Start a NEW Multitask chat (type /multitask or use Multitask Mode)."
+echo "  5. Confirm the agent asks for budget / low / mid / high / cursor mode."
+echo "  6. Optional: commit AGENTS.md and .cursor/rules/cursor-agent-policy.mdc in the product repo."

@@ -27,7 +27,7 @@ Operational details: see [`AGENTS.md`](../AGENTS.md) and [`skills/cursor-agent-p
 
 ## Machine mandate (global)
 
-The plugin's `alwaysApply` rules do not always enter every agent's runtime context. After installing the plugin, run **once per PC** from the plugin repo root (re-run after `git pull` if `AGENTS.md` changed):
+The plugin does **not** ship `rules/` in `plugin.json` (v1.3.1+) to avoid duplicating `cursor-agent-policy` in Customize → Rules. Subagents still need the mandate on disk. After installing the plugin, run **once per PC** from the plugin repo root (re-run after `git pull` when `rules/cursor-agent-policy.mdc` or `AGENTS.md` change):
 
 **Windows (PowerShell):**
 
@@ -43,11 +43,11 @@ chmod +x ./scripts/install-global.sh
 ./scripts/install-global.sh
 ```
 
-That copies `AGENTS.md` to `%USERPROFILE%\.cursor\AGENTS.md` (or `~/.cursor/AGENTS.md`) and writes `…/.cursor/rules/cursor-agent-policy.mdc`.
+That copies `AGENTS.md` to `%USERPROFILE%\.cursor\AGENTS.md` (or `~/.cursor/AGENTS.md`) and copies `rules/cursor-agent-policy.mdc` to `…/.cursor/rules/cursor-agent-policy.mdc`.
 
 ## Project overlay (local)
 
-Optional. One product repo only. Does not replace global.
+Optional. One product repo only. Use **global or** committed project rule for Always Apply — not both, or Customize → Rules will list duplicates.
 
 **Windows (PowerShell):**
 
