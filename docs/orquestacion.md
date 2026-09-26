@@ -5,7 +5,7 @@ One plugin, two layers. Not two separate products.
 | Layer | Artifacts | Question |
 |---|---|---|
 | **How** | `agents/`, process skills (W0–W8, I0–I9, Epi, R, O) | Which pipeline, which gate, HU/epic ceiling |
-| **What (which models)** | `AGENTS.md`, `rules/cursor-agent-policy.mdc`, skill `cursor-agent-policy`, `docs/matriz.md` | Mode, type, slug |
+| **What (which models)** | `AGENTS.md`, `policy/cursor-agent-policy.mdc`, skill `cursor-agent-policy`, `docs/matriz.md` | Mode, type, slug |
 | **In which language** | Skill `session-language` | Chat and new artifacts (first message) |
 
 The main chat asks for the mode **once** (`low` / `mid` / `high` / `cursor`) and forwards that selection to every `Task` as `modo activo: …` (active mode). The session language (the language of the user's first message) is also forwarded on every `Task` so subagents know which language to use. Any subagent launcher **must** set `model` using the skill lookup; omitting `model` bypasses the policy for that branch.
@@ -27,7 +27,7 @@ Operational details: see [`AGENTS.md`](../AGENTS.md) and [`skills/cursor-agent-p
 
 ## Machine mandate (global)
 
-The plugin does **not** ship `rules/` in `plugin.json` (v1.3.1+) to avoid duplicating `cursor-agent-policy` in Customize → Rules. Subagents still need the mandate on disk. After installing the plugin, run **once per PC** from the plugin repo root (re-run after `git pull` when `rules/cursor-agent-policy.mdc` or `AGENTS.md` change):
+The plugin keeps the mandate in `policy/` (not `rules/`). Cursor auto-loads a plugin `rules/` folder even without a `plugin.json` key, which duplicated `cursor-agent-policy` in Customize → Rules. Subagents still need the mandate on disk. After installing the plugin, run **once per PC** from the plugin repo root (re-run after `git pull` when `policy/cursor-agent-policy.mdc` or `AGENTS.md` change):
 
 **Windows (PowerShell):**
 
@@ -43,7 +43,7 @@ chmod +x ./scripts/install-global.sh
 ./scripts/install-global.sh
 ```
 
-That copies `AGENTS.md` to `%USERPROFILE%\.cursor\AGENTS.md` (or `~/.cursor/AGENTS.md`) and copies `rules/cursor-agent-policy.mdc` to `…/.cursor/rules/cursor-agent-policy.mdc`.
+That copies `AGENTS.md` to `%USERPROFILE%\.cursor\AGENTS.md` (or `~/.cursor/AGENTS.md`) and copies `policy/cursor-agent-policy.mdc` to `…/.cursor/rules/cursor-agent-policy.mdc`.
 
 ## Project overlay (local)
 

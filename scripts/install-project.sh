@@ -9,7 +9,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SOURCE="${ROOT}/AGENTS.md"
-RULE_SOURCE="${ROOT}/rules/cursor-agent-policy.mdc"
+RULE_SOURCE="${ROOT}/policy/cursor-agent-policy.mdc"
 PROJECT=""
 SYMLINK=0
 

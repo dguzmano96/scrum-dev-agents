@@ -22,7 +22,7 @@ You should see **8 agents you call from chat** and **5 that run behind the scene
 
 ### 2. Model policy (required for nested Tasks)
 
-Scrum decides **how** (which agent, which pipeline, one HU vs one epic). The policy decides **with what** (`model` = mode × work type). The plugin **does not** register `rules/` in `plugin.json` (v1.3.1+), so **Customize → Rules** shows **one** `cursor-agent-policy`, not a duplicate from the plugin plus your machine copy.
+Scrum decides **how** (which agent, which pipeline, one HU vs one epic). The policy decides **with what** (`model` = mode × work type). The plugin stores the mandate in `policy/` (not `rules/`) from v1.3.2, because Cursor auto-loads a plugin `rules/` folder even without a `plugin.json` key. **Customize → Rules** should show **one** user `cursor-agent-policy` after `install-global`.
 
 Custom subagents do not always receive plugin context, so install the policy **globally** (recommended) **or** into the product repo — not both as two Always Apply rules.
 

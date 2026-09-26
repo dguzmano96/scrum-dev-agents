@@ -21,7 +21,7 @@ $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path $PSScriptRoot -Parent
 $source = Join-Path $repoRoot "AGENTS.md"
-$ruleSource = Join-Path $repoRoot "rules\cursor-agent-policy.mdc"
+$ruleSource = Join-Path $repoRoot "policy\cursor-agent-policy.mdc"
 
 if (-not (Test-Path $source)) {
     throw "Source AGENTS.md not found. Run from the scrum-dev-agents plugin repo."

@@ -1,7 +1,8 @@
 # Install cursor-agent-policy globally on this machine (all Cursor windows/projects).
 # Mechanism: %USERPROFILE%\.cursor\rules\cursor-agent-policy.mdc (alwaysApply: true)
 # Canonical copy: %USERPROFILE%\.cursor\AGENTS.md
-# Source of truth: rules/cursor-agent-policy.mdc (+ AGENTS.md body kept in sync)
+# Source of truth: policy/cursor-agent-policy.mdc (+ AGENTS.md body kept in sync)
+# Lives in policy/ (not rules/) so the plugin does not auto-register a second Customize rule.
 #
 # Usage (from plugin repo root):
 #   Set-ExecutionPolicy -Scope Process Bypass
@@ -16,7 +17,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path $PSScriptRoot -Parent
-$ruleSource = Join-Path $repoRoot "rules\cursor-agent-policy.mdc"
+$ruleSource = Join-Path $repoRoot "policy\cursor-agent-policy.mdc"
 if (-not (Test-Path $ruleSource)) {
     throw "Source rule not found: $ruleSource"
 }
@@ -62,6 +63,6 @@ Write-Host "  2. Start a NEW Multitask chat (/multitask) in any window or projec
 Write-Host "  3. The orchestrator should ask once for low / mid / high / cursor mode."
 Write-Host "  4. Every Task must pass model from the matrix (Scrum does not pick slugs)."
 Write-Host ""
-Write-Host "Re-run after git pull when rules/cursor-agent-policy.mdc or AGENTS.md change."
+Write-Host "Re-run after git pull when policy/cursor-agent-policy.mdc or AGENTS.md change."
 Write-Host "The plugin does not register this rule (avoids duplicate in Customize -> Rules)."
 Write-Host "Optional one-repo overlay: .\scripts\install-project.ps1 -ProjectPath <product>"
