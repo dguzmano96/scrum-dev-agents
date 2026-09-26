@@ -6,7 +6,7 @@
 
 `vence` is **one calendar month** after `precios_consultados` and applies to the **price table only**. Benchmark dates are audit stamps. They do not expire scores and do not mark evals VENCIDAS.
 
-Capacity math and the **open URL registry** are canonical in [`docs/fuentes.md`](fuentes.md). The original ten URLs are admitted examples, not a ceiling. Price refresh: [`AGENTS.md`](../AGENTS.md) §2.1. If today > `vence` or `precios_consultados` is more than one calendar month old, refresh prices (EN + ES contrast) **before** assigning a slug. Price-only refresh of models already in the set does not re-fetch benchmarks; it does re-check gates, dominance, and the cost tie-break. New Task slugs require registry + discovery and a whole-set percentile recompute.
+Capacity math and the **open URL registry** are canonical in [`docs/fuentes.md`](fuentes.md). The original ten URLs are admitted examples, not a ceiling. Price refresh: [`AGENTS.md`](../AGENTS.md) §2.1 (must apply `bar_drain`, cheap cache, and no effort ranking). If today > `vence` or `precios_consultados` is more than one calendar month old, refresh prices (EN + ES contrast) **before** assigning a slug. Price-only refresh of models already in the set does not re-fetch benchmarks; it does re-check gates, dominance, and the `bar_drain` / list-`cost` tie-break under those three criteria. New Task slugs require registry + discovery and a whole-set percentile recompute.
 
 **Collector vs orchestrator:** fetching facts ≠ assigning tiers. Used **only** in a model-policy update. The collector is chosen **at the start of that update** from the price list just fetched (cheapest Task slug that can web-search; tiers do not apply; do not pin a slug). Record it in that update’s log only — not a matrix cell. One collector per target model (parallel); the mode’s **orchestrator** row then applies this file’s math (deterministic). Full rule: [`AGENTS.md`](../AGENTS.md) §5.1. Collectors do not fill this matrix. Scrum agents never use this role.
 
@@ -14,9 +14,11 @@ Capacity math and the **open URL registry** are canonical in [`docs/fuentes.md`]
 
 ```text
 cost = (input_usd_per_M + 2 * output_usd_per_M) / 3
+pool_multiplier = 15 if Cursor Models pool else 1
+bar_drain = cost / pool_multiplier
 ```
 
-Prices in USD / million tokens (Cursor docs EN; ES table matched). Regional residency +10% is not in `cost`. Pool Cursor vs API is not part of budget/low/mid/high selection.
+List `cost` is the published API price (USD / million tokens; EN table; ES matched 2026-09-22). Regional residency +10% is not in `cost`. **Tier gates and dominance/tie-break use `bar_drain`.** Cursor Models pool = Composer 2.5, Grok 4.5, Grok 4.6, Grok 4.7 (all efforts). `pool_multiplier_cursor = 15` is empirical from Spending snapshot 2026-09-26 (see [`docs/fuentes.md`](fuentes.md)).
 
 ## Scoring (this pass)
 
@@ -27,75 +29,94 @@ Prices in USD / million tokens (Cursor docs EN; ES table matched). Regional resi
 - Percentile among policy models that have that datum: `100 * (W + (T-1)/2) / (N-1)`. `N=1` is coverage, not a contest. Missing = unknown, not zero. Date does not enter the score.
 - Tag score = simple mean of that tag’s percentiles. No coverage multiplier. Fewer than 2 ids = **WEAK**.
 - `plan` = mean of `orquestar` and `decidir` the model has (one of two = weak). `research` = mean of `explorar` and `interpretar`. `review` = `verificar`.
-- Effort on the page must match the Task slug (medium ≠ max). Sibling scores are not copied unless the page says same checkpoint. Vendor system cards do not add a score.
-- Dominance: if A is better on all shared ids of that tag and `cost(A) ≤ cost(B)`, B cannot occupy the cell.
+- Effort is **not** a ranking criterion: do not match benchmark effort to the Task slug; collapse same-family effort variants into one candidate; do not copy scores across families. The matrix slug is the default non-Fast catalog id; the user chooses effort per task (override replaces the suffix when the catalog has that family).
+- Dominance: if A is better on all shared ids of that tag and `bar_drain(A) ≤ bar_drain(B)`, B cannot occupy the cell. Tie-break: lower `bar_drain`, then lower list `cost`.
 - Empty cell if no eligible model has even one tagged id. No proxy.
-- This pass (2026-09-22 blank slate): collector `gpt-5.6-luna-high`. **37** records returned (32 first wave + 5 late: Sol, Terra, K2.7, K3, Muse). Failed: 0. Whole-set percentiles recomputed after the late records.
+- Fichas and percentiles: collector pass **2026-09-22** (`gpt-5.6-luna-high`). **37** records. Cell reassignment **2026-09-26**: `bar_drain` + cheap-cache budget gate; tag scores unchanged.
 
 ## Assignment budget / low / mid / high / cursor
 
-`—` = empty. `W` = weak evidence (1 tagged id, or `plan`/`research` with only one of the two tags).
+`—` = empty. `W` = weak evidence (1 tagged id, or `plan`/`research` with only one of the two tags). Reassignment **2026-09-26** (`bar_drain` + cheap cache). Tag scores from fichas 2026-09-22 unchanged.
 
 | Type | budget | low | mid | high | cursor |
 |---|---|---|---|---|---|
-| **orchestrator** | `gpt-5.4-nano-xhigh` | `gemini-3.8-flash-high` | `cursor-grok-4.6-medium` | `cursor-grok-4.6-medium` | `cursor-grok-4.6-medium` |
-| `explore` | `gpt-5.4-nano-xhigh` W | `gemini-3.7-flash-high` W | `cursor-grok-4.5-high` | `cursor-grok-4.5-high` | `cursor-grok-4.5-high` |
-| `implement` | `gpt-5.4-nano-xhigh` W | `gemini-3.8-flash-high` | `cursor-grok-4.6-medium` | `claude-fable-5-1-thinking-high` | `cursor-grok-4.6-medium` |
-| `decide` | `gpt-5.4-nano-xhigh` W | `gemini-3.7-flash-high` | `kimi-k3-max` | `claude-fable-5-1-thinking-high` | `cursor-grok-4.6-medium` |
-| `debug` | `gpt-5.4-nano-xhigh` W | `gemini-3.8-flash-high` W | `grok-4.7-xhigh` W | `claude-fable-5-1-thinking-high` W | `grok-4.7-xhigh` W |
+| **orchestrator** | `cursor-grok-4.6-medium` | `cursor-grok-4.6-medium` | `gpt-5.6-terra-medium` | `cursor-grok-4.6-medium` | `cursor-grok-4.6-medium` |
+| `explore` | `cursor-grok-4.5-high` | `cursor-grok-4.5-high` | `kimi-k3-max` W | `cursor-grok-4.5-high` | `cursor-grok-4.5-high` |
+| `implement` | `cursor-grok-4.6-medium` | `gemini-3.8-flash-high` | `kimi-k3-max` W | `claude-fable-5-1-thinking-high` | `cursor-grok-4.6-medium` |
+| `decide` | `cursor-grok-4.6-medium` | `gemini-3.7-flash-high` | `kimi-k3-max` | `claude-fable-5-1-thinking-high` | `cursor-grok-4.6-medium` |
+| `debug` | `grok-4.7-xhigh` W | `grok-4.7-xhigh` W | `gpt-5.6-terra-medium` W | `claude-fable-5-1-thinking-high` W | `grok-4.7-xhigh` W |
 | `interpret` | — | — | — | — | — |
-| `verify` | `gpt-5-mini` W | `gemini-3.8-flash-high` W | `gemini-3.1-pro` | `gemini-3.1-pro` | `grok-4.7-xhigh` W |
-| `plan` | `gpt-5.4-nano-xhigh` | `gemini-3.8-flash-high` | `cursor-grok-4.6-medium` | `claude-fable-5-1-thinking-high` | `cursor-grok-4.6-medium` |
-| `research` | `gpt-5.4-nano-xhigh` W | `gemini-3.7-flash-high` W | `kimi-k3-max` W | `kimi-k3-max` W | `cursor-grok-4.5-high` W |
-| `review` | `gpt-5-mini` W | `gemini-3.8-flash-high` W | `gemini-3.1-pro` | `gemini-3.1-pro` | `grok-4.7-xhigh` W |
+| `verify` | `grok-4.7-xhigh` W | `grok-4.7-xhigh` W | `gemini-3.1-pro` | `gemini-3.1-pro` | `grok-4.7-xhigh` W |
+| `plan` | `cursor-grok-4.6-medium` | `gemini-3.8-flash-high` | `kimi-k3-max` | `claude-fable-5-1-thinking-high` | `cursor-grok-4.6-medium` |
+| `research` | `cursor-grok-4.5-high` W | `gemini-3.7-flash-high` W | `kimi-k3-max` W | `kimi-k3-max` W | `cursor-grok-4.5-high` W |
+| `review` | `grok-4.7-xhigh` W | `grok-4.7-xhigh` W | `gemini-3.1-pro` | `gemini-3.1-pro` | `grok-4.7-xhigh` W |
 | `write` | `gemini-2.5-flash` W | `gemini-3.8-flash-high` W | `gpt-5.2` W | `claude-4.6-opus-high-thinking` | — |
 
 **cursor** allow-list: `composer-2.5`, `grok-4.7-xhigh`, `cursor-grok-4.6-medium`, `cursor-grok-4.5-high`. Fast is out. Docs name “Grok 4.7”; Task accepts `grok-4.7-xhigh`, not `grok-4.7-high`.
+
+Winner `bar_drain` (approx): pool Grok/Composer **0.31** / **0.12**; Gemini 3.7/3.8 **2.58**; Gemini 2.5 Flash **1.77**; Terra / Gemini 3.1 **8.67**; K3 **11.00**; GPT-5.2 **9.92**; Fable **36.67**; Opus 4.6 **18.33**.
 
 ### Why these cells (this pass)
 
 | Cell | Winner | Shared / deciding tagged ids |
 |---|---|---|
-| orchestrator budget | Nano | AutomationBench-AA + GDPval-AA (2 ids). Mini same 2 ids, lower tag score, higher `cost`. |
-| orchestrator low | Gemini 3.8 | After late records, orquestar 76.19 (2) &gt; 3.7 74.21. 3.7 wins AutomationBench (62&gt;60); 3.8 wins GDPval (1412&gt;1371). Neither dominates. Same `cost` 2.58. |
-| orchestrator mid/high/cursor | Grok 4.6 | AutomationBench-AA + GDPval-AA, tag 94.44 (2). 4.7 orquestar is 1 id (W). K3 orquestar is GDPval-only (W) and 4.6 is better on that shared id and cheaper. |
-| explore mid/high/cursor | Grok 4.5 | AA-LCR + BrowseComp (2), tag 68.75. K3 LCR 88.7% is 1 id (W) and cannot beat. |
-| implement low | Gemini 3.8 | CursorBench-4.0 + DeepSWE-v1.1 + SciCode-AA (3), tag 82.32. |
-| implement mid/cursor | Grok 4.6 | Same 3 ids, tag 60.40. 4.7 has only CursorBench (W). |
-| implement high | Fable 5.1 | CursorBench + SciCode (2), tag 95.45. Better than 3.8 on those two shared ids but **not** cheaper. |
-| decide low | Gemini 3.7 | HLE-AA + ARC-AGI-1 + ARC-AGI-2 (3), tag 69.27. |
-| decide mid | Kimi K3 | ARC-AGI-1 + ARC-AGI-2 (2), tag 43.18 &gt; 4.6 41.82. Split on the two shared ARC ids (4.6 better ARC-2; K3 better ARC-1). No dominance. |
-| decide high | Fable 5.1 | HLE + ARC-1 + ARC-2 (3), tag 93.33. |
-| decide cursor | Grok 4.6 | Same 3 ids; K3 is outside the cursor pool. |
-| research mid/high | Kimi K3 W | No `interpretar` contest. All research is W (one of two tags). K3 explorar = AA-LCR 88.7% (pct 100, 1 id). 4.5 keeps **explore** (2 ids). |
-| verify mid/high | Gemini 3.1 Pro | Omniscience + FACTS (2), tag 41.67. Sol also 2 ids (40.00) — 3.1 higher. Weak 1-id rivals cannot beat. |
-| write high | Opus 4.6 High | Arena Text Overall + Longer Query (2), tag 95. |
-| interpret * | — | No `interpretar` contest (N≥2) after the closed map. |
-| cursor write | — | No pool slug has a tagged `redactar` id. |
+| orchestrator budget/low/high/cursor | Grok 4.6 | AutomationBench-AA + GDPval-AA, tag 94.44 (2). `bar_drain` ≈ 0.31 → budget+low. Dominates 4.5; 4.7 orquestar is 1 id (W). |
+| orchestrator mid | Terra | Pool Grok not mid-eligible. Terra orquestar 36.51 (2). K3 orquestar GDPval-only (W) cannot beat ≥2 ids. |
+| explore budget/low/high/cursor | Grok 4.5 | AA-LCR + BrowseComp (2), tag 68.75. `bar_drain` ≈ 0.31. |
+| explore mid | Kimi K3 W | Pool 4.5 not mid. K3 LCR pct 100 (1 id). |
+| implement budget | Grok 4.6 | implementar 60.40 (3); Gemini 3.8 not budget (`bar_drain` 2.58 ≥ 2). |
+| implement low | Gemini 3.8 | CursorBench + DeepSWE + SciCode (3), tag 82.32 &gt; 4.6 60.40. |
+| implement mid | Kimi K3 W | Pool/Fable not mid; K3 DeepSWE 80 (1 id). |
+| implement high/cursor | Fable / Grok 4.6 | Fable 95.45 (2) high; cursor pool → 4.6 60.40 (3). |
+| decide budget | Grok 4.6 | decidir 41.82 (3); Gemini 3.7 not budget. |
+| decide low | Gemini 3.7 | HLE + ARC-1 + ARC-2 (3), tag 69.27 &gt; 4.6 41.82. |
+| decide mid | Kimi K3 | ARC 2 ids, 43.18. Grok not mid. |
+| decide high/cursor | Fable / Grok 4.6 | Fable 93.33 (3); cursor → 4.6. |
+| debug budget/low/cursor | Grok 4.7 W | Terminal-Bench 83.3 (1). `bar_drain` ≈ 0.31. |
+| debug mid | Terra W | Pool not mid; Terra TB 20 (1) among mid fichas. |
+| debug high | Fable W | TB 100 (1). |
+| verify/review budget/low/cursor | Grok 4.7 W | Omniscience 80.8 (1). Beats Mini/3.8 W on raw score among W. |
+| verify/review mid/high | Gemini 3.1 Pro | Omniscience + FACTS (2), tag 41.67. |
+| plan budget/cursor | Grok 4.6 | mean(orquestar 94.44, decidir 41.82) ≈ 68.1. |
+| plan low | Gemini 3.8 | mean(76.19, 79.17) ≈ 77.7 &gt; 4.6 plan. |
+| plan mid | Kimi K3 | mean(orq W, decidir 43.18); Grok not mid. |
+| plan high | Fable | mean(82.94, 93.33) ≈ 88.1. |
+| research budget/cursor | Grok 4.5 W | No `interpretar`; explorar 68.75 (2). |
+| research low | Gemini 3.7 W | explorar 78.12 (1) &gt; 4.5 68.75 among research-W (missing interpretar). |
+| research mid/high | Kimi K3 W | LCR pct 100 (1). 4.5 keeps **explore** (2 ids). |
+| write budget | Gemini 2.5 Flash W | Arena Text 20 (1); only budget redactar among assigned. |
+| write low | Gemini 3.8 W | Arena 80 (1). |
+| write mid | GPT-5.2 W | Arena 40 (1); Opus not mid. |
+| write high | Opus 4.6 | Arena Overall + Longer Query (2), tag 95. |
+| interpret * | — | No `interpretar` contest (N≥2). |
+| cursor write | — | No pool slug has `redactar`. |
 
-### Budget models (all three gates)
+### Budget models (`bar_drain` &lt; 2 + cheap cache)
 
-| slug | in | out | cost | cache write | cache read | gates |
-|---|---:|---:|---:|---|---:|---|
-| `gpt-5.4-nano-xhigh` | 0.20 | 1.25 | 0.90 | `-` | 0.02 | 1+2+3; budget orchestrator / explore / implement / decide / debug / plan / research |
-| `gpt-5-mini` | 0.25 | 2.00 | 1.42 | `-` | 0.025 | 1+2+3; budget verify / review (Omniscience W) |
-| `gemini-2.5-flash` | 0.30 | 2.50 | 1.77 | `-` | 0.03 | 1+2+3; budget write (Arena Text W) |
-| `composer-2.5` | 0.50 | 2.50 | 1.83 | `-` | 0.20 | 1+2+3; CursorBench only, 11th of 12 → not assigned |
-
-`gpt-5.6-luna-high`: cost 0.87, cache write **$0.25**, cache read 0.02. Fails budget gate 2. Low-eligible.
+| slug | in | out | cost | bar_drain | cache write | cache read | notes |
+|---|---:|---:|---:|---:|---|---:|---|
+| `cursor-grok-4.6-medium` | 2.00 | 6.00 | 4.67 | **0.31** | `-` | 0.50 | budget+low orchestrator / implement / decide / plan |
+| `cursor-grok-4.5-high` | 2.00 | 6.00 | 4.67 | **0.31** | `-` | 0.50 | budget+low explore / research |
+| `grok-4.7-xhigh` | 2.00 | 6.00 | 4.67 | **0.31** | `-` | 0.50 | budget+low debug / verify / review |
+| `composer-2.5` | 0.50 | 2.50 | 1.83 | **0.12** | `-` | 0.20 | CursorBench only → not assigned |
+| `gpt-5.6-luna-high` | 0.20 | 1.20 | 0.87 | 0.87 | 0.25 | 0.02 | **passes** cheap cache; no cell (tags lose) |
+| `gpt-5.4-nano-xhigh` | 0.20 | 1.25 | 0.90 | 0.90 | `-` | 0.02 | eligible; dominated on orquestar by pool Grok |
+| `gpt-5-mini` | 0.25 | 2.00 | 1.42 | 1.42 | `-` | 0.025 | eligible; verify lost to 4.7 W |
+| `gemini-2.5-flash` | 0.30 | 2.50 | 1.77 | 1.77 | `-` | 0.03 | budget write |
 
 ## Dominance discards (this pass)
 
-| B | A | Tag | Shared `benchmark_id` | costs |
+| B | A | Tag | Shared `benchmark_id` | bar_drain |
 |---|---|---|---|---|
-| `cursor-grok-4.5-high` | `cursor-grok-4.6-medium` | orquestar | AutomationBench-AA (63&gt;58), GDPval-AA (1605&gt;1430) | 4.67 ≤ 4.67 |
-| `grok-4.7-xhigh` | `cursor-grok-4.6-medium` | orquestar | 4.7 has only GDPval-AA (1 id). Weak cannot occupy against 4.6’s 2 ids | 4.67 = 4.67 |
-| `grok-4.7-xhigh` | `cursor-grok-4.6-medium` | implementar | 4.7 has only CursorBench-4.0. Weak cannot occupy against 4.6’s 3 ids | 4.67 = 4.67 |
-| `cursor-grok-4.6-medium` | `gemini-3.8-flash-high` | implementar | CursorBench-4.0 (39.6&gt;36.1), DeepSWE-v1.1 (74&gt;67) — SciCode 57≥56. 3.8 cheaper | 2.58 ≤ 4.67; blocks 4.6 from **low** implement only |
-| `kimi-k3-max` | `cursor-grok-4.6-medium` | orquestar | only shared GDPval-AA (1605&gt;1584); K3 has no AutomationBench (W) | 4.67 ≤ 11.00 |
-| Mid Arena-only write rivals (Sonnet 4, etc.) | `gpt-5.2` | redactar | same Arena-Text-Overall, worse Elo, not cheaper than 5.2 | mid write stays 5.2 W |
+| `cursor-grok-4.5-high` | `cursor-grok-4.6-medium` | orquestar | AutomationBench-AA (63&gt;58), GDPval-AA (1605&gt;1430) | 0.31 ≤ 0.31 |
+| `grok-4.7-xhigh` | `cursor-grok-4.6-medium` | orquestar | 4.7 has only GDPval-AA (1 id). Weak cannot occupy against 4.6’s 2 ids | 0.31 = 0.31 |
+| `grok-4.7-xhigh` | `cursor-grok-4.6-medium` | implementar | 4.7 has only CursorBench-4.0. Weak cannot occupy against 4.6’s 3 ids | 0.31 = 0.31 |
+| `kimi-k3-max` | `cursor-grok-4.6-medium` | orquestar | only shared GDPval-AA (1605&gt;1584); K3 has no AutomationBench (W) | 0.31 ≤ 11.00 |
+| Mid Arena-only write rivals | `gpt-5.2` | redactar | same Arena-Text-Overall, worse Elo | mid write stays 5.2 W |
 
-Luna vs Nano: Luna cheaper but fails budget gate 2. They share AutomationBench (tie 6%) and GDPval (Luna 1319 &gt; Nano 937) — Luna does not strictly beat on **all** shared orquestar ids. Nano wins budget by eligibility + cost vs Mini.
+Gemini 3.8 vs Grok 4.6 on implementar: 3.8 better on shared CursorBench + DeepSWE, but `bar_drain` 2.58 ≰ 0.31 → **no** dominance either way. Higher tag score (82.32 &gt; 60.40) keeps **low** implement for 3.8; 4.6 still wins **budget** implement (3.8 not budget-eligible).
+
+Luna vs Nano: Luna passes cheap cache (`cw` 0.25 ≤ 1.25×0.20 and ≤ $1). They share AutomationBench (tie 6%) and GDPval (Luna 1319 &gt; Nano 937) — Luna does not strictly beat on **all** shared orquestar ids. Both lose budget orquestar to Grok 4.6.
 
 ## Price inventory (Task slugs)
 
@@ -104,33 +125,33 @@ EN/ES Cursor tables agreed on listed rows. `cw` / `cr` = cache write / read. Orc
 | display | slug | in | out | cost | cw | cr | notes |
 |---|---|---:|---:|---:|---|---:|---|
 | Auto | auto | var | var | — | — | — | excluded |
-| GPT-5.6 Luna | gpt-5.6-luna-high | 0.20 | 1.20 | 0.87 | 0.25 | 0.02 | **this run’s collector**; not budget (cw billed) |
-| GPT-5.4 Nano | gpt-5.4-nano-xhigh | 0.20 | 1.25 | 0.90 | - | 0.02 | budget |
-| GPT-5 Mini | gpt-5-mini | 0.25 | 2.00 | 1.42 | - | 0.025 | budget |
-| Gemini 2.5 Flash | gemini-2.5-flash | 0.30 | 2.50 | 1.77 | - | 0.03 | budget |
-| Composer 2.5 | composer-2.5 | 0.50 | 2.50 | 1.83 | - | 0.20 | budget + cursor pool |
-| Gemini 3 Flash | gemini-3-flash | 0.50 | 3.00 | 2.17 | - | 0.05 | low |
-| Gemini 3.7 Flash | gemini-3.7-flash-high | 0.75 | 3.50 | 2.58 | - | 0.075 | low explore / decide / research |
-| Gemini 3.8 Flash | gemini-3.8-flash-high | 0.75 | 3.50 | 2.58 | - | 0.075 | low orchestrator / implement / debug / plan / verify / write |
+| GPT-5.6 Luna | gpt-5.6-luna-high | 0.20 | 1.20 | 0.87 | 0.25 | 0.02 | **this run’s collector**; budget-eligible (cheap cache); no cell |
+| GPT-5.4 Nano | gpt-5.4-nano-xhigh | 0.20 | 1.25 | 0.90 | - | 0.02 | budget-eligible; no cell after pool Grok |
+| GPT-5 Mini | gpt-5-mini | 0.25 | 2.00 | 1.42 | - | 0.025 | budget-eligible; verify lost to 4.7 |
+| Gemini 2.5 Flash | gemini-2.5-flash | 0.30 | 2.50 | 1.77 | - | 0.03 | budget write |
+| Composer 2.5 | composer-2.5 | 0.50 | 2.50 | 1.83 | - | 0.20 | budget + cursor pool; no cell |
+| Gemini 3 Flash | gemini-3-flash | 0.50 | 3.00 | 2.17 | - | 0.05 | low (`bar_drain` 2.17) |
+| Gemini 3.7 Flash | gemini-3.7-flash-high | 0.75 | 3.50 | 2.58 | - | 0.075 | low decide / research |
+| Gemini 3.8 Flash | gemini-3.8-flash-high | 0.75 | 3.50 | 2.58 | - | 0.075 | low implement / plan / write |
 | Kimi K2.7 Code | kimi-k2.7-code | 0.95 | 4.00 | 2.98 | - | 0.19 | low; orquestar 21.83 (2) — no cell |
 | GPT-5.4 Mini | gpt-5.4-mini-high | 0.75 | 4.50 | 3.25 | - | 0.075 | low; Mini; no high |
 | Muse Spark 1.3 | muse-spark-1.3-high | 1.25 | 4.25 | 3.25 | - | 0.15 | low; CursorBench-4.0 33.4% only (W) — no cell |
 | GLM 5.2 | glm-5.2-high | 1.40 | 4.40 | 3.40 | - | 0.26 | low; no admitted High-effort primary row |
-| Claude 4.5 Haiku | claude-4.5-haiku-thinking | 1.00 | 5.00 | 3.67 | 1.25 | 0.10 | low; not budget (cw billed) |
-| Grok 4.7 | grok-4.7-xhigh | 2.00 | 6.00 | 4.67 | - | 0.50 | mid/cursor |
-| Grok 4.6 | cursor-grok-4.6-medium | 2.00 | 6.00 | 4.67 | - | 0.50 | mid/high/cursor orchestrator |
-| Grok 4.5 | cursor-grok-4.5-high | 2.00 | 6.00 | 4.67 | - | 0.50 | mid/high/cursor explore |
+| Claude 4.5 Haiku | claude-4.5-haiku-thinking | 1.00 | 5.00 | 3.67 | 1.25 | 0.10 | low; not budget (cw $1.25 &gt; $1/M) |
+| Grok 4.7 | grok-4.7-xhigh | 2.00 | 6.00 | 4.67 | - | 0.50 | budget/low/cursor (`bar_drain` ≈ 0.31); debug/verify |
+| Grok 4.6 | cursor-grok-4.6-medium | 2.00 | 6.00 | 4.67 | - | 0.50 | budget/low/high/cursor orchestrator (`bar_drain` ≈ 0.31) |
+| Grok 4.5 | cursor-grok-4.5-high | 2.00 | 6.00 | 4.67 | - | 0.50 | budget/low/high/cursor explore |
 | Gemini 3.6 Flash | gemini-3.6-flash-medium | 1.50 | 7.50 | 5.50 | - | 0.15 | mid |
 | Gemini 3.5 Flash | gemini-3.5-flash | 1.50 | 9.00 | 6.50 | - | 0.15 | mid |
 | Claude Sonnet 5 | claude-sonnet-5-thinking-medium | 2.00 | 10.00 | 7.33 | 2.50 | 0.20 | mid |
 | Gemini 3.1 Pro | gemini-3.1-pro | 2.00 | 12.00 | 8.67 | - | 0.20 | mid/high verify |
-| GPT-5.6 Terra | gpt-5.6-terra-medium | 2.00 | 12.00 | 8.67 | 2.50 | 0.20 | mid; orquestar 36.51 (2); cw billed |
+| GPT-5.6 Terra | gpt-5.6-terra-medium | 2.00 | 12.00 | 8.67 | 2.50 | 0.20 | mid orchestrator / debug (`bar_drain` 8.67) |
 | GPT-5.2 | gpt-5.2 | 1.75 | 14.00 | 9.92 | - | 0.175 | mid write |
 | GPT-5.3 Codex | gpt-5.3-codex | 1.75 | 14.00 | 9.92 | - | 0.175 | mid |
 | GPT-5.4 | gpt-5.4-medium | 2.50 | 15.00 | 10.83 | - | 0.25 | mid |
 | Claude 4 Sonnet | claude-4-sonnet | 3.00 | 15.00 | 11.00 | 3.75 | 0.30 | mid |
 | Claude 4.6 Sonnet | claude-4.6-sonnet-medium-thinking | 3.00 | 15.00 | 11.00 | 3.75 | 0.30 | mid; LiveBench only → `sin-tag` |
-| Kimi K3 | kimi-k3-max | 3.00 | 15.00 | 11.00 | - | 0.30 | mid decide; mid/high research W |
+| Kimi K3 | kimi-k3-max | 3.00 | 15.00 | 11.00 | - | 0.30 | mid explore/implement/decide/plan; mid/high research W |
 | Composer 2.5 Fast | composer-2.5-fast | 3.00 | 15.00 | 11.00 | - | 0.50 | Fast; not assigned |
 | GPT-5.6 Sol | gpt-5.6-sol-medium | 4.00 | 20.00 | 14.67 | 5.00 | 0.40 | high; out $20 ≥ 18 → not mid; verify 40.00 (2) &lt; 3.1 |
 | Claude Opus 5.5 | claude-opus-5-5-medium | 4.00 | 20.00 | 14.67 | 5.00 | 0.20 | high |
@@ -230,7 +251,7 @@ in 0.75 · out 3.50 · cost 2.58 · cw `-` · cr 0.075
 | AA | AA-Omniscience-Index | 30 | AA | verificar | 69.2 (N=14) |
 | Arena | Arena-Text-Overall | 1493±9 | https://arena.ai/leaderboard/text | redactar | 80 (N=11) |
 
-Tag (rescored): implementar 82.32 (3, **strong**); orquestar 76.19 (2, **strong** — **low orchestrator**); redactar 80 (1, W); depurar 80 (1, W); verificar 73.33 (1, W); decidir 79.17 (1, W); explorar 65.62 (1, W).
+Tag (rescored): implementar 82.32 (3, **strong** — **low implement**); orquestar 76.19 (2, **strong**, lost orchestrator to pool Grok `bar_drain` 0.31); redactar 80 (1, W — **low write**); depurar 80 (1, W); verificar 73.33 (1, W); decidir 79.17 (1, W); explorar 65.62 (1, W). **low plan**.
 
 ### cursor-grok-4.6-medium
 
@@ -248,7 +269,7 @@ in 2.00 · out 6.00 · cost 4.67 · cw `-` · cr 0.50
 | ARC Prize | ARC-AGI-1 | 87.5% | same | decidir | 28.6 (N=8) |
 | AA | Terminal-Bench-4.0 | 13% | AA | depurar | 66.7 (N=13) |
 
-Tag (rescored): orquestar 94.44 (2, **strong**); implementar 60.40 (3, **strong**); decidir 41.82 (3, **strong** — lost **mid** decide to K3 43.18).
+Tag (rescored): orquestar 94.44 (2, **strong** — **budget/low/high/cursor orchestrator**); implementar 60.40 (3, **strong** — **budget/cursor implement**); decidir 41.82 (3, **strong** — **budget decide**; mid decide stays K3). `bar_drain` ≈ 0.31 (not mid).
 
 ### cursor-grok-4.5-high
 
@@ -264,7 +285,7 @@ in 2.00 · out 6.00 · cost 4.67 · cw `-` · cr 0.50
 | ARC Prize | ARC-AGI-2 | 52.6% | https://arcprize.org/results/xai-grok-4-5 | decidir | 25 (N=9) |
 | ARC Prize | ARC-AGI-1 | 85.7% | same | decidir | 14.3 (N=8) |
 
-Tag (rescored): explorar 68.75 (2, **strong** — keeps explore); orquestar 75.40 (2, **strong**, **dominated** by 4.6); decidir 37.98 (3). Research mid/high lost to K3 (both W; K3 LCR pct 100).
+Tag (rescored): explorar 68.75 (2, **strong** — **budget/low/high/cursor explore** + **budget/cursor research** W); orquestar 75.40 (2, **strong**, **dominated** by 4.6); decidir 37.98 (3). Research mid/high lost to K3 (both W; K3 LCR pct 100). `bar_drain` ≈ 0.31 (not mid).
 
 ### grok-4.7-xhigh
 
@@ -350,7 +371,7 @@ in 3.00 · out 15.00 · cost 11.00 · cw `-` · cr 0.30 · mid + high
 | ARC Prize | ARC-AGI-2 | 60.4% | https://arcprize.org/ | decidir | 36.36 (N=12) |
 | ARC Prize | ARC-AGI-1 | 94.5% | https://arcprize.org/ | decidir | 50 (N=11) |
 
-Tag: decidir 43.18 (2, **strong** — **mid decide**); explorar 100 (1, W — **mid/high research** W); orquestar 83.33 (1, W, dominated on the shared GDPval by 4.6); implementar 80 (1, W). Rejected: Vals Index (`sin-tag`); τ-bench N=1; Arena English ≠ Overall.
+Tag: decidir 43.18 (2, **strong** — **mid decide** / **mid plan**); explorar 100 (1, W — **mid explore** + **mid/high research** W); orquestar 83.33 (1, W, dominated on the shared GDPval by 4.6); implementar 80 (1, W — **mid implement**). Rejected: Vals Index (`sin-tag`); τ-bench N=1; Arena English ≠ Overall.
 
 ### gpt-5.6-sol-medium
 
@@ -385,7 +406,7 @@ in 2.00 · out 12.00 · cost 8.67 · cw 2.50 · cr 0.20 · mid + high (not budge
 | ARC Prize | ARC-AGI-2 | 37.5% | https://arcprize.org/ | decidir | 0 (N=12) |
 | ARC Prize | ARC-AGI-1 | 77.0% | https://arcprize.org/ | decidir | 0 (N=11) |
 
-Tag: orquestar 36.51 (2); decidir 0 (2). No cell. Rejected: SciCode / τ² from OpenRouter (aggregator).
+Tag: orquestar 36.51 (2 — **mid orchestrator**); decidir 0 (2); depurar 20 (1, W — **mid debug**). Rejected: SciCode / τ² from OpenRouter (aggregator).
 
 ### kimi-k2.7-code
 

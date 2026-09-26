@@ -37,7 +37,7 @@ Do not use Auto on subagents. Fast vs non-Fast are **distinct rows**. User overr
 
 Before substantial work, ask **once**, in the **session language** (skill `session-language`):
 
-> Mode **budget** (cheapest; free cache-write + cheap cache-read), **low** (price), **mid** (quality/price), **high** (performance), or **cursor** (Cursor Models pool only)?
+> Mode **budget** (cheapest; `bar_drain` + cheap cache), **low** (price), **mid** (quality/price), **high** (performance), or **cursor** (Cursor Models pool only)?
 
 - If the user picks a mode: use it for the orchestrator and **all** `Task`s this session (except a one-off override).
 - If **no answer**: operate in **low** and **say so on every reply** (“default policy: low mode”).
@@ -48,31 +48,34 @@ Orchestrators (use the row for the active mode; do not change rows until the use
 
 | Mode | Orchestrator | Slug | Why |
 |---|---|---|---|
-| **budget** | GPT-5.4 Nano | `gpt-5.4-nano-xhigh` | `cost` 0.90; AutomationBench-AA + GDPval-AA (2 ids). Luna cheaper but billed cache write (not budget). |
-| **low** | Gemini 3.8 Flash | `gemini-3.8-flash-high` | `cost` 2.58; orquestar 76.19 (2 ids) after whole-set rescoring. Beats 3.7 74.21; neither dominates. Default until they pick a mode. |
-| **mid** | Grok 4.6 | `cursor-grok-4.6-medium` | `cost` 4.67; orquestar 92.86 (AutomationBench-AA 63% + GDPval-AA). Dominates 4.5 on both shared ids. |
+| **budget** | Grok 4.6 | `cursor-grok-4.6-medium` | `bar_drain` ≈ 0.31 (pool ×15); orquestar 94.44 (2 ids). Luna passes cheap cache but loses the tag. |
+| **low** | Grok 4.6 | `cursor-grok-4.6-medium` | Same; leads orquestar among low-eligible. Default until they pick a mode. |
+| **mid** | GPT-5.6 Terra | `gpt-5.6-terra-medium` | Pool Grok leaves mid (`bar_drain` 0.31). Terra orquestar 36.51 (2); K3 orquestar is 1 id (W). |
 | **high** | Grok 4.6 | `cursor-grok-4.6-medium` | Best absolute strong `orquestar` (not Nano/Mini). 4.7 is 1 id (W). |
 | **cursor** | Grok 4.6 | `cursor-grok-4.6-medium` | Same pool row. Composer has no `orquestar` datum. |
 
-Default suggestion until they pick a mode: **Gemini 3.8 Flash** (`gemini-3.8-flash-high`).
+Default suggestion until they pick a mode: **Grok 4.6** (`cursor-grok-4.6-medium`).
 
-Thinking: Cursor binds effort to the user picker. Do not duplicate thinking variants; use this matrix’s family slug. Map published effort to the Task slug (medium ≠ max).
+Effort is **not** a ranking criterion. The matrix slug is the default non-Fast catalog id for that family; the **user** chooses effort (low/medium/high/xhigh) per task difficulty. Do not prefer a higher effort suffix. Do not require benchmark effort labels to match the Task slug. Collapse same-checkpoint effort variants into one candidate. A user override replaces the suffix when the catalog has that family.
 
 ## 2. Formula and freshness
 
 ```text
 cost = (input_usd_per_M + 2 * output_usd_per_M) / 3
+pool_multiplier = 15 if Cursor Models pool else 1
+bar_drain = cost / pool_multiplier
 ```
 
-Agents are output-heavy. Fast costing more = worse on **budget** / **low**. Regional residency +10% does not enter `cost`.
+List `cost` is the published API price (keep publishing it). **Numeric tier gates and dominance/tie-break use `bar_drain`.** Cursor Models pool families (all effort variants): Composer 2.5, Grok 4.5, Grok 4.6, Grok 4.7 — `pool_multiplier = 15`. Everyone else: `1`. `pool_multiplier_cursor = 15` is **empirical** from the user’s Spending snapshot **2026-09-26** (not an official entitlement); full evidence in [`docs/fuentes.md`](docs/fuentes.md). Agents are output-heavy. Fast costing more = worse on **budget** / **low**. Regional residency +10% does not enter `cost`.
 
 Capacity: tag percentiles from the **admitted registry** in [`docs/fuentes.md`](docs/fuentes.md) (open URL set, closed math). The original ten URLs are examples, not a ceiling. Score date is stored for audit and **does not** enter the score. There is **no** `evals=VENCIDAS` ranking penalty.
 
-- **budget**: `cost` < 2, cache write free/`-`/$0, cache read cheaper than that model’s uncached input. No Fast. No preview.
-- **low**: `cost` ≤ 4. No Fast. No preview. No $10/$50 class.
-- **mid**: 4 < `cost` ≤ 12. No Fast. No published input or output ≥ $18/M. No $10/$50 class.
-- **high**: best absolute tag score. No Nano/Mini. No preview. Fast loses to its non-Fast sibling when the page says same checkpoint.
-- **cursor**: only `composer-2.5`, `grok-4.7-xhigh`, `cursor-grok-4.6-medium`, `cursor-grok-4.5-high`. Fast is out.
+- **budget**: `bar_drain` < 2; **cheap cache** (cache read < uncached input; cache write free/`-`/$0 **or** (cw ≤ 1.25× input **and** cw ≤ $1/M)); no Fast; no preview. Do **not** require free cache-write.
+- **low**: `bar_drain` ≤ 4. No Fast. No preview. No $10/$50 class.
+- **mid**: 4 < `bar_drain` ≤ 12. No Fast. No published input or output ≥ $18/M. No $10/$50 class.
+- **high**: best absolute tag score. No Nano/Mini. No preview. Fast loses to its non-Fast sibling when the page says same checkpoint. `bar_drain` does not cap high.
+- **cursor**: only `composer-2.5`, `grok-4.7-xhigh`, `cursor-grok-4.6-medium`, `cursor-grok-4.5-high`. Fast is out. Tag score inside the allow-list; `bar_drain` may tie-break.
+- Bands overlap (budget-eligible models also compete for low). Winner = best tag score among eligible after dominance. Dominance: A better on all shared ids of that tag and `bar_drain(A) ≤ bar_drain(B)` → B cannot occupy. Tie-break: lower `bar_drain`, then lower list `cost`.
 - If today is after `vence`, or `precios_consultados` is more than one calendar month old, run **§2.1 Price refresh** before assigning or suggesting any slug.
 
 As of 2026-09-22, the price table is current through **2026-10-22**.
@@ -81,12 +84,20 @@ As of 2026-09-22, the price table is current through **2026-10-22**.
 
 `benchmarks_consultados` is an audit stamp. Benchmark scores do **not** expire by date. `vence` does **not** mark benchmarks as VENCIDAS.
 
+Whenever this pass recomputes eligibility, dominance, tie-break, or cells, it **must** apply these three criteria (canonical math: [`docs/fuentes.md`](docs/fuentes.md)). Do **not** fall back to list-`cost`-only gates, “cache write must be free/`-`/$0”, or effort-matching:
+
+1. **`bar_drain`**: recompute `cost` from the new list prices, then `bar_drain = cost / pool_multiplier` with the **same** multipliers (15 for Cursor Models pool families Composer 2.5 / Grok 4.5 / 4.6 / 4.7; 1 otherwise). Numeric budget/low/mid gates and dominance/tie-break use `bar_drain`. Keep publishing list `cost`. Do **not** drop the pool multiplier. Change `15` only if a new Spending snapshot or official pool size is recorded in `docs/fuentes.md`.
+2. **Cheap cache (budget)**: cache read < uncached input; cache write free/`-`/$0 **or** (cw ≤ 1.25× input **and** cw ≤ $1/M). Luna can pass. Do **not** restore “cache write must be `−`/$0”.
+3. **Effort is not a criterion**: do not require benchmark effort to match the Task slug; do not prefer higher effort; collapse same-checkpoint effort variants into one candidate. The matrix slug stays the default catalog id; the user picks effort per task.
+
+Steps:
+
 1. If today is after `vence`, or `precios_consultados` is more than one calendar month old, the policy is **stale on price**. Before assigning or suggesting any slug, open https://cursor.com/docs/models-and-pricing and contrast the Spanish variant of that same page.
-2. Update input, output, cache write, and cache read. Recompute `cost = (input + 2 * output) / 3`. Regional residency +10% stays out of `cost`.
-3. Re-check tier eligibility with the new costs (budget gates; low `cost` ≤ 4; mid 4 < `cost` ≤ 12; high; cursor allow-list). Recalculate who wins each cell if eligibility, dominance, or the cost tie-break changed. Record the new `precios_consultados` and set `vence` to **one month** after that date.
+2. Update input, output, cache write, and cache read. Recompute `cost = (input + 2 * output) / 3`, then `bar_drain` (§2). Regional residency +10% stays out of `cost`.
+3. Re-check tier eligibility with the three criteria above (budget = `bar_drain` < 2 + cheap cache; low/mid = `bar_drain` bands; high; cursor allow-list). Recalculate who wins each cell if eligibility, dominance, or the `bar_drain` / list-`cost` tie-break changed. Record the new `precios_consultados` and set `vence` to **one month** after that date.
 4. If the pricing page brings models that were not in the policy set (new Task-catalog slug, or a docs name whose Task slug you resolve and note): do **not** drop them in with price alone. Score them from the **registry + discovery** in [`docs/fuentes.md`](docs/fuentes.md): same `benchmark_id` only, unknown stays unknown, no sibling-score copy unless the page says same checkpoint, one tag per the closed map, percentile **only** among policy models that have that datum. Because percentiles are relative, recompute percentiles and tag scores for the **whole** policy set after the new models are included, then redo categorization and cell assignment. A new model with no benchmark on a tag does not fill that cell by proxy.
-5. A price-only refresh of models already in the set does **not** require re-fetching benchmarks. It **does** require re-checking gates, dominance, and tie-break, because `cost` changed.
-6. The same monthly pass **also** re-fetches every admitted URL, discovers new URLs for the tag-map families (admit only if all gates pass), replaces a score only with a newer number of the **same** `benchmark_id`, and reassigns a cell only when eligibility, a percentile, dominance, or the cost tie-break changed. A dead URL is marked dead; replace it only with that benchmark’s new official host.
+5. A price-only refresh of models already in the set does **not** require re-fetching benchmarks. It **does** require re-checking gates, dominance, and tie-break under the three criteria, because list prices (hence `bar_drain`) and cache rows changed.
+6. The same monthly pass **also** re-fetches every admitted URL, discovers new URLs for the tag-map families (admit only if all gates pass), replaces a score only with a newer number of the **same** `benchmark_id`, and reassigns a cell only when eligibility, a percentile, dominance, or the `bar_drain` / list-`cost` tie-break changed. A dead URL is marked dead; replace it only with that benchmark’s new official host.
 7. **Who fetches vs who decides:** the orchestrator lists the slugs to query, then launches **one collector per slug** (parallel, cheap web-search slug — §5.1). After every collector returns, **this** orchestrator (the mode’s orchestrator row) merges records and applies the written math. Collectors never assign tiers.
 
 ## 3. Subagent types, ceilings, and Scrum map
@@ -139,30 +150,32 @@ When launching the custom agent, `model` = this type’s row × active mode. The
 
 ## 4. Matrix budget / low / mid / high / cursor by type
 
-Use the slug. Do not swap Fast for non-Fast (or the reverse) without override. `—` = empty cell.
+Use the slug. Do not swap Fast for non-Fast (or the reverse) without override. `—` = empty cell. Cell reassignment **2026-09-26** (`bar_drain` + cheap cache; fichas 2026-09-22 unchanged).
 
 | Type | budget | low | mid | high | cursor |
 |---|---|---|---|---|---|
-| **orchestrator** | `gpt-5.4-nano-xhigh` | `gemini-3.8-flash-high` | `cursor-grok-4.6-medium` | `cursor-grok-4.6-medium` | `cursor-grok-4.6-medium` |
-| `explore` | `gpt-5.4-nano-xhigh` | `gemini-3.7-flash-high` | `cursor-grok-4.5-high` | `cursor-grok-4.5-high` | `cursor-grok-4.5-high` |
-| `implement` | `gpt-5.4-nano-xhigh` | `gemini-3.8-flash-high` | `cursor-grok-4.6-medium` | `claude-fable-5-1-thinking-high` | `cursor-grok-4.6-medium` |
-| `decide` | `gpt-5.4-nano-xhigh` | `gemini-3.7-flash-high` | `kimi-k3-max` | `claude-fable-5-1-thinking-high` | `cursor-grok-4.6-medium` |
-| `debug` | `gpt-5.4-nano-xhigh` | `gemini-3.8-flash-high` | `grok-4.7-xhigh` | `claude-fable-5-1-thinking-high` | `grok-4.7-xhigh` |
+| **orchestrator** | `cursor-grok-4.6-medium` | `cursor-grok-4.6-medium` | `gpt-5.6-terra-medium` | `cursor-grok-4.6-medium` | `cursor-grok-4.6-medium` |
+| `explore` | `cursor-grok-4.5-high` | `cursor-grok-4.5-high` | `kimi-k3-max` | `cursor-grok-4.5-high` | `cursor-grok-4.5-high` |
+| `implement` | `cursor-grok-4.6-medium` | `gemini-3.8-flash-high` | `kimi-k3-max` | `claude-fable-5-1-thinking-high` | `cursor-grok-4.6-medium` |
+| `decide` | `cursor-grok-4.6-medium` | `gemini-3.7-flash-high` | `kimi-k3-max` | `claude-fable-5-1-thinking-high` | `cursor-grok-4.6-medium` |
+| `debug` | `grok-4.7-xhigh` | `grok-4.7-xhigh` | `gpt-5.6-terra-medium` | `claude-fable-5-1-thinking-high` | `grok-4.7-xhigh` |
 | `interpret` | — | — | — | — | — |
-| `verify` | `gpt-5-mini` | `gemini-3.8-flash-high` | `gemini-3.1-pro` | `gemini-3.1-pro` | `grok-4.7-xhigh` |
-| `plan` | `gpt-5.4-nano-xhigh` | `gemini-3.8-flash-high` | `cursor-grok-4.6-medium` | `claude-fable-5-1-thinking-high` | `cursor-grok-4.6-medium` |
-| `research` | `gpt-5.4-nano-xhigh` | `gemini-3.7-flash-high` | `kimi-k3-max` | `kimi-k3-max` | `cursor-grok-4.5-high` |
-| `review` | `gpt-5-mini` | `gemini-3.8-flash-high` | `gemini-3.1-pro` | `gemini-3.1-pro` | `grok-4.7-xhigh` |
+| `verify` | `grok-4.7-xhigh` | `grok-4.7-xhigh` | `gemini-3.1-pro` | `gemini-3.1-pro` | `grok-4.7-xhigh` |
+| `plan` | `cursor-grok-4.6-medium` | `gemini-3.8-flash-high` | `kimi-k3-max` | `claude-fable-5-1-thinking-high` | `cursor-grok-4.6-medium` |
+| `research` | `cursor-grok-4.5-high` | `gemini-3.7-flash-high` | `kimi-k3-max` | `kimi-k3-max` | `cursor-grok-4.5-high` |
+| `review` | `grok-4.7-xhigh` | `grok-4.7-xhigh` | `gemini-3.1-pro` | `gemini-3.1-pro` | `grok-4.7-xhigh` |
 | `write` | `gemini-2.5-flash` | `gemini-3.8-flash-high` | `gpt-5.2` | `claude-4.6-opus-high-thinking` | — |
 
 Honest selection notes:
 
 - **cursor mode**: only the four Task slugs above. Docs vs Task: pricing page says Grok 4.7; Task accepts `grok-4.7-xhigh`, not `grok-4.7-high`. Old slug `cursor-grok-4.6-xhigh` is not in this Task catalog; use `cursor-grok-4.6-medium`.
-- **Dominance:** Grok 4.6 Medium is better than Grok 4.5 on both shared `orquestar` ids and the same `cost` → 4.5 cannot occupy orchestrator. Grok 4.7’s `orquestar` / `implementar` are 1 id (W) and cannot beat 4.6’s 2–3 ids. Gemini 3.8 Flash is better than Grok 4.6 on shared CursorBench + DeepSWE and cheaper → 4.6 cannot occupy **low** implement. After the five late records, 3.8’s orquestar 76.19 beats 3.7 74.21 (neither dominates). K3 takes **mid decide** (ARC 2 ids, 43.18 &gt; 4.6 41.82, split/no dominance) and **mid/high research** W (LCR 88.7%; no `interpretar` anywhere). 4.5 keeps explore (2 ids).
-- **GPT-5.6 Luna vs GPT-5.4 Nano:** Luna `cost` 0.87, cache write **$0.25** (fails budget gate 2). Nano `cost` 0.90, cache write `-`. This run’s collector was Luna (log only; not pinned). Composites stay `sin-tag`.
+- **`bar_drain`:** pool Grok/Composer `cost` 4.67 / 1.83 → `bar_drain` ≈ 0.31 / 0.12 → budget- and low-eligible; **not** mid (mid needs 4 < `bar_drain` ≤ 12). Mid orchestrator → Terra; mid explore/implement/decide/plan/research → K3 (or Terra for mid debug).
+- **Dominance:** Grok 4.6 beats Grok 4.5 on both shared `orquestar` ids with `bar_drain` 0.31 ≤ 0.31 → 4.5 cannot occupy orchestrator. Grok 4.7’s `orquestar` / `implementar` are 1 id (W) and cannot beat 4.6’s 2–3 ids. Gemini 3.8 `implementar` 82.32 > Grok 4.6 60.40 on shared CursorBench + DeepSWE (neither dominates on `bar_drain` because 2.58 ≰ 0.31) → 3.8 keeps **low** implement. K3 keeps **mid decide** (ARC 2 ids) and **mid/high research** W. 4.5 keeps explore (2 ids) for budget/low/high/cursor.
+- **GPT-5.6 Luna:** `cost` 0.87, cw $0.25 → **passes** cheap cache; budget-eligible; does not win cells (tag scores lose to pool Grok). Collector log only; not pinned. Composites stay `sin-tag`.
 - **Vals Index** is `sin-tag` on the closed map. Orchestrator cells use AutomationBench-AA + GDPval-AA.
 - **Empty `interpret`:** no `interpretar` contest (N≥2) after the map. **Empty cursor write:** no pool slug has `redactar`.
 - **Nesting is not a row.** A grandchild `explore` uses the mode’s `explore` row.
+- **Effort:** not a ranking criterion; matrix slug = default catalog id; user picks effort per task.
 
 ## 5. How to delegate (context + model)
 

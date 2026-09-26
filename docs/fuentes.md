@@ -73,33 +73,43 @@ Weak = fewer than 2 distinct `benchmark_id`s. A weak score does not beat a same-
 
 Unknown is not zero. Do not copy a sibling checkpoint (effort, Fast, medium vs high) unless the page says it is the same checkpoint; then reuse the row and mark it.
 
-Cell fill, dominance, and tie-break: see [`docs/matriz.md`](matriz.md). Dominance: if A is better on **all** shared `benchmark_id`s of that tag and `cost(A) ≤ cost(B)`, B cannot occupy the cell. Empty cell if nobody eligible has even one tagged id. No proxy.
+Cell fill, dominance, and tie-break: see [`docs/matriz.md`](matriz.md). Dominance: if A is better on **all** shared `benchmark_id`s of that tag and `bar_drain(A) ≤ bar_drain(B)`, B cannot occupy the cell. Tie-break: lower `bar_drain`, then lower list `cost`. Empty cell if nobody eligible has even one tagged id. No proxy.
+
+Effort is **not** a ranking criterion: do not require benchmark effort labels to match the Task slug; do not prefer xhigh/high/medium/low; collapse effort variants of the same checkpoint family into one candidate (use existing fichas). The matrix slug is the default non-Fast catalog id only; the user picks effort per task difficulty, and a user override replaces the suffix when the catalog has that family.
 
 Score date does **not** penalize. `vence` does **not** mark benchmarks VENCIDAS.
 
 ### Refresh (prices + registry)
 
-Keep the monthly price procedure (`vence` 2026-10-22). The **same** pass also:
+Keep the monthly price procedure (`vence` 2026-10-22). Benchmark dates do **not** expire scores and do **not** mark evals VENCIDAS.
+
+**Mandatory criteria** whenever the pass recomputes eligibility, dominance, tie-break, or cells (do **not** fall back to list-`cost`-only gates, free-cache-write-only budget, or effort-matching):
+
+1. **`bar_drain`**: after updating list prices, recompute `cost = (input + 2 * output) / 3`, then `bar_drain = cost / pool_multiplier` with the **same** multipliers — `15` for Cursor Models pool families (Composer 2.5, Grok 4.5, Grok 4.6, Grok 4.7, all efforts); `1` otherwise. Numeric budget/low/mid gates and dominance/tie-break use `bar_drain`. Keep publishing list `cost`. Do **not** drop the pool multiplier. Change `15` only if a new Spending snapshot or official pool size is recorded in **this** file.
+2. **Cheap cache (budget)**: cache read < uncached input; cache write free (`-`, $0) **or** (cw ≤ 1.25× input **and** cw ≤ $1.00/M). Luna can pass. Do **not** restore “cache write must be `−`/$0”.
+3. **Effort is not a criterion**: do not require benchmark effort to match the Task slug; do not prefer higher effort; collapse same-checkpoint effort variants into one candidate. The matrix slug is the default catalog id; the user picks effort per task.
+
+The **same** pass also:
 
 1. Re-fetch **every** admitted URL.
 2. **Discover** new URLs for the families in the tag map. Admit one only if the gates pass. Append it with date, `benchmark_id`s, and tag.
 3. Replace a score only with a **newer published number of the same** `benchmark_id`.
 4. If new models appear on the Cursor price page, score them from the registry (and discovery), then recompute percentiles for the **whole** policy set (percentiles are relative).
-5. Reassign a cell only when eligibility, a percentile, dominance, or the cost tie-break changed.
+5. Reassign a cell only when eligibility, a percentile, dominance, or the `bar_drain` / list-`cost` tie-break changed (under the three criteria above).
 
-A **price-only** change of models already in the set does **not** require new benchmarks; it **does** re-check gates, dominance, and tie-break. A **new model** or a **new admitted** `benchmark_id` does require rescoring.
+A **price-only** change of models already in the set does **not** require new benchmarks; it **does** re-check gates, dominance, and tie-break under the three criteria. A **new model** or a **new admitted** `benchmark_id` does require rescoring.
 
 A dead URL is marked **dead**. Replace it only with the **same** benchmark’s new official host. Do not substitute a different test to fill a hole.
 
-**Who fetches vs who decides** (full text: [`AGENTS.md`](../AGENTS.md) §5.1): only during a **model-policy update**. The collector model is **chosen at the start of that update** from the Cursor list just fetched (https://cursor.com/docs/models-and-pricing, contrast ES). Criterion: cheapest `cost` among slugs the Task catalog accepts that can web-search. `cost = (input + 2 * output) / 3`. Tiers do **not** apply (not the active mode’s column, not the four-model cursor pool). Fast loses. If the cheapest row cannot web-search or has no Task slug, **skip it here** and take the next. Record the chosen slug in **that update’s log only**. Do not pin a default. One collector per target model (parallel); facts only (price row + admitted-source rows; `unknown` if missing). No tiers, percentiles, dominance, or file edits. Scrum agents and process skills never use this role. After collectors return, the **mode’s orchestrator row** applies the written math (deterministic).
+**Who fetches vs who decides** (full text: [`AGENTS.md`](../AGENTS.md) §5.1): only during a **model-policy update**. The collector model is **chosen at the start of that update** from the Cursor list just fetched (https://cursor.com/docs/models-and-pricing, contrast ES). Criterion: cheapest `cost` among slugs the Task catalog accepts that can web-search. `cost = (input + 2 * output) / 3`. Tiers do **not** apply (not the active mode’s column, not the four-model cursor pool). Fast loses. If the cheapest row cannot web-search or has no Task slug, **skip it here** and take the next. Record the chosen slug in **that update’s log only**. Do not pin a default. One collector per target model (parallel); facts only (price row + admitted-source rows; `unknown` if missing). No tiers, percentiles, dominance, or file edits. Scrum agents and process skills never use this role. After collectors return, the **mode’s orchestrator row** applies the written math (deterministic), including the three criteria above.
 
 ### Price refresh steps (when `vence` passed)
 
 1. If today > `vence` or `precios_consultados` is more than one calendar month old: stale on price. Before assigning a slug, open https://cursor.com/docs/models-and-pricing and contrast https://cursor.com/es/docs/models-and-pricing.
-2. Update input, output, cache write, cache read. `cost = (input + 2 * output) / 3`. Regional +10% stays out.
-3. Re-check budget / low / mid / high / cursor eligibility. Redo cells if eligibility, dominance, or cost tie-break changed. New `precios_consultados`; `vence` = that date + one month.
-4. New models: not price-only. Score from this registry + discovery. Same `benchmark_id` only; unknown stays unknown; no sibling copy unless same checkpoint; one tag; percentile among policy models with that datum; recompute the **whole** set. No proxy fill.
-5. Price-only refresh of models already in the set: do **not** re-fetch benchmarks; **do** re-check gates, dominance, and tie-break.
+2. Update input, output, cache write, cache read. Recompute `cost = (input + 2 * output) / 3`, then `bar_drain` with the same pool multipliers. Regional +10% stays out of `cost`.
+3. Re-check budget / low / mid / high / cursor eligibility under the **three mandatory criteria** (`bar_drain` bands + cheap cache for budget; no effort ranking). Redo cells if eligibility, dominance, or `bar_drain` / list-`cost` tie-break changed. New `precios_consultados`; `vence` = that date + one month.
+4. New models: not price-only. Score from this registry + discovery. Same `benchmark_id` only; unknown stays unknown; no sibling copy unless same checkpoint (effort is not a ranking criterion — collapse same-checkpoint variants); one tag; percentile among policy models with that datum; recompute the **whole** set. No proxy fill.
+5. Price-only refresh of models already in the set: do **not** re-fetch benchmarks; **do** re-check gates, dominance, and tie-break under the three criteria.
 
 ## Run log (blank slate 2026-09-22)
 
@@ -137,26 +147,52 @@ Target skips (no collector): Fast rows; `auto`; `gemini-3-pro-image-preview`; pr
 cost = (input_usd_per_M + 2 * output_usd_per_M) / 3
 ```
 
-Cache write / cache read are recorded per model. If the page does not publish cache prices for that model, the model is **not** eligible for `budget`.
+List `cost` stays the published API price. **Tier gates and dominance/tie-break use `bar_drain`:**
 
-### Budget gates (all three required)
+```text
+pool_multiplier = 15 if the model is in the Cursor Models pool else 1
+bar_drain = cost / pool_multiplier
+```
 
-Read from the 2026-09-22 table (`-` = no separate cache-write price / treated as free):
+**Cursor Models pool** (all effort variants): Composer 2.5, Grok 4.5, Grok 4.6, Grok 4.7. Everyone else uses `pool_multiplier = 1`.
 
-1. `cost` < 2
-2. cache write has no price (`-`, 0, included)
-3. cache read < that model’s uncached input
+`pool_multiplier_cursor = 15` is **empirical** from the user’s Cursor Spending snapshot **2026-09-26** (not an official Cursor entitlement): Cursor Models **12.5M** tokens at **1.7%** usage vs Other Models **6M** at **5.0%** (~6× per-million usage on Other); after list-price adjustment (e.g. Grok $2/$6 vs Gemini 3.8 $0.75/$3.50) the dollar-pool ratio rounds to **~15×**. Same snapshot: `composer-2.5` 3.7M = 0.2%; `cursor-grok-4.6-medium` 5M = 0.8%; `claude-opus-4-8-thinking-high` 113.1k = 1.9%; `gemini-3.8-flash-high` 632.8k = 1.0%.
 
-Models that passed all three **and** have a Task slug:
+Cache write / cache read are recorded per model. If the page does not publish cache read for that model, it is **not** eligible for `budget`.
 
-| slug | in | out | cost | cache write | cache read | gates |
-|---|---:|---:|---:|---|---:|---|
-| `gpt-5.4-nano-xhigh` | 0.20 | 1.25 | 0.90 | `-` | 0.02 | 1+2+3 |
-| `gpt-5-mini` | 0.25 | 2.00 | 1.42 | `-` | 0.025 | 1+2+3 |
-| `gemini-2.5-flash` | 0.30 | 2.50 | 1.77 | `-` | 0.03 | 1+2+3 |
-| `composer-2.5` | 0.50 | 2.50 | 1.83 | `-` | 0.20 | 1+2+3 |
+### Tier gates (numeric bands use `bar_drain`)
 
-`gpt-5.6-luna-high`: in 0.20, out 1.20, `cost` 0.87, cache write **$0.25**, cache read $0.02. Fails gate 2 (billed cache write). Eligible **low**, not budget. **This run’s collector** (log only).
+- **budget**: `bar_drain` < 2; **cheap cache** (below); no Fast; no preview.
+- **low**: `bar_drain` ≤ 4; no Fast; no preview; no $10/$50 list-price class.
+- **mid**: 4 < `bar_drain` ≤ 12; no Fast; no published input or output ≥ $18/M; no $10/$50 class.
+- **high**: best absolute tag score among eligible models; no Nano/Mini; no preview; Fast loses to non-Fast sibling when the page says same checkpoint; `bar_drain` does not cap high.
+- **cursor**: allow-list only (`composer-2.5`, `grok-4.7-xhigh`, `cursor-grok-4.6-medium`, `cursor-grok-4.5-high`); Fast out; pick by tag score inside the pool (`bar_drain` may tie-break).
+
+Low overlaps budget the same way as before (models that pass budget also pass low).
+
+### Cheap cache (budget)
+
+All required:
+
+1. cache read < that model’s uncached input
+2. cache write is free (`-`, $0) **or** (cache write ≤ 1.25 × input **and** cache write ≤ **$1.00**/M)
+
+Anthropic cache writes above $1/M fail. GPT-5.6 Luna (cw $0.25, in $0.20) passes cheap cache; Luna is budget-eligible on price but does not win cells unless its tag score beats rivals after dominance.
+
+### Budget-eligible examples (2026-09-22 prices; bar_drain pass + cheap cache)
+
+| slug | in | out | cost | bar_drain | cache write | cache read |
+|---|---:|---:|---:|---:|---|---:|
+| `cursor-grok-4.6-medium` | 2.00 | 6.00 | 4.67 | **0.31** | `-` | 0.50 |
+| `cursor-grok-4.5-high` | 2.00 | 6.00 | 4.67 | **0.31** | `-` | 0.50 |
+| `grok-4.7-xhigh` | 2.00 | 6.00 | 4.67 | **0.31** | `-` | 0.50 |
+| `composer-2.5` | 0.50 | 2.50 | 1.83 | **0.12** | `-` | 0.20 |
+| `gpt-5.6-luna-high` | 0.20 | 1.20 | 0.87 | 0.87 | 0.25 | 0.02 |
+| `gpt-5.4-nano-xhigh` | 0.20 | 1.25 | 0.90 | 0.90 | `-` | 0.02 |
+| `gpt-5-mini` | 0.25 | 2.00 | 1.42 | 1.42 | `-` | 0.025 |
+| `gemini-2.5-flash` | 0.30 | 2.50 | 1.77 | 1.77 | `-` | 0.03 |
+
+`gpt-5.6-luna-high`: **this run’s collector** (log only). Eligible budget on gates; orquestar tag loses to pool Grok and Nano on shared ids.
 
 Gemini 3.8 Flash: EN/ES list output **$3.50**. **Used Cursor $3.50.** `cost` = (0.75 + 7.00) / 3 = **2.58**.
 

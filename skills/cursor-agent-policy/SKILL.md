@@ -45,15 +45,23 @@ Catalog and freshness: `docs/matriz.md`, `docs/fuentes.md` (**canonical registry
 
 ## Price + registry refresh (monthly)
 
-If today > `vence` or `precios_consultados` is more than one calendar month old, **do not assign a slug** until you run `AGENTS.md` §2.1 / `docs/fuentes.md`:
+If today > `vence` or `precios_consultados` is more than one calendar month old, **do not assign a slug** until you run `AGENTS.md` §2.1 / `docs/fuentes.md`. Benchmark dates do **not** expire scores and do **not** mark evals VENCIDAS.
+
+Whenever the refresh recomputes eligibility, dominance, tie-break, or cells, apply these **three mandatory criteria** (do not fall back to list-`cost`-only gates, free-cache-write-only budget, or effort-matching):
+
+1. **`bar_drain`**: recompute list `cost = (input + 2 * output) / 3`, then `bar_drain = cost / pool_multiplier` (15 for Cursor Models pool: Composer 2.5, Grok 4.5/4.6/4.7; 1 otherwise). Numeric budget/low/mid gates and dominance/tie-break use `bar_drain`. Keep publishing list `cost`. Do not drop the multiplier; change 15 only if a new Spending snapshot is recorded in `docs/fuentes.md`.
+2. **Cheap cache (budget)**: cache read < uncached input; cache write free/`-`/$0 **or** (cw ≤ 1.25× input **and** cw ≤ $1/M). Luna can pass. Do not restore “cache write must be `−`/$0”.
+3. **Effort is not a criterion**: do not match benchmark effort to the Task slug; do not prefer higher effort; collapse same-checkpoint variants. Matrix slug = default catalog id; user picks effort per task.
+
+Steps:
 
 1. Open https://cursor.com/docs/models-and-pricing and contrast the Spanish variant.
-2. Update in / out / cache write / cache read; recompute `cost = (input + 2 * output) / 3` (+10% residency stays out).
-3. Re-check budget / low / mid / high / cursor gates; redo cells if eligibility, dominance, or cost tie-break moved. Set `vence` to one month after the new `precios_consultados`.
+2. Update in / out / cache write / cache read; recompute `cost` then `bar_drain` (+10% residency stays out of `cost`).
+3. Re-check budget / low / mid / high / cursor under the three criteria; redo cells if eligibility, dominance, or `bar_drain` / list-`cost` tie-break moved. Set `vence` to one month after the new `precios_consultados`.
 4. New models: **not** price-only. Score from the **admitted registry + discovery** in `docs/fuentes.md`, then recompute percentiles for the **whole** set. No proxy fill.
-5. Price-only refresh of models already in the set: do **not** re-fetch benchmarks; **do** re-check gates, dominance, and tie-break.
+5. Price-only refresh of models already in the set: do **not** re-fetch benchmarks; **do** re-check gates, dominance, and tie-break under the three criteria.
 6. Same pass: re-fetch every admitted URL; admit a new URL only if all gates in `docs/fuentes.md` pass; replace a score only with a newer number of the **same** `benchmark_id`.
-7. **Collector vs orchestrator** (model-policy update only — `AGENTS.md` §5.1): pick the collector **this run** from the price list just fetched (cheapest Task slug that can web-search; tiers do not apply; do not pin a slug). One fact-fetch `Task` per target model, in parallel. Collectors do not assign tiers or edit files. After they return, the **mode’s orchestrator** row applies the written math (deterministic). This role is not a skill type and is not used by Scrum agents.
+7. **Collector vs orchestrator** (model-policy update only — `AGENTS.md` §5.1): pick the collector **this run** from the price list just fetched (cheapest Task slug that can web-search; tiers do not apply; do not pin a slug). One fact-fetch `Task` per target model, in parallel. Collectors do not assign tiers or edit files. After they return, the **mode’s orchestrator** row applies the written math (deterministic), including the three criteria. This role is not a skill type and is not used by Scrum agents.
 
 ## Collector (model-policy update only)
 
