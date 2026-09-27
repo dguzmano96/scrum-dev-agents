@@ -10,7 +10,13 @@ function Get-PriceFreshness {
     if ($env:PRICE_FRESHNESS_RULE) {
         $rule = $env:PRICE_FRESHNESS_RULE
     } else {
-        $rule = Join-Path $root "rules\cursor-agent-policy.mdc"
+        $userHome = if ($env:USERPROFILE) { $env:USERPROFILE } elseif ($env:HOME) { $env:HOME } else { $null }
+        $localSnapshot = if ($userHome) { Join-Path $userHome ".cursor\scrum-dev-agents\AGENTS.md" } else { $null }
+        if ($localSnapshot -and (Test-Path -LiteralPath $localSnapshot)) {
+            $rule = $localSnapshot
+        } else {
+            $rule = Join-Path $root "rules\cursor-agent-policy.mdc"
+        }
     }
 
     if ($env:PRICE_FRESHNESS_TODAY) {

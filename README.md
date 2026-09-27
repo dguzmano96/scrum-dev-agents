@@ -33,7 +33,7 @@ Scrum decides **how** (which agent, which pipeline, one HU vs one epic). The pol
 
 If you previously ran `install-global` or `install-project`, remove the extra `cursor-agent-policy` under **Customize → Rules** (user rule in `~/.cursor/rules/` or the product `.cursor/rules/` copy). One Always Apply rule is enough. The plugin copy updates when Cursor updates the plugin.
 
-When `vence` has passed, the session hook tells the orchestrator to refresh prices before assigning a slug. A weekly workflow in this repo opens an issue so the matrix can be updated on `main`; the next plugin update ships that matrix. The workflow does not rewrite cells by itself.
+When the price table is stale (`vence` has passed or `precios_consultados` is older than one month), the session hook tells the orchestrator to inform you and ask whether you want to update models on this computer. If you agree, the plugin refreshes locally by itself (without committing to GitHub) using the cheapest web-search capable model, saving the snapshot in `~/.cursor/scrum-dev-agents/` (`%USERPROFILE%\.cursor\scrum-dev-agents\` on Windows). If you decline, the current table continues in force.
 
 ### 2. Optional copy into a product repo
 
@@ -129,7 +129,7 @@ Every `Task` (child and grandchild) must include `model`, `modo activo: budget|l
 
 **Prices and capacity:** token prices come from [Cursor models and pricing](https://cursor.com/docs/models-and-pricing); `cost = (input + 2 × output) / 3` (regional +10% is not in `cost`). The price table is stamped `precios_consultados` and expires one calendar month later (`vence`); benchmark dates are audit-only and do not expire scores. Tag capacity uses an open admitted-source registry with fixed math ([docs/fuentes.md](docs/fuentes.md)), not a closed list of ten URLs.
 
-**Policy refresh only:** when updating the matrix, a **collector** model (cheapest Task slug on the live price list that can web-search) fetches one model’s prices and benchmark rows; it does not assign tiers and is not used by Scrum agents. The mode’s **orchestrator** slug merges collector output and applies the written rules after all collectors return ([`AGENTS.md`](AGENTS.md) §5.1).
+**Policy refresh only:** when the price table is stale, the agent asks for user consent to refresh locally. On consent, the entire refresh (fetching pricing/benchmarks, calculating tiers, and writing local files to `~/.cursor/scrum-dev-agents/` or `%USERPROFILE%\.cursor\scrum-dev-agents\`) runs on the cheapest Task slug on the live price list that can web-search ([`AGENTS.md`](AGENTS.md) §2.0).
 
 If you do not pick a mode, the orchestrator stays on **low** and says so. Naming a model or "use Fast" wins **on that** `Task` only.
 

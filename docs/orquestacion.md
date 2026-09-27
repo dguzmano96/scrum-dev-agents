@@ -29,9 +29,9 @@ Operational details: see [`AGENTS.md`](../AGENTS.md) and [`skills/cursor-agent-p
 
 Adding this repo under **Customize → Plugins** loads agents, skills, and `rules/cursor-agent-policy.mdc` (`alwaysApply: true`). Declare that path in `.cursor-plugin/plugin.json` so Cursor scans `rules/` once.
 
-`sessionStart` runs `hooks/session-start.ps1` on Windows (PowerShell, already installed) and `hooks/session-start.sh` on macOS and Linux (`sh`, already installed). When `today` is after `vence`, or `precios_consultados` is more than one calendar month old, it injects `additional_context` telling the orchestrator to run the price refresh before any slug. A fresh table injects nothing. Cloud agents do not run `sessionStart` at true session start; the same dates inside the Always Apply rule still apply there.
+`sessionStart` runs `hooks/session-start.ps1` on Windows (PowerShell, already installed) and `hooks/session-start.sh` on macOS and Linux (`sh`, already installed). When the active table is stale (`today` is after `vence`, or `precios_consultados` is more than one calendar month old), it injects `additional_context` telling the orchestrator to inform the user in the session language and ask whether they want to update models on their machine. A fresh table injects nothing.
 
-A weekly GitHub Action (`.github/workflows/price-freshness.yml`) opens one issue when that window has passed. Merging the refresh to `main` is what ships new prices with the next plugin update. The action does not rewrite the matrix.
+When the user agrees, the plugin refreshes locally by itself on the user's machine (never by committing to GitHub), running the entire update on the cheapest Task-catalog model that can WebSearch/WebFetch, and persists the updated snapshot in `~/.cursor/scrum-dev-agents/` (`%USERPROFILE%\.cursor\scrum-dev-agents\` on Windows). The shipped plugin files remain the baseline. If the user declines, the current table continues in force without refreshing.
 
 If an older install copied the rule to `~/.cursor/rules/cursor-agent-policy.mdc`, remove that copy so Customize → Rules lists the plugin rule once.
 

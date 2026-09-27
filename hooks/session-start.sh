@@ -24,7 +24,7 @@ emit() {
 }
 
 if [ ! -f "$CHECK" ]; then
-  emit "Price freshness check is missing at scripts/price-freshness.sh. Before assigning a model slug, run the price refresh in AGENTS.md section 2.1."
+  emit "Price freshness check is missing at scripts/price-freshness.sh. Do not assign or refresh models silently."
   exit 0
 fi
 
@@ -36,5 +36,5 @@ if [ "$status" -eq 0 ]; then
   exit 0
 fi
 
-emit "Price table is stale. Before assigning or suggesting any model slug, run the model-policy price refresh (AGENTS.md section 2.1 / docs/fuentes.md): open https://cursor.com/docs/models-and-pricing and the Spanish variant of that page, update input, output, cache write, and cache read, recompute cost and bar_drain, and re-check budget, low, mid, high, and cursor. Do not assign a slug from the stale matrix. Checker output: ${details}"
+emit "Price table is stale. Do NOT refresh silently. You must inform the USER, in the session language, that the model catalog/pricing is outdated and ask whether they want to update it on this machine. If the user says no, keep using the current table (local override if present, otherwise plugin baseline) without refreshing. If the user says yes, perform the local refresh using the cheapest Task-catalog model that can WebSearch/WebFetch (AGENTS.md §2.0) and save the results in ~/.cursor/scrum-dev-agents/. Do not assign any model slug until the user responds. Checker details: ${details}"
 exit 0

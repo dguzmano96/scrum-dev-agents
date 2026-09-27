@@ -8,7 +8,18 @@
 set -eu
 
 ROOT=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
-RULE=${PRICE_FRESHNESS_RULE:-$ROOT/rules/cursor-agent-policy.mdc}
+
+# If PRICE_FRESHNESS_RULE is not explicitly set, prefer local snapshot if present
+if [ -z "${PRICE_FRESHNESS_RULE:-}" ]; then
+  LOCAL_RULE="${HOME:-}/.cursor/scrum-dev-agents/AGENTS.md"
+  if [ -n "${HOME:-}" ] && [ -f "$LOCAL_RULE" ]; then
+    RULE="$LOCAL_RULE"
+  else
+    RULE="$ROOT/rules/cursor-agent-policy.mdc"
+  fi
+else
+  RULE="$PRICE_FRESHNESS_RULE"
+fi
 
 if [ -n "${PRICE_FRESHNESS_TODAY:-}" ]; then
   today=$PRICE_FRESHNESS_TODAY
