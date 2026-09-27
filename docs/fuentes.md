@@ -156,7 +156,22 @@ bar_drain = cost / pool_multiplier
 
 **Cursor Models pool** (all effort variants): Composer 2.5, Grok 4.5, Grok 4.6, Grok 4.7. Everyone else uses `pool_multiplier = 1`.
 
-`pool_multiplier_cursor = 15` is **empirical** from the user’s Cursor Spending snapshot **2026-09-26** (not an official Cursor entitlement): Cursor Models **12.5M** tokens at **1.7%** usage vs Other Models **6M** at **5.0%** (~6× per-million usage on Other); after list-price adjustment (e.g. Grok $2/$6 vs Gemini 3.8 $0.75/$3.50) the dollar-pool ratio rounds to **~15×**. Same snapshot: `composer-2.5` 3.7M = 0.2%; `cursor-grok-4.6-medium` 5M = 0.8%; `claude-opus-4-8-thinking-high` 113.1k = 1.9%; `gemini-3.8-flash-high` 632.8k = 1.0%.
+`pool_multiplier_cursor = 15` is **empirical** (not an official Cursor entitlement). The pricing page describes two included pools and says Cursor Models have “significantly more included usage”; it does not publish the factor. This file’s factor is the ratio of those allowances measured in list dollars:
+
+```text
+list_dollars = sum(tokens_M × cost)     # cost = (input + 2 × output) / 3
+pool_multiplier = (list_dollars_cursor / usage_pct_cursor) / (list_dollars_other / usage_pct_other)
+```
+
+Exclude `auto` (no list price) and rows whose usage rounds to 0.0%. Grok Fast uses the published 2× rate (Grok 4.6 Fast = $4 / $12, `cost` 9.33).
+
+**2026-09-26** (first record): Cursor Models **12.5M** tokens at **1.7%** vs Other Models **6M** at **5.0%** (~6× usage per million tokens on Other). After the list-dollar adjustment the ratio rounds to **~15×**. Lines cited then: `composer-2.5` 3.7M = 0.2%; `cursor-grok-4.6-medium` 5M = 0.8%; `claude-opus-4-8-thinking-high` 113.1k = 1.9%; `gemini-3.8-flash-high` 632.8k = 1.0%.
+
+**2026-09-27** (Included Usage cycle Sep 26–Oct 26; confirms **15**, does not retune): Cursor Models **51.3M** = **8.4%**, Other Models **6M** = **5.0%**. The Other block is unchanged. The token-only ratio fell to ~5.1× because the Cursor mix shifted onto Grok; the list-dollar ratio did not.
+
+Priced Cursor rows with usage > 0 (Fast at 2×): `cursor-grok-4.6-medium` 26.2M = 3.9%; `cursor-grok-4.6-high-fast` 8.5M = 2.5%; `composer-2.5` 7.8M = 0.4%; `grok-4.7-high` 1.8M = 0.3%; `grok-4.7-xhigh` 1.4M = 0.2%; `grok-4.7-medium` 760.2k = 0.2%; `cursor-grok-4.5-high` 325.5k = 0.1%. Sum **$235.90 / 7.6%**. `auto` 4.1M = 0.9% is out. Other rows: Opus 4.8 113.1k = 1.9%; Gemini 3.8 632.8k = 1.0%; Gemini 3.7 472.2k = 0.9%; GPT-5.4 Nano high 1.7M = 0.4%; Nano medium 2.3M = 0.4%; GPT-5 Mini 753.3k = 0.3%. Sum **$9.60 / 4.9%** (lines; the group header is 5.0% by rounding). Ratio **15.9**. Grok 4.6 Fast and non-Fast agree within ~1% on usage-per-list-dollar, which checks the 2× Fast price.
+
+**15 stays.** A ±0.05 point swing on each usage figure (the table prints one decimal) moves the ratio across roughly 14.5–17.9. `cost` 4.67 / 15 = **0.31** and / 16 = 0.29; both sit under the budget gate (`< 2`) and the low gate (`≤ 4`). No non-pool `bar_drain` in this set is below 0.87, so dominance and cells do not move.
 
 Cache write / cache read are recorded per model. If the page does not publish cache read for that model, it is **not** eligible for `budget`.
 

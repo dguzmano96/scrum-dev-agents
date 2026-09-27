@@ -66,7 +66,7 @@ pool_multiplier = 15 if Cursor Models pool else 1
 bar_drain = cost / pool_multiplier
 ```
 
-List `cost` is the published API price (keep publishing it). **Numeric tier gates and dominance/tie-break use `bar_drain`.** Cursor Models pool families (all effort variants): Composer 2.5, Grok 4.5, Grok 4.6, Grok 4.7 — `pool_multiplier = 15`. Everyone else: `1`. `pool_multiplier_cursor = 15` is **empirical** from the user’s Spending snapshot **2026-09-26** (not an official entitlement); full evidence in [`docs/fuentes.md`](docs/fuentes.md). Agents are output-heavy. Fast costing more = worse on **budget** / **low**. Regional residency +10% does not enter `cost`.
+List `cost` is the published API price (keep publishing it). **Numeric tier gates and dominance/tie-break use `bar_drain`.** Cursor Models pool families (all effort variants): Composer 2.5, Grok 4.5, Grok 4.6, Grok 4.7 — `pool_multiplier = 15`. Everyone else: `1`. `pool_multiplier_cursor = 15` is **empirical** (Spending snapshots **2026-09-26** and **2026-09-27**; the later one measures **15.9** and keeps **15**); full evidence in [`docs/fuentes.md`](docs/fuentes.md). Agents are output-heavy. Fast costing more = worse on **budget** / **low**. Regional residency +10% does not enter `cost`.
 
 Capacity: tag percentiles from the **admitted registry** in [`docs/fuentes.md`](docs/fuentes.md) (open URL set, closed math). The original ten URLs are examples, not a ceiling. Score date is stored for audit and **does not** enter the score. There is **no** `evals=VENCIDAS` ranking penalty.
 
