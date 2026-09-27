@@ -1,5 +1,5 @@
 ---
-description: Cursor agent orchestration policy (Multitask) - budget/low/mid/high/cursor models. Scrum = how; this rule = with what. User-facing language = first chat message.
+description: Cursor agent orchestration policy (Multitask) - budget/low/mid/high/cursor/emergencia models. Scrum = how; this rule = with what. User-facing language = first chat message.
 alwaysApply: true
 ---
 # Cursor agent policy (Multitask)
@@ -41,12 +41,12 @@ Do not use Auto on subagents. Fast vs non-Fast are **distinct rows**. User overr
 
 Before substantial work, ask **once**, in the **session language** (skill `session-language`):
 
-> Mode **budget** (cheapest; `bar_drain` + cheap cache), **low** (price), **mid** (quality/price), **high** (performance), or **cursor** (Cursor Models pool only)?
+> Mode **budget** (cheapest; `bar_drain` + cheap cache), **low** (price), **mid** (quality/price), **high** (performance), **cursor** (Cursor Models pool only), or **emergencia** (Composer 2.5, no Fast; orquestador = el de budget; consignas más largas)?
 
 - If the user picks a mode: use it for the orchestrator and **all** `Task`s this session (except a one-off override).
 - If **no answer**: operate in **low** and **say so on every reply** (“default policy: low mode”).
 - When fixing or suggesting a mode, propose **exactly 1** orchestrator model (the matrix row for that mode). **Repeat the suggestion until the user selects it.** Until then: stay on **low** + keep suggesting the orchestrator. If that mode’s orchestrator cell is empty, say so; do not invent a proxy.
-- **Propagate** `modo activo: budget|low|mid|high|cursor` and `session language: {tag}` in every child prompt. Subagents **do not** re-ask mode or language.
+- **Propagate** `modo activo: budget|low|mid|high|cursor|emergencia` and `session language: {tag}` in every child prompt. Subagents **do not** re-ask mode or language.
 
 Orchestrators (use the row for the active mode; do not change rows until the user selects):
 
@@ -57,6 +57,7 @@ Orchestrators (use the row for the active mode; do not change rows until the use
 | **mid** | GPT-5.6 Terra | `gpt-5.6-terra-medium` | Pool Grok leaves mid (`bar_drain` 0.31). Terra orquestar 36.51 (2); K3 orquestar is 1 id (W). |
 | **high** | Grok 4.6 | `cursor-grok-4.6-medium` | Best absolute strong `orquestar` (not Nano/Mini). 4.7 is 1 id (W). |
 | **cursor** | Grok 4.6 | `cursor-grok-4.6-medium` | Same pool row. Composer has no `orquestar` datum. |
+| **emergencia** | Grok 4.6 | `cursor-grok-4.6-medium` | Mismo orquestador que budget; los subagentes son Composer 2.5 y por eso la consigna lleva más contexto. |
 
 Default suggestion until they pick a mode: **Grok 4.6** (`cursor-grok-4.6-medium`).
 
@@ -164,32 +165,33 @@ When launching the custom agent, `model` = this type’s row × active mode. The
 | Native `generalPurpose` (read/map) | `explore` | — |
 | Native `shell` | `debug` or `verify` by symptom | One failure or one check. |
 
-## 4. Matrix budget / low / mid / high / cursor by type
+## 4. Matrix budget / low / mid / high / cursor / emergencia by type
 
-Use the slug. Do not swap Fast for non-Fast (or the reverse) without override. `—` = empty cell. Cell reassignment **2026-09-26** (`bar_drain` + cheap cache; fichas 2026-09-22 unchanged).
+Use the slug. Do not swap Fast for non-Fast (or the reverse) without override. `—` = empty cell. Cell reassignment **2026-09-26** (`bar_drain` + cheap cache; fichas 2026-09-22 unchanged). Columna **emergencia** = elección de usuario (no concurso de tags).
 
-| Type | budget | low | mid | high | cursor |
-|---|---|---|---|---|---|
-| **orchestrator** | `cursor-grok-4.6-medium` | `cursor-grok-4.6-medium` | `gpt-5.6-terra-medium` | `cursor-grok-4.6-medium` | `cursor-grok-4.6-medium` |
-| `explore` | `cursor-grok-4.5-high` | `cursor-grok-4.5-high` | `kimi-k3-max` | `cursor-grok-4.5-high` | `cursor-grok-4.5-high` |
-| `implement` | `cursor-grok-4.6-medium` | `gemini-3.8-flash-high` | `kimi-k3-max` | `claude-fable-5-1-thinking-high` | `cursor-grok-4.6-medium` |
-| `decide` | `cursor-grok-4.6-medium` | `gemini-3.7-flash-high` | `kimi-k3-max` | `claude-fable-5-1-thinking-high` | `cursor-grok-4.6-medium` |
-| `debug` | `grok-4.7-xhigh` | `grok-4.7-xhigh` | `gpt-5.6-terra-medium` | `claude-fable-5-1-thinking-high` | `grok-4.7-xhigh` |
-| `interpret` | — | — | — | — | — |
-| `verify` | `grok-4.7-xhigh` | `grok-4.7-xhigh` | `gemini-3.1-pro` | `gemini-3.1-pro` | `grok-4.7-xhigh` |
-| `plan` | `cursor-grok-4.6-medium` | `gemini-3.8-flash-high` | `kimi-k3-max` | `claude-fable-5-1-thinking-high` | `cursor-grok-4.6-medium` |
-| `research` | `cursor-grok-4.5-high` | `gemini-3.7-flash-high` | `kimi-k3-max` | `kimi-k3-max` | `cursor-grok-4.5-high` |
-| `review` | `grok-4.7-xhigh` | `grok-4.7-xhigh` | `gemini-3.1-pro` | `gemini-3.1-pro` | `grok-4.7-xhigh` |
-| `write` | `gemini-2.5-flash` | `gemini-3.8-flash-high` | `gpt-5.2` | `claude-4.6-opus-high-thinking` | — |
+| Type | budget | low | mid | high | cursor | emergencia |
+|---|---|---|---|---|---|---|
+| **orchestrator** | `cursor-grok-4.6-medium` | `cursor-grok-4.6-medium` | `gpt-5.6-terra-medium` | `cursor-grok-4.6-medium` | `cursor-grok-4.6-medium` | `cursor-grok-4.6-medium` |
+| `explore` | `cursor-grok-4.5-high` | `cursor-grok-4.5-high` | `kimi-k3-max` | `cursor-grok-4.5-high` | `cursor-grok-4.5-high` | `composer-2.5` |
+| `implement` | `cursor-grok-4.6-medium` | `gemini-3.8-flash-high` | `kimi-k3-max` | `claude-fable-5-1-thinking-high` | `cursor-grok-4.6-medium` | `composer-2.5` |
+| `decide` | `cursor-grok-4.6-medium` | `gemini-3.7-flash-high` | `kimi-k3-max` | `claude-fable-5-1-thinking-high` | `cursor-grok-4.6-medium` | `composer-2.5` |
+| `debug` | `grok-4.7-xhigh` | `grok-4.7-xhigh` | `gpt-5.6-terra-medium` | `claude-fable-5-1-thinking-high` | `grok-4.7-xhigh` | `composer-2.5` |
+| `interpret` | — | — | — | — | — | `composer-2.5` |
+| `verify` | `grok-4.7-xhigh` | `grok-4.7-xhigh` | `gemini-3.1-pro` | `gemini-3.1-pro` | `grok-4.7-xhigh` | `composer-2.5` |
+| `plan` | `cursor-grok-4.6-medium` | `gemini-3.8-flash-high` | `kimi-k3-max` | `claude-fable-5-1-thinking-high` | `cursor-grok-4.6-medium` | `composer-2.5` |
+| `research` | `cursor-grok-4.5-high` | `gemini-3.7-flash-high` | `kimi-k3-max` | `kimi-k3-max` | `cursor-grok-4.5-high` | `composer-2.5` |
+| `review` | `grok-4.7-xhigh` | `grok-4.7-xhigh` | `gemini-3.1-pro` | `gemini-3.1-pro` | `grok-4.7-xhigh` | `composer-2.5` |
+| `write` | `gemini-2.5-flash` | `gemini-3.8-flash-high` | `gpt-5.2` | `claude-4.6-opus-high-thinking` | — | `composer-2.5` |
 
 Honest selection notes:
 
 - **cursor mode**: only the four Task slugs above. Docs vs Task: pricing page says Grok 4.7; Task accepts `grok-4.7-xhigh`, not `grok-4.7-high`. Old slug `cursor-grok-4.6-xhigh` is not in this Task catalog; use `cursor-grok-4.6-medium`.
+- **emergencia:** orquestador = el de budget (`cursor-grok-4.6-medium`). Todo otro tipo = solo `composer-2.5` (nunca Fast). `interpret` y `write` van llenos. No retoca quién gana budget/low/mid/high/cursor.
 - **`bar_drain`:** pool Grok/Composer `cost` 4.67 / 1.83 → `bar_drain` ≈ 0.31 / 0.12 → budget- and low-eligible; **not** mid (mid needs 4 < `bar_drain` ≤ 12). Mid orchestrator → Terra; mid explore/implement/decide/plan/research → K3 (or Terra for mid debug).
 - **Dominance:** Grok 4.6 beats Grok 4.5 on both shared `orquestar` ids with `bar_drain` 0.31 ≤ 0.31 → 4.5 cannot occupy orchestrator. Grok 4.7’s `orquestar` / `implementar` are 1 id (W) and cannot beat 4.6’s 2–3 ids. Gemini 3.8 `implementar` 82.32 > Grok 4.6 60.40 on shared CursorBench + DeepSWE (neither dominates on `bar_drain` because 2.58 ≰ 0.31) → 3.8 keeps **low** implement. K3 keeps **mid decide** (ARC 2 ids) and **mid/high research** W. 4.5 keeps explore (2 ids) for budget/low/high/cursor.
 - **GPT-5.6 Luna:** `cost` 0.87, cw $0.25 → **passes** cheap cache; budget-eligible; does not win cells (tag scores lose to pool Grok). Collector log only; not pinned. Composites stay `sin-tag`.
 - **Vals Index** is `sin-tag` on the closed map. Orchestrator cells use AutomationBench-AA + GDPval-AA.
-- **Empty `interpret`:** no `interpretar` contest (N≥2) after the map. **Empty cursor write:** no pool slug has `redactar`.
+- **Empty `interpret`:** no `interpretar` contest (N≥2) after the map. **Empty cursor write:** no pool slug has `redactar`. En **emergencia** esas celdas usan `composer-2.5`.
 - **Nesting is not a row.** A grandchild `explore` uses the mode’s `explore` row.
 - **Effort:** not a ranking criterion; matrix slug = default catalog id; user picks effort per task.
 
@@ -229,9 +231,13 @@ Fetching facts and assigning tiers are **different jobs**. Do not hardcode a col
 
 Refresh / new-model hook: (1) orchestrator fetches the price list and picks the collector for **this** run; (2) lists slugs to query; (3) one collector per slug, in parallel; (4) orchestrator recomputes tiers only from those records plus the written math in [`docs/fuentes.md`](docs/fuentes.md).
 
+### 5.2 Modo emergencia (consignas más largas)
+
+Cuando `modo activo: emergencia`, el orquestador escribe consignas más descriptivas: da al subagente más contexto y material para que Composer 2.5 se pierda menos. El techo de cada Task sigue siendo uno (un archivo, una HU, un trade-off). Más material significa hechos ya decididos, rutas y símbolos exactos, el borde del slice, restricciones, un ejemplo breve de la forma esperada si la tarea es ambigua, el formato de retorno (campos que el orquestador leerá) y qué queda fuera de alcance en la misma consigna — no un alcance más ancho y no pegar el repo entero ni copiar `AGENTS.md` ni el hilo completo. Declara `modo activo: emergencia` y `session language: {tag}`. Repite las decisiones ya tomadas con una frase de motivo cuando eso evita que el subagente las reabra. Nombra paths, símbolos y el borde del slice. Incluye los hechos de entrada, las restricciones y un ejemplo pequeño de la forma deseada si la tarea es ambigua. Escribe el formato de retorno. Di qué está fuera de alcance en esa misma consigna. No partas un techo en varios Tasks solo para añadir palabras.
+
 ## 6. Exclusions
 
-Outside the budget/low/mid/high/cursor assignment (ficha may exist; do not assign):
+Outside the budget/low/mid/high/cursor/emergencia assignment (ficha may exist; do not assign):
 
 - `auto` — router; **forbidden on subagents**.
 - `claude-opus-4-7-thinking-xhigh` — Preview (limited fast mode). Outside every tier including cursor.

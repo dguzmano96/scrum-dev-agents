@@ -36,7 +36,7 @@ Use this only when the team commits the policy inside the product. It duplicates
 
 1. Confirm **Customize → Plugins → scrum-dev-agents** shows the policy rule plus agents and skills.
 2. Start a **new** Multitask chat (`/multitask`) in the product workspace.
-3. The orchestrator asks **once** for mode **budget / low / mid / high / cursor** (in the language of your first message).
+3. The orchestrator asks **once** for mode **budget / low / mid / high / cursor / emergencia** (in the language of your first message).
 4. Every `Task` must set `model` from the matrix. Scrum does not pick slugs. Details: [docs/orquestacion.md](docs/orquestacion.md), [`AGENTS.md`](AGENTS.md), full cells in [docs/matriz.md](docs/matriz.md), registry + math in [docs/fuentes.md](docs/fuentes.md).
 
 ---
@@ -44,7 +44,7 @@ Use this only when the team commits the policy inside the product. It duplicates
 ## The trick (in 30 seconds)
 
 1. You request in your language using `Use agent-{name}:` (examples below). Session language = first chat message. Legacy Spanish ids (`agent-implementador`, …) still route.
-2. The chat asks the model mode (**budget / low / mid / high / cursor**) once per Multitask session.
+2. The chat asks the model mode (**budget / low / mid / high / cursor / emergencia**) once per Multitask session.
 3. Scrum picks the specialist and the pipeline. The **model policy** maps `modo activo` × work type to a slug on **every** `Task` (including nested). Never omit `model`.
 4. The main chat should not implement your product. Backlog agents plan; implementer agents write code under rules; the verifier inspects thoroughly.
 
@@ -94,7 +94,7 @@ Two layers. Do not mix them.
 | **With what** | Which model slug? | `matrix[mode][type]` — skill `cursor-agent-policy` |
 | **In which language** | Chat and new artifacts? | First message — skill `session-language` |
 
-Every `Task` (child and grandchild) must include `model`, `modo activo: budget|low|mid|high|cursor`, and `session language: {tag}`. Nesting is **not** a cheaper row: an architect grandchild uses the **`decide`** row, not the parent's `implement` slug.
+Every `Task` (child and grandchild) must include `model`, `modo activo: budget|low|mid|high|cursor|emergencia`, and `session language: {tag}`. Nesting is **not** a cheaper row: an architect grandchild uses the **`decide`** row, not the parent's `implement` slug.
 
 | You call | Matrix type | Example slug in **low** |
 |---|---|---|
@@ -104,7 +104,7 @@ Every `Task` (child and grandchild) must include `model`, `modo activo: budget|l
 | `agent-verifier` | `verify` | `gemini-3.8-flash-high` |
 | `agent-investigator-ideator` | `research` | `gemini-3.7-flash-high` |
 
-**Orchestrator** (main chat) in **low** until you pick a mode: `gemini-3.8-flash-high`. In **cursor** mode: `cursor-grok-4.6-medium`. See the orchestrator row in [docs/matriz.md](docs/matriz.md).
+**Orchestrator** (main chat) in **low** until you pick a mode: `gemini-3.8-flash-high`. In **cursor** mode: `cursor-grok-4.6-medium`. In **emergencia**: orquestador `cursor-grok-4.6-medium` (el de budget); cada otro tipo `composer-2.5` (nunca Fast). See the orchestrator row in [docs/matriz.md](docs/matriz.md).
 
 **Prices and capacity:** token prices come from [Cursor models and pricing](https://cursor.com/docs/models-and-pricing); `cost = (input + 2 × output) / 3` (regional +10% is not in `cost`). The price table is stamped `precios_consultados` and expires one calendar month later (`vence`); benchmark dates are audit-only and do not expire scores. Tag capacity uses an open admitted-source registry with fixed math ([docs/fuentes.md](docs/fuentes.md)), not a closed list of ten URLs.
 

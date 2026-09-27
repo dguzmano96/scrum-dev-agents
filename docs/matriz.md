@@ -34,25 +34,27 @@ List `cost` is the published API price (USD / million tokens; EN table; ES match
 - Empty cell if no eligible model has even one tagged id. No proxy.
 - Fichas and percentiles: collector pass **2026-09-22** (`gpt-5.6-luna-high`). **37** records. Cell reassignment **2026-09-26**: `bar_drain` + cheap-cache budget gate; tag scores unchanged.
 
-## Assignment budget / low / mid / high / cursor
+## Assignment budget / low / mid / high / cursor / emergencia
 
-`—` = empty. `W` = weak evidence (1 tagged id, or `plan`/`research` with only one of the two tags). Reassignment **2026-09-26** (`bar_drain` + cheap cache). Tag scores from fichas 2026-09-22 unchanged.
+`—` = empty. `W` = weak evidence (1 tagged id, or `plan`/`research` with only one of the two tags). Reassignment **2026-09-26** (`bar_drain` + cheap cache). Tag scores from fichas 2026-09-22 unchanged. Columna **emergencia** = elección de usuario (no concurso de tags; no recalcula percentiles).
 
-| Type | budget | low | mid | high | cursor |
-|---|---|---|---|---|---|
-| **orchestrator** | `cursor-grok-4.6-medium` | `cursor-grok-4.6-medium` | `gpt-5.6-terra-medium` | `cursor-grok-4.6-medium` | `cursor-grok-4.6-medium` |
-| `explore` | `cursor-grok-4.5-high` | `cursor-grok-4.5-high` | `kimi-k3-max` W | `cursor-grok-4.5-high` | `cursor-grok-4.5-high` |
-| `implement` | `cursor-grok-4.6-medium` | `gemini-3.8-flash-high` | `kimi-k3-max` W | `claude-fable-5-1-thinking-high` | `cursor-grok-4.6-medium` |
-| `decide` | `cursor-grok-4.6-medium` | `gemini-3.7-flash-high` | `kimi-k3-max` | `claude-fable-5-1-thinking-high` | `cursor-grok-4.6-medium` |
-| `debug` | `grok-4.7-xhigh` W | `grok-4.7-xhigh` W | `gpt-5.6-terra-medium` W | `claude-fable-5-1-thinking-high` W | `grok-4.7-xhigh` W |
-| `interpret` | — | — | — | — | — |
-| `verify` | `grok-4.7-xhigh` W | `grok-4.7-xhigh` W | `gemini-3.1-pro` | `gemini-3.1-pro` | `grok-4.7-xhigh` W |
-| `plan` | `cursor-grok-4.6-medium` | `gemini-3.8-flash-high` | `kimi-k3-max` | `claude-fable-5-1-thinking-high` | `cursor-grok-4.6-medium` |
-| `research` | `cursor-grok-4.5-high` W | `gemini-3.7-flash-high` W | `kimi-k3-max` W | `kimi-k3-max` W | `cursor-grok-4.5-high` W |
-| `review` | `grok-4.7-xhigh` W | `grok-4.7-xhigh` W | `gemini-3.1-pro` | `gemini-3.1-pro` | `grok-4.7-xhigh` W |
-| `write` | `gemini-2.5-flash` W | `gemini-3.8-flash-high` W | `gpt-5.2` W | `claude-4.6-opus-high-thinking` | — |
+| Type | budget | low | mid | high | cursor | emergencia |
+|---|---|---|---|---|---|---|
+| **orchestrator** | `cursor-grok-4.6-medium` | `cursor-grok-4.6-medium` | `gpt-5.6-terra-medium` | `cursor-grok-4.6-medium` | `cursor-grok-4.6-medium` | `cursor-grok-4.6-medium` |
+| `explore` | `cursor-grok-4.5-high` | `cursor-grok-4.5-high` | `kimi-k3-max` W | `cursor-grok-4.5-high` | `cursor-grok-4.5-high` | `composer-2.5` |
+| `implement` | `cursor-grok-4.6-medium` | `gemini-3.8-flash-high` | `kimi-k3-max` W | `claude-fable-5-1-thinking-high` | `cursor-grok-4.6-medium` | `composer-2.5` |
+| `decide` | `cursor-grok-4.6-medium` | `gemini-3.7-flash-high` | `kimi-k3-max` | `claude-fable-5-1-thinking-high` | `cursor-grok-4.6-medium` | `composer-2.5` |
+| `debug` | `grok-4.7-xhigh` W | `grok-4.7-xhigh` W | `gpt-5.6-terra-medium` W | `claude-fable-5-1-thinking-high` W | `grok-4.7-xhigh` W | `composer-2.5` |
+| `interpret` | — | — | — | — | — | `composer-2.5` |
+| `verify` | `grok-4.7-xhigh` W | `grok-4.7-xhigh` W | `gemini-3.1-pro` | `gemini-3.1-pro` | `grok-4.7-xhigh` W | `composer-2.5` |
+| `plan` | `cursor-grok-4.6-medium` | `gemini-3.8-flash-high` | `kimi-k3-max` | `claude-fable-5-1-thinking-high` | `cursor-grok-4.6-medium` | `composer-2.5` |
+| `research` | `cursor-grok-4.5-high` W | `gemini-3.7-flash-high` W | `kimi-k3-max` W | `kimi-k3-max` W | `cursor-grok-4.5-high` W | `composer-2.5` |
+| `review` | `grok-4.7-xhigh` W | `grok-4.7-xhigh` W | `gemini-3.1-pro` | `gemini-3.1-pro` | `grok-4.7-xhigh` W | `composer-2.5` |
+| `write` | `gemini-2.5-flash` W | `gemini-3.8-flash-high` W | `gpt-5.2` W | `claude-4.6-opus-high-thinking` | — | `composer-2.5` |
 
 **cursor** allow-list: `composer-2.5`, `grok-4.7-xhigh`, `cursor-grok-4.6-medium`, `cursor-grok-4.5-high`. Fast is out. Docs name “Grok 4.7”; Task accepts `grok-4.7-xhigh`, not `grok-4.7-high`.
+
+**emergencia:** orquestador = `cursor-grok-4.6-medium` (el de budget). Todo otro tipo = `composer-2.5` (nunca Fast). `interpret` y `write` van llenos. Consignas más largas: [`AGENTS.md`](../AGENTS.md) §5.2.
 
 Winner `bar_drain` (approx): pool Grok/Composer **0.31** / **0.12**; Gemini 3.7/3.8 **2.58**; Gemini 2.5 Flash **1.77**; Terra / Gemini 3.1 **8.67**; K3 **11.00**; GPT-5.2 **9.92**; Fable **36.67**; Opus 4.6 **18.33**.
 
@@ -88,8 +90,9 @@ Winner `bar_drain` (approx): pool Grok/Composer **0.31** / **0.12**; Gemini 3.7/
 | write low | Gemini 3.8 W | Arena 80 (1). |
 | write mid | GPT-5.2 W | Arena 40 (1); Opus not mid. |
 | write high | Opus 4.6 | Arena Overall + Longer Query (2), tag 95. |
-| interpret * | — | No `interpretar` contest (N≥2). |
-| cursor write | — | No pool slug has `redactar`. |
+| interpret * | — | No `interpretar` contest (N≥2). En **emergencia** la celda es `composer-2.5`. |
+| cursor write | — | No pool slug has `redactar`. En **emergencia** `write` es `composer-2.5`. |
+| emergencia (columna) | Grok 4.6 orquestador; Composer 2.5 el resto | Elección de usuario, no concurso de tags. |
 
 ### Budget models (`bar_drain` &lt; 2 + cheap cache)
 

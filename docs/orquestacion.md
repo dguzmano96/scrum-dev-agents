@@ -8,7 +8,7 @@ One plugin, two layers. Not two separate products.
 | **What (which models)** | `AGENTS.md`, `rules/cursor-agent-policy.mdc`, skill `cursor-agent-policy`, `docs/matriz.md` | Mode, type, slug |
 | **In which language** | Skill `session-language` | Chat and new artifacts (first message) |
 
-The main chat asks for the mode **once** (`low` / `mid` / `high` / `cursor`) and forwards that selection to every `Task` as `modo activo: …` (active mode). The session language (the language of the user's first message) is also forwarded on every `Task` so subagents know which language to use. Any subagent launcher **must** set `model` using the skill lookup; omitting `model` bypasses the policy for that branch.
+The main chat asks for the mode **once** (`budget` / `low` / `mid` / `high` / `cursor` / `emergencia`) and forwards that selection to every `Task` as `modo activo: …` (active mode). In **emergencia**, subagent prompts carry more context (same Task ceilings). The session language (the language of the user's first message) is also forwarded on every `Task` so subagents know which language to use. Any subagent launcher **must** set `model` using the skill lookup; omitting `model` bypasses the policy for that branch.
 
 ```mermaid
 flowchart TB

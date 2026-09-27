@@ -1,7 +1,7 @@
 ---
 name: cursor-agent-policy
 description: >-
-  Model lookup (with what) for any Task: mode budget/low/mid/high/cursor × type
+  Model lookup (with what) for any Task: mode budget/low/mid/high/cursor/emergencia × type
   explore/implement/decide/debug/interpret/verify/plan/research/review/write.
   ALWAYS use before launching a Task or custom agent. Scrum does not pick slugs.
 ---
@@ -20,7 +20,7 @@ Before **every** `Task` (principal, child, or grandchild). Also when launching a
 
 1. **Mode** = `modo activo` from the prompt. If missing → `low` and declare it.
 2. **Type** = map in [`reference.md`](reference.md) (Scrum agent or native type).
-3. **`model`** = cell `matrix[mode][type]`. In `cursor` mode, only the four Task-launchable Cursor Models slugs for matrix cells. If the cell is empty, do not invent a proxy; ask or wait for an override. Scrum agents and process skills never use a collector.
+3. **`model`** = cell `matrix[mode][type]`. In `cursor` mode, only the four Task-launchable Cursor Models slugs for matrix cells. In `emergencia`, orchestrator = `cursor-grok-4.6-medium`; every other type = `composer-2.5` (never Fast; `interpret` and `write` are filled). If the cell is empty, do not invent a proxy; ask or wait for an override. Scrum agents and process skills never use a collector.
 4. Set `model` on the `Task`. **Never omit it.**
 5. Put `modo activo: {mode}` and `session language: {tag}` in the child prompt so its `Task`s look up the same way. Language: skill `session-language`.
 6. User override (a named model, Fast, another mode) wins **on that** `Task`. The rest of the session returns to the matrix.
@@ -36,6 +36,10 @@ Before **every** `Task` (principal, child, or grandchild). Also when launching a
 ## Ceilings
 
 The **type** ceiling (one slice, one trade-off, one module) is this policy. The **domain** ceiling (one HU, one epic, one wizard) is Scrum. Honor **both**.
+
+### Modo emergencia (consignas más largas)
+
+Cuando `modo activo: emergencia`, el orquestador escribe consignas más descriptivas: da al subagente más contexto y material para que Composer 2.5 se pierda menos. El techo de cada Task sigue siendo uno (un archivo, una HU, un trade-off). Más material significa hechos ya decididos, rutas y símbolos exactos, el borde del slice, restricciones, un ejemplo breve de la forma esperada si la tarea es ambigua, el formato de retorno (campos que el orquestador leerá) y qué queda fuera de alcance en la misma consigna — no un alcance más ancho y no pegar el repo entero ni copiar `AGENTS.md` ni el hilo completo. Declara `modo activo: emergencia` y `session language: {tag}`. Repite las decisiones ya tomadas con una frase de motivo cuando eso evita que el subagente las reabra. Nombra paths, símbolos y el borde del slice. Incluye los hechos de entrada, las restricciones y un ejemplo pequeño de la forma deseada si la tarea es ambigua. Escribe el formato de retorno. Di qué está fuera de alcance en esa misma consigna. No partas un techo en varios Tasks solo para añadir palabras.
 
 Catalog and freshness: `docs/matriz.md`, `docs/fuentes.md` (**canonical registry + math**), `AGENTS.md` at the plugin root. Capacity is **not** limited to a closed list of ten sites.
 
