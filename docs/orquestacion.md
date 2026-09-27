@@ -31,7 +31,7 @@ Adding this repo under **Customize → Plugins** loads agents, skills, and `rule
 
 `sessionStart` runs `hooks/session-start.ps1` on Windows (PowerShell, already installed) and `hooks/session-start.sh` on macOS and Linux (`sh`, already installed). When the active table is stale (`today` is after `vence`, or `precios_consultados` is more than one calendar month old), it injects `additional_context` telling the orchestrator to inform the user in the session language and ask whether they want to update models on their machine. A fresh table injects nothing.
 
-When the user agrees, the plugin refreshes locally by itself on the user's machine (never by committing to GitHub), running the entire update on the cheapest Task-catalog model that can WebSearch/WebFetch, and persists the updated snapshot in `~/.cursor/scrum-dev-agents/` (`%USERPROFILE%\.cursor\scrum-dev-agents\` on Windows). The shipped plugin files remain the baseline. If the user declines, the current table continues in force without refreshing.
+When the user agrees to a local refresh (not now): launch one subagent per model, in parallel, each using the cheapest Task-catalog slug that can WebSearch/WebFetch (not one subagent for all models). After they return, the same cheap slug applies the existing math in `docs/fuentes.md` and writes only to `~/.cursor/scrum-dev-agents/` (Windows: `%USERPROFILE%\.cursor\scrum-dev-agents\`). GitHub stays the baseline. No GitHub Action. If the user declines, the current table continues in force without refreshing.
 
 If an older install copied the rule to `~/.cursor/rules/cursor-agent-policy.mdc`, remove that copy so Customize → Rules lists the plugin rule once.
 

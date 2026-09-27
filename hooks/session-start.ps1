@@ -34,6 +34,6 @@ if ($code -eq 0) {
     exit 0
 }
 
-$prefix = "Price table is stale. Do NOT refresh silently. You must inform the USER, in the session language, that the model catalog/pricing is outdated and ask whether they want to update it on this machine. If the user says no, keep using the current table (local override if present, otherwise plugin baseline) without refreshing. If the user says yes, perform the local refresh using the cheapest Task-catalog model that can WebSearch/WebFetch (AGENTS.md §2.0) and save the results in %USERPROFILE%\.cursor\scrum-dev-agents\. Do not assign any model slug until the user responds. Checker details: "
+$prefix = "Price table is stale. Do NOT refresh silently. You must inform the USER, in the session language, that the model catalog/pricing is outdated and ask whether they want to update it on this machine. If the user says no, keep using the current table (local override if present, otherwise plugin baseline) without refreshing. When the user later agrees to a local refresh (not now): launch one subagent per model, in parallel, each using the cheapest Task-catalog slug that can WebSearch/WebFetch (not one subagent for all models). After they return, the same cheap slug applies the existing math and writes only to %USERPROFILE%\.cursor\scrum-dev-agents\ (Linux/macOS: ~/.cursor/scrum-dev-agents/). GitHub stays the baseline. No GitHub Action. Do not assign any model slug until the user responds. Checker details: "
 Write-HookJson ($prefix + $details)
 exit 0

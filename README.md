@@ -33,7 +33,7 @@ Scrum decides **how** (which agent, which pipeline, one HU vs one epic). The pol
 
 If you previously ran `install-global` or `install-project`, remove the extra `cursor-agent-policy` under **Customize → Rules** (user rule in `~/.cursor/rules/` or the product `.cursor/rules/` copy). One Always Apply rule is enough. The plugin copy updates when Cursor updates the plugin.
 
-When the price table is stale (`vence` has passed or `precios_consultados` is older than one month), the session hook tells the orchestrator to inform you and ask whether you want to update models on this computer. If you agree, the plugin refreshes locally by itself (without committing to GitHub) using the cheapest web-search capable model, saving the snapshot in `~/.cursor/scrum-dev-agents/` (`%USERPROFILE%\.cursor\scrum-dev-agents\` on Windows). If you decline, the current table continues in force.
+When the price table is stale (`vence` has passed or `precios_consultados` is older than one month), the session hook tells the orchestrator to inform you and ask whether you want to update models on this computer. When the user later agrees to a local refresh (not now): one subagent per model, in parallel, each using the cheapest Task-catalog slug that can WebSearch/WebFetch (not one subagent for all models). After they return, the same cheap slug applies the existing math and writes only to `~/.cursor/scrum-dev-agents/` (Windows: `%USERPROFILE%\.cursor\scrum-dev-agents\`). GitHub stays the baseline. No GitHub Action. If you decline, the current table continues in force.
 
 ### 2. Optional copy into a product repo
 
