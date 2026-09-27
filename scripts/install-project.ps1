@@ -1,5 +1,5 @@
 # Install cursor-agent-policy into one product repo (local overlay).
-# Does not replace install-global.ps1. Prefer global for every Cursor window.
+# Optional product-repo copy. The GitHub plugin already loads the same rule.
 #
 # Writes:
 #   {ProjectPath}/AGENTS.md
@@ -21,7 +21,7 @@ $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path $PSScriptRoot -Parent
 $source = Join-Path $repoRoot "AGENTS.md"
-$ruleSource = Join-Path $repoRoot "policy\cursor-agent-policy.mdc"
+$ruleSource = Join-Path $repoRoot "rules\cursor-agent-policy.mdc"
 
 if (-not (Test-Path $source)) {
     throw "Source AGENTS.md not found. Run from the scrum-dev-agents plugin repo."
@@ -84,8 +84,8 @@ Write-Host "Project rule:   $ruleFile"
 Write-Host ""
 Write-Host "Next steps:"
 Write-Host "  1. Open this product as a workspace in Cursor (File > Open Folder)."
-Write-Host "  2. For nested Tasks in every window: .\scripts\install-global.ps1 (machine rule)."
-Write-Host "  3. Use global OR committed project rule in Customize -> Rules, not both Always Apply."
+Write-Host "  2. The GitHub plugin already loads this rule. Skip this overlay unless the product repo should commit its own copy."
+Write-Host "  3. Keep a single Always Apply cursor-agent-policy (plugin, or this project file, not both)."
 Write-Host "  4. Start a NEW Multitask chat (type /multitask or use Multitask Mode)."
 Write-Host "  5. Confirm the agent asks for budget / low / mid / high / cursor mode."
 Write-Host "  6. Optional: commit AGENTS.md and .cursor/rules/cursor-agent-policy.mdc in the product repo."

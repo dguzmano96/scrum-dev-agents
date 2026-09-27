@@ -7,7 +7,7 @@ Summary snapshot: **2026-09-22**.
 
 `benchmarks_consultados` is an audit stamp. Benchmark scores do **not** expire by date. `vence` does **not** mark benchmarks as VENCIDAS.
 
-**Canonical methodology** for capacity lives in this file. `AGENTS.md`, `policy/cursor-agent-policy.mdc`, `docs/matriz.md`, and skill `cursor-agent-policy` **point here**. They must not restate a closed list of ten sites as the only allowed scores.
+**Canonical methodology** for capacity lives in this file. `AGENTS.md`, `rules/cursor-agent-policy.mdc`, `docs/matriz.md`, and skill `cursor-agent-policy` **point here**. They must not restate a closed list of ten sites as the only allowed scores.
 
 ## Methodology (closed math, open registry)
 

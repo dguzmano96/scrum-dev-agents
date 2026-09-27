@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# Install cursor-agent-policy globally on this machine (all Cursor windows/projects).
-# Source of truth: policy/cursor-agent-policy.mdc (+ AGENTS.md body kept in sync)
-# Lives in policy/ (not rules/) so the plugin does not auto-register a second Customize rule.
+# Optional. Copies the model policy into the user Cursor directory.
+# The GitHub plugin already loads rules/cursor-agent-policy.mdc. Running this
+# script as well duplicates that Always Apply rule. Use it only when Plugins
+# are unavailable.
 # Usage (from plugin repo root):
 #   chmod +x ./scripts/install-global.sh
 #   ./scripts/install-global.sh
@@ -10,7 +11,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-RULE_SOURCE="${ROOT}/policy/cursor-agent-policy.mdc"
+RULE_SOURCE="${ROOT}/rules/cursor-agent-policy.mdc"
 SOURCE="${1:-$ROOT/AGENTS.md}"
 
 if [[ ! -f "$RULE_SOURCE" ]]; then
@@ -50,6 +51,6 @@ echo "  2. Start a NEW Multitask chat (/multitask) in any window or project."
 echo "  3. The orchestrator should ask once for budget / low / mid / high / cursor mode."
 echo "  4. Every Task must pass model from the matrix (Scrum does not pick slugs)."
 echo
-echo "Re-run after git pull when policy/cursor-agent-policy.mdc or AGENTS.md change."
-echo "The plugin does not register this rule (avoids duplicate in Customize -> Rules)."
+echo "Warning: the GitHub plugin already registers this rule. Disable one copy in Customize -> Rules."
+echo "Re-run after git pull when rules/cursor-agent-policy.mdc or AGENTS.md change."
 echo "Optional one-repo overlay: ./scripts/install-project.sh /path/to/product"

@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"./hooks/session-start.ps1\" || sh \"./hooks/session-start.sh\""
+      }
+    ]
+  }
+}
