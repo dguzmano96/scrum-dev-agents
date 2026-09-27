@@ -87,5 +87,5 @@ Write-Host "  1. Open this product as a workspace in Cursor (File > Open Folder)
 Write-Host "  2. The GitHub plugin already loads this rule. Skip this overlay unless the product repo should commit its own copy."
 Write-Host "  3. Keep a single Always Apply cursor-agent-policy (plugin, or this project file, not both)."
 Write-Host "  4. Start a NEW Multitask chat (type /multitask or use Multitask Mode)."
-Write-Host "  5. Confirm the agent asks for budget / low / mid / high / cursor mode."
+Write-Host "  5. Confirm the agent asks for budget / low / mid / high / cursor / emergencia mode."
 Write-Host "  6. Optional: commit AGENTS.md and .cursor/rules/cursor-agent-policy.mdc in the product repo."

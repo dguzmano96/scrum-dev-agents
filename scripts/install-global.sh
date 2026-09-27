@@ -48,7 +48,7 @@ echo
 echo "Next steps:"
 echo "  1. Open Customize -> Rules and confirm exactly one 'cursor-agent-policy' (Always Apply)."
 echo "  2. Start a NEW Multitask chat (/multitask) in any window or project."
-echo "  3. The orchestrator should ask once for budget / low / mid / high / cursor mode."
+echo "  3. The orchestrator should ask once for budget / low / mid / high / cursor / emergencia mode."
 echo "  4. Every Task must pass model from the matrix (Scrum does not pick slugs)."
 echo
 echo "Warning: the GitHub plugin already registers this rule. Disable one copy in Customize -> Rules."

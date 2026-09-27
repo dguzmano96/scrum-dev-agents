@@ -70,7 +70,7 @@ Cada HU corre en un **subagente `agent-implementer` nuevo y aislado**, lanzado v
 ### Flujo por HU
 
 1. **Lanzar subagente** (`Task`, `subagent_type: "agent-implementer"`, `model` = lookup `implement`) con un prompt que incluya:
-   - `modo activo: {low|mid|high|cursor}` (el de la sesión; no confundir con guiado/express).
+   - `modo activo: {low|mid|high|cursor|emergencia}` (el de la sesión; no confundir con guiado/express).
    - Proyecto (raíz) + EP-ID + HU-ID (o path al `HU-*.md`).
    - Modo Scrum (guiado / express) acordado en Epi2.
    - Instrucción: ejecutar `story-implementer` completa (I0–I9) **con I3 ARCH** (`agent-story-architect` / `impl-architecture-guide`) y **`impl-craft-gate`** en I2/I6/I7.

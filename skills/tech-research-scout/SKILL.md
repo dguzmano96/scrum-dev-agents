@@ -42,7 +42,7 @@ Seguir `freshness-guard`. Priorizar:
 ## Prompt para subagente `agent-research-scout`
 
 ```text
-Eres agent-research-scout. modo activo: {low|mid|high|cursor}
+Eres agent-research-scout. modo activo: {low|mid|high|cursor|emergencia}
 Pedido del usuario: {pedido}
 Stack/as-is relevante: {resumen inventory}
 Frente de búsqueda: {frente}

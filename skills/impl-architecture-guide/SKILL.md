@@ -18,14 +18,14 @@ description: >-
 Task({
   subagent_type: "agent-story-architect",
   model: "<lookup modo activo × decide>",
-  prompt: "modo activo: {low|mid|high|cursor}\nHU-ID, path HU, raíz proyecto. Solo briefing MD. No implementar."
+  prompt: "modo activo: {low|mid|high|cursor|emergencia}\nHU-ID, path HU, raíz proyecto. Solo briefing MD. No implementar."
 })
 
 # Subagente ligero (lectura/explore)
 Task({
   subagent_type: "explore",
   model: "<lookup modo activo × explore>",
-  prompt: "modo activo: {low|mid|high|cursor}\nSolo leer área afectada; devolver paths + snippets."
+  prompt: "modo activo: {low|mid|high|cursor|emergencia}\nSolo leer área afectada; devolver paths + snippets."
 })
 ```
 
