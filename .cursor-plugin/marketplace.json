@@ -1,0 +1,16 @@
+{
+  "name": "scrum-dev-agents",
+  "owner": {
+    "name": "Diego Guzman"
+  },
+  "metadata": {
+    "description": "Scrum discovery-to-verified-code agents plus a model-routing policy."
+  },
+  "plugins": [
+    {
+      "name": "scrum-dev-agents",
+      "source": ".",
+      "description": "Scrum discovery-to-verified-code agents plus a model-routing policy (low/mid/high/cursor)."
+    }
+  ]
+}
