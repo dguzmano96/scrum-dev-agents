@@ -18,7 +18,7 @@ pool_multiplier = 15 if Cursor Models pool else 1
 bar_drain = cost / pool_multiplier
 ```
 
-List `cost` is the published API price (USD / million tokens; EN table; ES matched 2026-09-22). Regional residency +10% is not in `cost`. **Tier gates and dominance/tie-break use `bar_drain`.** Cursor Models pool = Composer 2.5, Grok 4.5, Grok 4.6, Grok 4.7 (all efforts). `pool_multiplier_cursor = 15` is empirical from Spending snapshot 2026-09-26 (see [`docs/fuentes.md`](fuentes.md)).
+List `cost` is the published API price (USD / million tokens; EN table; ES matched 2026-09-22). Regional residency +10% is not in `cost`. **Tier gates and dominance/tie-break use `bar_drain`.** Cursor Models pool = Composer 2.5, Grok 4.5, Grok 4.6, Grok 4.7 (all efforts). `pool_multiplier_cursor = 15` is empirical from Spending snapshots 2026-09-26 and 2026-09-27 (the later one measures 15.9 and keeps 15; see [`docs/fuentes.md`](fuentes.md)).
 
 ## Scoring (this pass)
 
