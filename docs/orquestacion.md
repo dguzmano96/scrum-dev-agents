@@ -27,13 +27,13 @@ Operational details: see [`AGENTS.md`](../AGENTS.md) and [`skills/cursor-agent-p
 
 ## Plugin mandate
 
-Adding this repo under **Customize → Plugins** loads agents, skills, and `rules/cursor-agent-policy.mdc` (`alwaysApply: true`). Declare that path in `.cursor-plugin/plugin.json` so Cursor scans `rules/` once.
+Adding this repo under **Customize → Plugins → Add → From GitHub** (not Import Marketplace) loads agents, skills, hooks, and `rules/cursor-agent-policy.mdc` (`alwaysApply: true`). `.cursor-plugin/plugin.json` sets `"rules": "./rules/"`. Plugin rules live with the plugin under **Customize → Plugins → scrum-dev-agents**. **Customize → Rules** is the user-rule list (`+ New`) and can stay empty after install.
 
 `sessionStart` runs `hooks/session-start.ps1` on Windows (PowerShell, already installed) and `hooks/session-start.sh` on macOS and Linux (`sh`, already installed). When the active table is stale (`today` is after `vence`, or `precios_consultados` is more than one calendar month old), it injects `additional_context` telling the orchestrator to inform the user in the session language and ask whether they want to update models on their machine. A fresh table injects nothing.
 
 When the user agrees to a local refresh (not now): launch one subagent per model, in parallel, each using the cheapest Task-catalog slug that can WebSearch/WebFetch (not one subagent for all models). After they return, the same cheap slug applies the existing math in `docs/fuentes.md` and writes only to `~/.cursor/scrum-dev-agents/` (Windows: `%USERPROFILE%\.cursor\scrum-dev-agents\`). GitHub stays the baseline. No GitHub Action. If the user declines, the current table continues in force without refreshing.
 
-If an older install copied the rule to `~/.cursor/rules/cursor-agent-policy.mdc`, remove that copy so Customize → Rules lists the plugin rule once.
+If an older install copied the rule to `~/.cursor/rules/cursor-agent-policy.mdc`, remove that user-rule copy so only the plugin rule applies. You do not need `install-global` when the plugin is installed.
 
 ## Project overlay (local)
 

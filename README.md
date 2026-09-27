@@ -10,32 +10,13 @@ This is a plugin of agents and skills for [Cursor](https://cursor.com). Plugin i
 
 ## Install
 
-**Requirement:** Cursor with Plugin support.
+Install is **Customize → Plugins → Add → From GitHub** with `https://github.com/dguzmano96/scrum-dev-agents` (not Import Marketplace). After restart, **Customize → Rules** can stay empty (“Guide Agent with Rules”) — that tab is the **user-rule** list (`+ New`). The model policy (`rules/cursor-agent-policy.mdc`, `alwaysApply: true`) is part of the installed plugin: open **Customize → Plugins → scrum-dev-agents** to see the rule, agents, and skills. You do not need `install-global`.
 
-### 1. Plugin (agents, skills, and model policy)
-
-1. Open **Cursor** → **Customize → Plugins** → **Add from GitHub**
-2. Paste: `https://github.com/dguzmano96/scrum-dev-agents`
-3. Open your **product** workspace (not only this plugin repo) when you generate stack skills
-
-That single step loads:
-
-| Piece | Where |
-|---|---|
-| Scrum agents | `agents/` |
-| Skills, including model lookup | `skills/` |
-| Model policy (`alwaysApply: true`) | `rules/cursor-agent-policy.mdc` |
-| Price-window check on each new chat | PowerShell on Windows, `sh` on macOS and Linux |
-
-You should see **8 agents you call from chat** and **5 that run behind the scenes**. Stack-specific skills (Next.js, .NET, Cloudflare, PostgreSQL, etc.) are created inside your project when you choose technologies.
-
-Scrum decides **how** (which agent, which pipeline, one HU vs one epic). The policy decides **with what** (`model` = mode × work type).
-
-If you previously ran `install-global` or `install-project`, remove the extra `cursor-agent-policy` under **Customize → Rules** (user rule in `~/.cursor/rules/` or the product `.cursor/rules/` copy). One Always Apply rule is enough. The plugin copy updates when Cursor updates the plugin.
+That loads 8 agents you call from chat, 5 that run behind the scenes, skills (including model lookup), and a session hook that flags a stale price table. Generate stack skills in your **product** workspace. Scrum decides **how**; the policy decides **with what** (`model` = mode × work type).
 
 When the price table is stale (`vence` has passed or `precios_consultados` is older than one month), the session hook tells the orchestrator to inform you and ask whether you want to update models on this computer. When the user later agrees to a local refresh (not now): one subagent per model, in parallel, each using the cheapest Task-catalog slug that can WebSearch/WebFetch (not one subagent for all models). After they return, the same cheap slug applies the existing math and writes only to `~/.cursor/scrum-dev-agents/` (Windows: `%USERPROFILE%\.cursor\scrum-dev-agents\`). GitHub stays the baseline. No GitHub Action. If you decline, the current table continues in force.
 
-### 2. Optional copy into a product repo
+### Optional copy into a product repo
 
 Use this only when the team commits the policy inside the product. It duplicates the plugin rule if both stay enabled.
 
@@ -51,11 +32,9 @@ Use this only when the team commits the policy inside the product. It duplicates
 ./scripts/install-project.sh /path/to/your/product
 ```
 
-`install-global` still copies the same files into `~/.cursor/` for a machine that cannot use Plugins. Skip it when the plugin is installed.
+### New Multitask chat
 
-### 3. New Multitask chat
-
-1. Confirm **Customize → Rules** lists **exactly one** `cursor-agent-policy` (Always Apply).
+1. Confirm **Customize → Plugins → scrum-dev-agents** shows the policy rule plus agents and skills.
 2. Start a **new** Multitask chat (`/multitask`) in the product workspace.
 3. The orchestrator asks **once** for mode **budget / low / mid / high / cursor** (in the language of your first message).
 4. Every `Task` must set `model` from the matrix. Scrum does not pick slugs. Details: [docs/orquestacion.md](docs/orquestacion.md), [`AGENTS.md`](AGENTS.md), full cells in [docs/matriz.md](docs/matriz.md), registry + math in [docs/fuentes.md](docs/fuentes.md).
@@ -423,7 +402,7 @@ More prompts and diagrams: [docs/primera-linea.md](docs/primera-linea.md).
 
 - **Not a runtime or server** — only agents, skills and the model policy inside Cursor.
 - **No SonarQube** — Sonar-style static analysis is not in this repo.
-- **It does include the model policy** — `AGENTS.md` + skill `cursor-agent-policy`. Install it globally and/or locally (commands above).
+- **It does include the model policy** — `AGENTS.md` + plugin rule `rules/cursor-agent-policy.mdc` + skill `cursor-agent-policy`. It arrives with **Add → From GitHub**; look under **Plugins**, not the empty user **Rules** tab.
 - **Does not commit on your behalf** unless you explicitly ask it to.
 
 ---
