@@ -12,90 +12,50 @@ This is a plugin of agents and skills for [Cursor](https://cursor.com). Plugin i
 
 **Requirement:** Cursor with Plugin support.
 
-### 1. Plugin (agents + skills)
+### 1. Plugin (agents, skills, and model policy)
 
 1. Open **Cursor** → **Customize → Plugins** → **Add from GitHub**
 2. Paste: `https://github.com/dguzmano96/scrum-dev-agents`
 3. Open your **product** workspace (not only this plugin repo) when you generate stack skills
 
-You should see **8 agents you call from chat** and **5 that run behind the scenes**. Plugin skills load automatically; stack-specific skills (Next.js, .NET, Cloudflare, PostgreSQL, etc.) are created inside your project when you choose technologies.
+That single step loads:
 
-### 2. Model policy (required for nested Tasks)
-
-Scrum decides **how** (which agent, which pipeline, one HU vs one epic). The policy decides **with what** (`model` = mode × work type). The plugin stores the mandate in `policy/` (not `rules/`) from v1.3.2, because Cursor auto-loads a plugin `rules/` folder even without a `plugin.json` key. **Customize → Rules** should show **one** user `cursor-agent-policy` after `install-global`.
-
-Custom subagents do not always receive plugin context, so install the policy **globally** (recommended) **or** into the product repo — not both as two Always Apply rules.
-
-Clone this repo first (or `cd` into an existing clone), then pick **global** or **local** (see below).
-
-#### Global (recommended) — all Cursor windows on this PC
-
-Run once per machine. Re-run after `git pull` if `AGENTS.md` changed.
-
-**Windows (PowerShell)** — from the plugin repo root:
-
-```powershell
-Set-ExecutionPolicy -Scope Process Bypass
-.\scripts\install-global.ps1
-```
-
-If the script is blocked:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\install-global.ps1
-```
-
-**macOS / Linux:**
-
-```bash
-chmod +x ./scripts/install-global.sh
-./scripts/install-global.sh
-```
-
-Writes:
-
-| Path | Role |
+| Piece | Where |
 |---|---|
-| `%USERPROFILE%\.cursor\AGENTS.md` (Windows) / `~/.cursor/AGENTS.md` (macOS/Linux) | Canonical policy text |
-| `%USERPROFILE%\.cursor\rules\cursor-agent-policy.mdc` / `~/.cursor/rules/cursor-agent-policy.mdc` | User rule (`alwaysApply: true`) |
+| Scrum agents | `agents/` |
+| Skills, including model lookup | `skills/` |
+| Model policy (`alwaysApply: true`) | `rules/cursor-agent-policy.mdc` |
+| Price-window check on each new chat | PowerShell on Windows, `sh` on macOS and Linux |
 
-#### Local — one product repo only
+You should see **8 agents you call from chat** and **5 that run behind the scenes**. Stack-specific skills (Next.js, .NET, Cloudflare, PostgreSQL, etc.) are created inside your project when you choose technologies.
 
-Use this when the team should share the mandate in git. If you already ran **global** install, skip the project `.mdc` (or disable one of the two in Customize → Rules) so only **one** Always Apply rule remains.
+Scrum decides **how** (which agent, which pipeline, one HU vs one epic). The policy decides **with what** (`model` = mode × work type).
 
-**Windows (PowerShell)** — from the plugin repo root:
+If you previously ran `install-global` or `install-project`, remove the extra `cursor-agent-policy` under **Customize → Rules** (user rule in `~/.cursor/rules/` or the product `.cursor/rules/` copy). One Always Apply rule is enough. The plugin copy updates when Cursor updates the plugin.
+
+When the price table is stale (`vence` has passed or `precios_consultados` is older than one month), the session hook tells the orchestrator to inform you and ask whether you want to update models on this computer. When the user later agrees to a local refresh (not now): one subagent per model, in parallel, each using the cheapest Task-catalog slug that can WebSearch/WebFetch (not one subagent for all models). After they return, the same cheap slug applies the existing math and writes only to `~/.cursor/scrum-dev-agents/` (Windows: `%USERPROFILE%\.cursor\scrum-dev-agents\`). GitHub stays the baseline. No GitHub Action. If you decline, the current table continues in force.
+
+### 2. Optional copy into a product repo
+
+Use this only when the team commits the policy inside the product. It duplicates the plugin rule if both stay enabled.
+
+**Windows (PowerShell)** — from a clone of this repo:
 
 ```powershell
-Set-ExecutionPolicy -Scope Process Bypass
 .\scripts\install-project.ps1 -ProjectPath "C:\path\to\your\product"
 ```
 
-Keep the product file pointed at the machine copy:
-
-```powershell
-.\scripts\install-project.ps1 -ProjectPath "C:\path\to\your\product" -Symlink
-```
-
 **macOS / Linux:**
 
 ```bash
-chmod +x ./scripts/install-project.sh
 ./scripts/install-project.sh /path/to/your/product
-./scripts/install-project.sh /path/to/your/product --symlink
 ```
 
-Writes:
-
-| Path | Role |
-|---|---|
-| `{product}/AGENTS.md` | Policy text in the product repo |
-| `{product}/.cursor/rules/cursor-agent-policy.mdc` | Project rule (`alwaysApply: true`) |
-
-Optional: commit those two files so teammates get the same matrix.
+`install-global` still copies the same files into `~/.cursor/` for a machine that cannot use Plugins. Skip it when the plugin is installed.
 
 ### 3. New Multitask chat
 
-1. Confirm **Customize → Rules** lists **exactly one** `cursor-agent-policy` (Always Apply). If you see two, disable or remove the extra (old plugin rule + global copy, or global + project).
+1. Confirm **Customize → Rules** lists **exactly one** `cursor-agent-policy` (Always Apply).
 2. Start a **new** Multitask chat (`/multitask`) in the product workspace.
 3. The orchestrator asks **once** for mode **budget / low / mid / high / cursor** (in the language of your first message).
 4. Every `Task` must set `model` from the matrix. Scrum does not pick slugs. Details: [docs/orquestacion.md](docs/orquestacion.md), [`AGENTS.md`](AGENTS.md), full cells in [docs/matriz.md](docs/matriz.md), registry + math in [docs/fuentes.md](docs/fuentes.md).
@@ -169,7 +129,7 @@ Every `Task` (child and grandchild) must include `model`, `modo activo: budget|l
 
 **Prices and capacity:** token prices come from [Cursor models and pricing](https://cursor.com/docs/models-and-pricing); `cost = (input + 2 × output) / 3` (regional +10% is not in `cost`). The price table is stamped `precios_consultados` and expires one calendar month later (`vence`); benchmark dates are audit-only and do not expire scores. Tag capacity uses an open admitted-source registry with fixed math ([docs/fuentes.md](docs/fuentes.md)), not a closed list of ten URLs.
 
-**Policy refresh only:** when updating the matrix, a **collector** model (cheapest Task slug on the live price list that can web-search) fetches one model’s prices and benchmark rows; it does not assign tiers and is not used by Scrum agents. The mode’s **orchestrator** slug merges collector output and applies the written rules after all collectors return ([`AGENTS.md`](AGENTS.md) §5.1).
+**Policy refresh only:** when the price table is stale, the agent asks for user consent to refresh locally. On consent, the entire refresh (fetching pricing/benchmarks, calculating tiers, and writing local files to `~/.cursor/scrum-dev-agents/` or `%USERPROFILE%\.cursor\scrum-dev-agents\`) runs on the cheapest Task slug on the live price list that can web-search ([`AGENTS.md`](AGENTS.md) §2.0).
 
 If you do not pick a mode, the orchestrator stays on **low** and says so. Naming a model or "use Fast" wins **on that** `Task` only.
 

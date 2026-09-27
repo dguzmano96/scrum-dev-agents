@@ -5,7 +5,7 @@ One plugin, two layers. Not two separate products.
 | Layer | Artifacts | Question |
 |---|---|---|
 | **How** | `agents/`, process skills (W0–W8, I0–I9, Epi, R, O) | Which pipeline, which gate, HU/epic ceiling |
-| **What (which models)** | `AGENTS.md`, `policy/cursor-agent-policy.mdc`, skill `cursor-agent-policy`, `docs/matriz.md` | Mode, type, slug |
+| **What (which models)** | `AGENTS.md`, `rules/cursor-agent-policy.mdc`, skill `cursor-agent-policy`, `docs/matriz.md` | Mode, type, slug |
 | **In which language** | Skill `session-language` | Chat and new artifacts (first message) |
 
 The main chat asks for the mode **once** (`low` / `mid` / `high` / `cursor`) and forwards that selection to every `Task` as `modo activo: …` (active mode). The session language (the language of the user's first message) is also forwarded on every `Task` so subagents know which language to use. Any subagent launcher **must** set `model` using the skill lookup; omitting `model` bypasses the policy for that branch.
@@ -25,29 +25,19 @@ flowchart TB
 
 Operational details: see [`AGENTS.md`](../AGENTS.md) and [`skills/cursor-agent-policy/SKILL.md`](../skills/cursor-agent-policy/SKILL.md).
 
-## Machine mandate (global)
+## Plugin mandate
 
-The plugin keeps the mandate in `policy/` (not `rules/`). Cursor auto-loads a plugin `rules/` folder even without a `plugin.json` key, which duplicated `cursor-agent-policy` in Customize → Rules. Subagents still need the mandate on disk. After installing the plugin, run **once per PC** from the plugin repo root (re-run after `git pull` when `policy/cursor-agent-policy.mdc` or `AGENTS.md` change):
+Adding this repo under **Customize → Plugins** loads agents, skills, and `rules/cursor-agent-policy.mdc` (`alwaysApply: true`). Declare that path in `.cursor-plugin/plugin.json` so Cursor scans `rules/` once.
 
-**Windows (PowerShell):**
+`sessionStart` runs `hooks/session-start.ps1` on Windows (PowerShell, already installed) and `hooks/session-start.sh` on macOS and Linux (`sh`, already installed). When the active table is stale (`today` is after `vence`, or `precios_consultados` is more than one calendar month old), it injects `additional_context` telling the orchestrator to inform the user in the session language and ask whether they want to update models on their machine. A fresh table injects nothing.
 
-```powershell
-Set-ExecutionPolicy -Scope Process Bypass
-.\scripts\install-global.ps1
-```
+When the user agrees to a local refresh (not now): launch one subagent per model, in parallel, each using the cheapest Task-catalog slug that can WebSearch/WebFetch (not one subagent for all models). After they return, the same cheap slug applies the existing math in `docs/fuentes.md` and writes only to `~/.cursor/scrum-dev-agents/` (Windows: `%USERPROFILE%\.cursor\scrum-dev-agents\`). GitHub stays the baseline. No GitHub Action. If the user declines, the current table continues in force without refreshing.
 
-**macOS / Linux:**
-
-```bash
-chmod +x ./scripts/install-global.sh
-./scripts/install-global.sh
-```
-
-That copies `AGENTS.md` to `%USERPROFILE%\.cursor\AGENTS.md` (or `~/.cursor/AGENTS.md`) and copies `policy/cursor-agent-policy.mdc` to `…/.cursor/rules/cursor-agent-policy.mdc`.
+If an older install copied the rule to `~/.cursor/rules/cursor-agent-policy.mdc`, remove that copy so Customize → Rules lists the plugin rule once.
 
 ## Project overlay (local)
 
-Optional. One product repo only. Use **global or** committed project rule for Always Apply — not both, or Customize → Rules will list duplicates.
+Optional. One product repo only, when that repo should commit its own copy. The plugin rule and a project rule together list two Always Apply entries.
 
 **Windows (PowerShell):**
 

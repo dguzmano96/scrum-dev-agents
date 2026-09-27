@@ -76,9 +76,21 @@ Capacity: tag percentiles from the **admitted registry** in [`docs/fuentes.md`](
 - **high**: best absolute tag score. No Nano/Mini. No preview. Fast loses to its non-Fast sibling when the page says same checkpoint. `bar_drain` does not cap high.
 - **cursor**: only `composer-2.5`, `grok-4.7-xhigh`, `cursor-grok-4.6-medium`, `cursor-grok-4.5-high`. Fast is out. Tag score inside the allow-list; `bar_drain` may tie-break.
 - Bands overlap (budget-eligible models also compete for low). Winner = best tag score among eligible after dominance. Dominance: A better on all shared ids of that tag and `bar_drain(A) ≤ bar_drain(B)` → B cannot occupy. Tie-break: lower `bar_drain`, then lower list `cost`.
-- If today is after `vence`, or `precios_consultados` is more than one calendar month old, run **§2.1 Price refresh** before assigning or suggesting any slug.
+- If today is after `vence`, or `precios_consultados` is more than one calendar month old, the table on this machine is stale. Ask the user once (§2.0). Do not refresh until they say yes. If they say no, keep assigning slugs from the plugin baseline.
 
-As of 2026-09-22, the price table is current through **2026-10-22**.
+As of 2026-09-22, the price table shipped in this repo is current through **2026-10-22**. That repo copy is only the baseline.
+
+### 2.0 Local update (this machine)
+
+The plugin repo is the baseline. A newer table lives only on the user's computer, in `~/.cursor/scrum-dev-agents/` (`%USERPROFILE%\.cursor\scrum-dev-agents\` on Windows): `AGENTS.md`, `matriz.md`, and `fuentes.md`. If that directory and its `AGENTS.md` exist and its `vence` is still in the future, **it wins** over the plugin copies for lookup. Do not commit those files, do not push, and do not open a GitHub issue.
+
+When the effective table is stale (`sessionStart` says so, or the dates above are past):
+
+1. Ask the user **once**, in the session language: the models are out of date. Do they want to update them on this computer?
+2. If they say no: keep using the current table (local override if one exists, otherwise the plugin baseline) for the rest of the session. Do not fetch prices or refresh.
+3. If they say yes: the plugin refreshes locally by itself (not by committing to GitHub). Run §2.1 and write the result **only** in that user directory (`~/.cursor/scrum-dev-agents/` on macOS/Linux or `%USERPROFILE%\.cursor\scrum-dev-agents\` on Windows), storing enough for subsequent sessions to use the updated tiers: `AGENTS.md` (retaining `- precios_consultados:` and `- vence:`), `matriz.md`, and `fuentes.md`.
+
+When the user agrees to a local refresh: launch **one subagent per model**, in parallel, each using the cheapest Task-catalog slug that can WebSearch/WebFetch (not one subagent for all models). That choice is made at the start of the refresh from the price list: `cost = (input + 2 * output) / 3`. Fast loses to its cheaper non-Fast sibling. Skip a row with no Task slug or no web search and take the next. Tiers do not apply to this pick. Each subagent rescues only the price row and admitted benchmark scores for its assigned model. After all collectors return, the same cheap web-search slug applies the existing math in `docs/fuentes.md` (gates, percentiles, dominance, tie-breaks) and writes the updated files only to `~/.cursor/scrum-dev-agents/` (Windows: `%USERPROFILE%\.cursor\scrum-dev-agents\`). GitHub stays the baseline. No GitHub Action. Do not redo the math on a more expensive orchestrator model.
 
 ### 2.1 Price refresh (monthly)
 
@@ -92,13 +104,13 @@ Whenever this pass recomputes eligibility, dominance, tie-break, or cells, it **
 
 Steps:
 
-1. If today is after `vence`, or `precios_consultados` is more than one calendar month old, the policy is **stale on price**. Before assigning or suggesting any slug, open https://cursor.com/docs/models-and-pricing and contrast the Spanish variant of that same page.
+1. Run this section only after the user agrees (§2.0), or when a maintainer is refreshing the baseline in git. Open https://cursor.com/docs/models-and-pricing and contrast the Spanish variant of that same page.
 2. Update input, output, cache write, and cache read. Recompute `cost = (input + 2 * output) / 3`, then `bar_drain` (§2). Regional residency +10% stays out of `cost`.
 3. Re-check tier eligibility with the three criteria above (budget = `bar_drain` < 2 + cheap cache; low/mid = `bar_drain` bands; high; cursor allow-list). Recalculate who wins each cell if eligibility, dominance, or the `bar_drain` / list-`cost` tie-break changed. Record the new `precios_consultados` and set `vence` to **one month** after that date.
 4. If the pricing page brings models that were not in the policy set (new Task-catalog slug, or a docs name whose Task slug you resolve and note): do **not** drop them in with price alone. Score them from the **registry + discovery** in [`docs/fuentes.md`](docs/fuentes.md): same `benchmark_id` only, unknown stays unknown, no sibling-score copy unless the page says same checkpoint, one tag per the closed map, percentile **only** among policy models that have that datum. Because percentiles are relative, recompute percentiles and tag scores for the **whole** policy set after the new models are included, then redo categorization and cell assignment. A new model with no benchmark on a tag does not fill that cell by proxy.
 5. A price-only refresh of models already in the set does **not** require re-fetching benchmarks. It **does** require re-checking gates, dominance, and tie-break under the three criteria, because list prices (hence `bar_drain`) and cache rows changed.
 6. The same monthly pass **also** re-fetches every admitted URL, discovers new URLs for the tag-map families (admit only if all gates pass), replaces a score only with a newer number of the **same** `benchmark_id`, and reassigns a cell only when eligibility, a percentile, dominance, or the `bar_drain` / list-`cost` tie-break changed. A dead URL is marked dead; replace it only with that benchmark’s new official host.
-7. **Who fetches vs who decides:** the orchestrator lists the slugs to query, then launches **one collector per slug** (parallel, cheap web-search slug — §5.1). After every collector returns, **this** orchestrator (the mode’s orchestrator row) merges records and applies the written math. Collectors never assign tiers.
+7. **Who fetches and who decides on local refresh:** on a user-consented local refresh (§2.0), launch one subagent per model, in parallel, each using the cheapest Task-catalog slug that can WebSearch/WebFetch (not one subagent for all models). After they return, the same cheap slug applies the existing math in `docs/fuentes.md` and writes only to `~/.cursor/scrum-dev-agents/` (Windows: `%USERPROFILE%\.cursor\scrum-dev-agents\`). GitHub stays the baseline; no GitHub Action. That same cheap web-search slug merges records, applies the written math, and writes local files—it does not re-run tier calculations on a more expensive orchestrator row. When maintainers refresh the git baseline in the repo, fetching facts and orchestrating math may be split as described in §5.1, but GitHub remains the baseline either way.
 
 ## 3. Subagent types, ceilings, and Scrum map
 

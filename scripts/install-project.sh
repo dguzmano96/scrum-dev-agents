@@ -9,7 +9,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SOURCE="${ROOT}/AGENTS.md"
-RULE_SOURCE="${ROOT}/policy/cursor-agent-policy.mdc"
+RULE_SOURCE="${ROOT}/rules/cursor-agent-policy.mdc"
 PROJECT=""
 SYMLINK=0
 
@@ -84,8 +84,8 @@ echo "Project rule:   $RULE_FILE"
 echo
 echo "Next steps:"
 echo "  1. Open this product as a workspace in Cursor (File > Open Folder)."
-echo "  2. For nested Tasks in every window, run ./scripts/install-global.sh (machine rule)."
-echo "  3. Use global OR committed project rule in Customize -> Rules, not both Always Apply."
+echo "  2. The GitHub plugin already loads this rule. Skip this overlay unless the product repo should commit its own copy."
+echo "  3. Keep a single Always Apply cursor-agent-policy (plugin, or this project file, not both)."
 echo "  4. Start a NEW Multitask chat (type /multitask or use Multitask Mode)."
 echo "  5. Confirm the agent asks for budget / low / mid / high / cursor mode."
 echo "  6. Optional: commit AGENTS.md and .cursor/rules/cursor-agent-policy.mdc in the product repo."
